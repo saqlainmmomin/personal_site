@@ -1,0 +1,72 @@
+---
+// CV link points at /cv.pdf (placeholder file in public/). Replace with the
+// real export before launch.
+const facts = [
+  { k: 'Role', v: 'Assistant Manager, Cyber Strategy & Governance, at a Big Four firm' },
+  { k: 'Certifications', v: 'ISO 27001, ISO 27701, ISO 22301 Lead Auditor' },
+  { k: 'Education', v: 'B.Tech in Information Technology and MBA in Finance, NMIMS' },
+  { k: 'Sectors', v: 'Financial services, fintech, SaaS' },
+];
+---
+
+<section class="who" id="who" aria-labelledby="who-h">
+  <div class="wrap">
+    <p class="eyebrow">Who</p>
+    <h2 id="who-h">The audit grounding.</h2>
+    <p class="lead">
+      Pre-certification readiness for ISO 27001, 27701, and 22301. Third-party
+      risk program design for financial services and fintech. Technology risk
+      assessments and board-level reporting.
+    </p>
+
+    <dl class="facts">
+      {
+        facts.map((f) => (
+          <div class="fact">
+            <dt class="mono">{f.k}</dt>
+            <dd>{f.v}</dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <a class="cv mono" href="/cv.pdf" download>Download CV (PDF) &darr;</a>
+  </div>
+</section>
+
+<style>
+  .who {
+    background: var(--audit-bg);
+    color: var(--audit-fg);
+    padding: var(--section-gap) 0;
+    border-top: 1px solid var(--audit-line);
+  }
+  .eyebrow { color: var(--audit-accent); margin-bottom: var(--s-4); }
+  h2 { font-family: var(--serif); font-size: var(--fs-h2); font-weight: 600; letter-spacing: -0.02em; }
+  .lead { font-size: var(--fs-lead); color: var(--audit-dim); max-width: 52ch; margin-top: var(--s-4); line-height: 1.45; }
+
+  .facts { margin-top: var(--s-7); border-top: 1px solid var(--audit-line); }
+  .fact {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: var(--s-5);
+    padding: var(--s-4) 0;
+    border-bottom: 1px solid var(--audit-line);
+  }
+  dt { font-size: var(--fs-label); letter-spacing: 0.08em; text-transform: uppercase; color: var(--audit-accent); padding-top: 4px; }
+  dd { font-size: var(--fs-body); }
+
+  .cv {
+    display: inline-block;
+    margin-top: var(--s-6);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    border-bottom: 1px solid var(--audit-accent);
+    color: var(--audit-accent);
+    padding-bottom: 3px;
+  }
+  @media (max-width: 560px) {
+    .fact { grid-template-columns: 1fr; gap: var(--s-1); }
+  }
+</style>

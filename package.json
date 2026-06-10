@@ -1,0 +1,19 @@
+{
+  "name": "personal-site",
+  "version": "1.0.0",
+  "description": "Saqlain Momin - personal site",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "keywords": [],
+  "author": "Saqlain Momin",
+  "license": "MIT",
+  "dependencies": {
+    "@astrojs/sitemap": "3.7.3",
+    "astro": "6.4.4"
+  }
+}

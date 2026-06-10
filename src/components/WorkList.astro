@@ -1,0 +1,166 @@
+---
+import WorkRow from './WorkRow.astro';
+import type { Project } from './WorkRow.astro';
+
+// link: null => renders a neutral "case study" marker (per the mixed-per-project
+// decision). Fill href/label from the confirmed per-project map before launch.
+const projects: Project[] = [
+  {
+    tag: 'compliance maturity platform',
+    lead: true,
+    builder: {
+      title: 'Six frameworks, 400 controls, one adaptive engine.',
+      body: 'A three-phase engine cuts 157 questions to about 35. Desk review pre-fills from documents, a tier engine assigns depth, a screening pass infers the rest. Scoring is deterministic and server-side: the model writes language, code decides the number.',
+      meta: 'Python 3.13 · FastAPI · Anthropic SDK · SQLAlchemy',
+    },
+    auditor: {
+      title: 'It closes the self-attestation gap I watched repeat across every client.',
+      body: 'Most platforms accept what a company declares about itself. Self-attestation is not assurance. CyberAssess reads the evidence first, the way a seasoned auditor does, then asks only what a human still needs to answer. Validated against 15 planted gaps across three synthetic companies: zero missed.',
+      meta: '6 frameworks · 400 controls · 157 to 35 questions · 0 missed of 15',
+    },
+    link: null,
+  },
+  {
+    tag: 'cyber due diligence for M&A',
+    lead: true,
+    builder: {
+      title: 'Six scanners, running in parallel.',
+      body: 'Async Python so the scanners run concurrently, because the speed is the product. A deterministic red-flag detector runs before the AI analysis. React 19 on the front for fast iteration.',
+      meta: 'async Python · FastAPI · React 19',
+    },
+    auditor: {
+      title: 'A three-day due-diligence review is already a control failure.',
+      body: 'Attackers iterate at machine speed. If it takes three days to know whether a target is sound, the answer arrives after it matters. Speed is a control. No certificate is a deal-breaker regardless of what the model thinks.',
+      meta: '6 concurrent scanners · 3 days to 60 seconds',
+    },
+    link: null,
+  },
+  {
+    tag: 'evidence-based compliance',
+    builder: {
+      title: 'Full-stack on Next.js 14 and Supabase.',
+      body: 'Auth, storage, and row-level security out of the box, Docker for deployment flexibility.',
+      meta: 'Next.js 14 · Supabase · Docker',
+    },
+    auditor: {
+      title: 'Built to kill self-attestation.',
+      body: 'An AI analyzes the actual document, a human confirms. That is the minimum standard that should exist, and almost no tooling meets it.',
+      meta: 'evidence first · human confirms',
+    },
+    link: null,
+  },
+  {
+    tag: 'AI capability tracker',
+    builder: {
+      title: 'A capability tracker scored against my own profile.',
+      body: 'React, Express, SQLite, Gemini, an n8n workflow that ingests AI news automatically.',
+      meta: 'React · Express · SQLite · Gemini · n8n',
+    },
+    auditor: {
+      title: 'I track AI capability the way I track a threat landscape.',
+      body: 'Quarterly shifts matter. Generic AI news is noise; relevance to the work is the signal.',
+      meta: 'quarterly shifts · signal over noise',
+    },
+    link: null,
+  },
+];
+---
+
+<section class="work" id="work" aria-labelledby="work-h">
+  <div class="wrap-wide">
+    <header class="head">
+      <div>
+        <p class="eyebrow">The work</p>
+        <h2 id="work-h">The response.</h2>
+        <p class="lead">
+          Four years auditing controls at enterprise scale taught me where they
+          fail. I build into the lag instead of writing about it.
+        </p>
+      </div>
+      <div class="toggle" role="group" aria-label="Read these as">
+        <button type="button" data-set="auditor" aria-pressed="true">Auditor</button>
+        <button type="button" data-set="builder" aria-pressed="false">Builder</button>
+      </div>
+    </header>
+
+    <div class="rows">
+      {projects.map((p) => <WorkRow project={p} />)}
+    </div>
+  </div>
+</section>
+
+<style>
+  .work {
+    background: var(--audit-bg);
+    color: var(--audit-fg);
+    padding: var(--section-gap) 0;
+    transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+  }
+  :global(html[data-reading='builder']) .work {
+    background: var(--build-bg);
+    color: var(--build-fg);
+  }
+
+  .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: var(--s-6);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-7);
+  }
+  .eyebrow { color: var(--audit-accent); margin-bottom: var(--s-4); }
+  :global(html[data-reading='builder']) .eyebrow { color: var(--build-accent); }
+  h2 {
+    font-family: var(--serif);
+    font-size: var(--fs-h2);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.02;
+  }
+  :global(html[data-reading='builder']) h2 { font-family: var(--mono); font-weight: 500; }
+  .lead {
+    font-size: var(--fs-lead);
+    color: var(--audit-dim);
+    max-width: 44ch;
+    margin-top: var(--s-4);
+    line-height: 1.45;
+  }
+  :global(html[data-reading='builder']) .lead { color: var(--build-dim); font-family: var(--mono); font-size: var(--fs-body); }
+
+  .toggle { display: inline-flex; border: 1px solid var(--audit-line); flex-shrink: 0; }
+  :global(html[data-reading='builder']) .toggle { border-color: var(--build-line); }
+  .toggle button {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    padding: 9px 18px;
+    background: transparent;
+    color: inherit;
+    border: 0;
+    cursor: pointer;
+    opacity: 0.55;
+    transition: opacity var(--dur) var(--ease), background var(--dur) var(--ease);
+  }
+  .toggle button[aria-pressed='true'] { opacity: 1; }
+  :global(html[data-reading='auditor']) .toggle button[data-set='auditor'] { background: var(--audit-bg-2); }
+  :global(html[data-reading='builder']) .toggle button[data-set='builder'] { background: var(--build-bg-2); }
+
+  .rows .row:last-child { border-bottom: 0; }
+</style>
+
+<script>
+  import { setReading, getReading, onReading } from '../lib/reading.ts';
+
+  const btns = Array.from(
+    document.querySelectorAll<HTMLButtonElement>('#work .toggle button')
+  );
+  function sync(r: string) {
+    btns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.set === r)));
+  }
+  btns.forEach((b) =>
+    b.addEventListener('click', () => setReading(b.dataset.set === 'builder' ? 'builder' : 'auditor'))
+  );
+  onReading(sync);
+  sync(getReading());
+</script>

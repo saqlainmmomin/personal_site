@@ -1,0 +1,62 @@
+---
+// LinkedIn / GitHub hrefs are placeholders until provided.
+const links = [
+  { label: 'saqlainmmomin@gmail.com', href: 'mailto:saqlainmmomin@gmail.com' },
+  { label: 'linkedin', href: 'https://www.linkedin.com/in/saqlain-musa/' },
+  { label: 'github', href: '#URL-NEEDED' },
+];
+---
+
+<footer class="contact" id="contact">
+  <div class="wrap">
+    <p class="eyebrow">Contact</p>
+    <h2>The frameworks will catch up eventually. I would rather be early.</h2>
+    <div class="links mono">
+      {
+        links.map((l) => (
+          <a
+            href={l.href}
+            {...l.href.startsWith('mailto') ? {} : { target: '_blank', rel: 'noopener' }}
+          >
+            {l.label}
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</footer>
+
+<style>
+  .contact {
+    background: var(--win-bg);
+    color: var(--win-fg);
+    padding: var(--section-gap) 0;
+    text-align: center;
+  }
+  .eyebrow { color: var(--machine); margin-bottom: var(--s-5); }
+  h2 {
+    font-family: var(--serif);
+    font-size: clamp(28px, 4.4vw, 46px);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.08;
+    max-width: 20ch;
+    margin: 0 auto;
+  }
+  .links {
+    margin-top: var(--s-7);
+    display: flex;
+    gap: var(--s-5);
+    justify-content: center;
+    flex-wrap: wrap;
+    font-size: 14px;
+  }
+  .links a {
+    color: var(--win-fg);
+    text-decoration: none;
+    border-bottom: 1px solid var(--win-grid);
+    padding-bottom: 3px;
+    transition: border-color var(--dur) var(--ease);
+  }
+  .links a:hover, .links a:focus-visible { border-color: var(--machine); }
+</style>

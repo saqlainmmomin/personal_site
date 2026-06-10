@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Type + palette directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#52525b;font-family:Inter,system-ui,sans-serif;color:#18181b;padding:40px 32px 80px}
+  .page-head{max-width:1240px;margin:0 auto 36px;color:#f4f4f5}
+  .page-head h1{font-size:24px;font-weight:600;letter-spacing:-.01em}
+  .page-head p{font-size:14px;color:#d4d4d8;margin-top:8px;max-width:70ch;line-height:1.5}
+
+  .dir{max-width:1240px;margin:0 auto 40px;background:#27272a;border-radius:14px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+  .dir-label{padding:16px 22px;color:#fafafa;display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;border-bottom:1px solid #3f3f46}
+  .dir-label .name{font-size:17px;font-weight:600;letter-spacing:.01em}
+  .dir-label .name .tag{font-size:11px;font-weight:500;color:#a1a1aa;margin-left:10px;letter-spacing:.04em}
+  .dir-label .specs{font-family:"JetBrains Mono",monospace;font-size:11px;color:#a1a1aa;line-height:1.7;text-align:right}
+
+  .panes{display:grid;grid-template-columns:1fr 1fr}
+  .pane{padding:56px 48px;min-height:340px;display:flex;flex-direction:column;justify-content:center}
+  .reg{font-size:11px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:24px;font-family:"JetBrains Mono",monospace}
+  .h{line-height:1.0;letter-spacing:-.02em;font-weight:600}
+  .sub{margin-top:20px;line-height:1.55;max-width:34ch}
+  .thread{margin-top:30px;font-size:13px;line-height:1.5;max-width:40ch;padding-top:16px;border-top:1px solid}
+  .win{display:flex;gap:0;height:34px;border-top:1px solid #3f3f46}
+  .win span{flex:1;display:flex;align-items:center;justify-content:center;font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.06em}
+
+  /* ============ DIRECTION 1 : LEDGER (cool / technical) ============ */
+  .d1 .builder{background:#0c0e13;color:#e3e8ee}
+  .d1 .builder .reg{color:#6ea8fe}
+  .d1 .builder .h{font-family:"JetBrains Mono",monospace;font-weight:500;font-size:44px;letter-spacing:-.03em}
+  .d1 .builder .sub{font-family:"JetBrains Mono",monospace;color:#8a97a8;font-size:14px;line-height:1.7}
+  .d1 .builder .thread{color:#6ea8fe;border-color:#1d2530;font-family:"JetBrains Mono",monospace}
+  .d1 .auditor{background:#f3f3f1;color:#1a1a17}
+  .d1 .auditor .reg{color:#0e6b5e;font-family:"Source Serif 4",serif;letter-spacing:.16em}
+  .d1 .auditor .h{font-family:"Source Serif 4",serif;font-size:50px}
+  .d1 .auditor .sub{font-family:"Source Serif 4",serif;color:#55534d;font-size:19px}
+  .d1 .auditor .thread{color:#0e6b5e;border-color:#dcdcd6;font-family:"Source Serif 4",serif;font-style:italic;font-size:15px}
+
+  /* ============ DIRECTION 2 : BUREAU (neutral / product) ============ */
+  .d2 .builder{background:#0a0a0b;color:#ededed}
+  .d2 .builder .reg{color:#c5f24a}
+  .d2 .builder .h{font-family:"DM Mono",monospace;font-weight:500;font-size:42px;letter-spacing:-.02em}
+  .d2 .builder .sub{font-family:"DM Mono",monospace;color:#8f8f93;font-size:14px;line-height:1.7}
+  .d2 .builder .thread{color:#c5f24a;border-color:#222;font-family:"DM Mono",monospace}
+  .d2 .auditor{background:#fafaf8;color:#111}
+  .d2 .auditor .reg{color:#e8431f}
+  .d2 .auditor .h{font-family:Inter,sans-serif;font-size:48px;font-weight:600;letter-spacing:-.035em}
+  .d2 .auditor .sub{font-family:Inter,sans-serif;color:#52525b;font-size:18px;font-weight:400}
+  .d2 .auditor .thread{color:#e8431f;border-color:#e5e5e2;font-family:Inter,sans-serif;font-weight:500}
+
+  /* ============ DIRECTION 3 : MANUSCRIPT (warm / editorial) ============ */
+  .d3 .builder{background:#11130f;color:#e6e9e1}
+  .d3 .builder .reg{color:#57d39b}
+  .d3 .builder .h{font-family:"Space Mono",monospace;font-weight:700;font-size:40px;letter-spacing:-.02em}
+  .d3 .builder .sub{font-family:"Space Mono",monospace;color:#8a917f;font-size:13.5px;line-height:1.7}
+  .d3 .builder .thread{color:#57d39b;border-color:#23271f;font-family:"Space Mono",monospace}
+  .d3 .auditor{background:#f6f1e7;color:#211d17}
+  .d3 .auditor .reg{color:#8a2b2b;font-family:"Fraunces",serif;letter-spacing:.16em}
+  .d3 .auditor .h{font-family:"Fraunces",serif;font-size:52px;font-weight:500}
+  .d3 .auditor .sub{font-family:"Fraunces",serif;color:#5b554a;font-size:19px}
+  .d3 .auditor .thread{color:#8a2b2b;border-color:#e2dccd;font-family:"Fraunces",serif;font-style:italic;font-size:15px}
+</style>
+</head>
+<body>
+  <div class="page-head">
+    <h1>Type + palette directions for the dual treatment</h1>
+    <p>Same hero, three directions. Left = Builder register (dark), right = Auditor register (light). The strip under each is the candidate Closing Window palette (single voice). None reuse the prototype fonts (IBM Plex Mono / Spectral / Space Grotesk). Pick a direction, or mix elements across them.</p>
+  </div>
+
+  <!-- DIRECTION 1 -->
+  <div class="dir d1">
+    <div class="dir-label">
+      <div class="name">Direction 1 — Ledger<span class="tag">cool / technical / balanced</span></div>
+      <div class="specs">builder: JetBrains Mono · #0c0e13 · blue #6ea8fe<br>auditor: Source Serif 4 · #f3f3f1 · teal #0e6b5e</div>
+    </div>
+    <div class="panes">
+      <div class="pane builder">
+        <div class="reg">build &amp; ship</div>
+        <div class="h">I build<br>security tools.</div>
+        <div class="sub">Async Python, FastAPI, the Anthropic SDK, Swift, n8n. Understand by shipping.</div>
+        <div class="thread">I see risk at the enterprise level, and I build the tools to close the gaps I find.</div>
+      </div>
+      <div class="pane auditor">
+        <div class="reg">Cyber Strategy &amp; Governance</div>
+        <div class="h">I assess where systems break.</div>
+        <div class="sub">Four years auditing controls at enterprise scale. I know why a control exists, not just that someone ticked the box.</div>
+        <div class="thread">I see risk at the enterprise level, and I build the tools to close the gaps I find.</div>
+      </div>
+    </div>
+    <div class="win">
+      <span style="background:#07080b;color:#6ea8fe">window bg #07080b</span>
+      <span style="background:#07080b;color:#6ea8fe">human #6ea8fe</span>
+      <span style="background:#07080b;color:#f5a623">machine #f5a623</span>
+    </div>
+  </div>
+
+  <!-- DIRECTION 2 -->
+  <div class="dir d2">
+    <div class="dir-label">
+      <div class="name">Direction 2 — Bureau<span class="tag">neutral / product / Swiss</span></div>
+      <div class="specs">builder: DM Mono · #0a0a0b · lime #c5f24a<br>auditor: Inter · #fafaf8 · vermillion #e8431f</div>
+    </div>
+    <div class="panes">
+      <div class="pane builder">
+        <div class="reg">build &amp; ship</div>
+        <div class="h">I build<br>security tools.</div>
+        <div class="sub">Async Python, FastAPI, the Anthropic SDK, Swift, n8n. Understand by shipping.</div>
+        <div class="thread">I see risk at the enterprise level, and I build the tools to close the gaps I find.</div>
+      </div>
+      <div class="pane auditor">
+        <div class="reg">Cyber Strategy &amp; Governance</div>
+        <div class="h">I assess where systems break.</div>
+        <div class="sub">Four years auditing controls at enterprise scale. I know why a control exists, not just that someone ticked the box.</div>
+        <div class="thread">I see risk at the enterprise level, and I build the tools to close the gaps I find.</div>
+      </div>
+    </div>
+    <div class="win">
+      <span style="background:#0a0a0b;color:#d4d4d8">window bg #0a0a0b</span>
+      <span style="background:#0a0a0b;color:#5b9dff">human #5b9dff</span>
+      <span style="background:#0a0a0b;color:#e8431f">machine #e8431f</span>
+    </div>
+  </div>
+
+  <!-- DIRECTION 3 -->
+  <div class="dir d3">
+    <div class="dir-label">
+      <div class="name">Direction 3 — Manuscript<span class="tag">warm / editorial / character</span></div>
+      <div class="specs">builder: Space Mono · #11130f · green #57d39b<br>auditor: Fraunces · #f6f1e7 · burgundy #8a2b2b</div>
+    </div>
+    <div class="panes">
+      <div class="pane builder">
+        <div class="reg">build &amp; ship</div>
+        <div class="h">I build<br>security tools.</div>
+        <div class="sub">Async Python, FastAPI, the Anthropic SDK, Swift, n8n. Understand by shipping.</div>
+        <div class="thread">I see risk at the enterprise level, and I build the tools to close the gaps I find.</div>
+      </div>
+      <div class="pane auditor">
+        <div class="reg">Cyber Strategy &amp; Governance</div>
+        <div class="h">I assess where systems break.</div>
+        <div class="sub">Four years auditing controls at enterprise scale. I know why a control exists, not just that someone ticked the box.</div>
+        <div class="thread">I see risk at the enterprise level, and I build the tools to close the gaps I find.</div>
+      </div>
+    </div>
+    <div class="win">
+      <span style="background:#13110d;color:#d8cdb8">window bg #13110d</span>
+      <span style="background:#13110d;color:#57d39b">human #57d39b</span>
+      <span style="background:#13110d;color:#d8693b">machine #d8693b</span>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+---
+import '../styles/tokens.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Saqlain Momin - Cyber Strategy & Governance, security tooling',
+  description =
+    'I see risk at the enterprise level, and I build the tools to close the gaps I find. Cyber strategy and governance, ISO Lead Auditor, and security tooling built in Python and the Anthropic SDK.',
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Saqlain Momin',
+  jobTitle: 'Assistant Manager, Cyber Strategy & Governance',
+  email: 'mailto:saqlainmmomin@gmail.com',
+  knowsAbout: [
+    'Cyber strategy and governance',
+    'ISO 27001',
+    'ISO 27701',
+    'ISO 22301',
+    'Third-party risk management',
+    'Agentic AI security',
+    'Security tooling',
+  ],
+  // GitHub URL still pending.
+  sameAs: ['https://www.linkedin.com/in/saqlain-musa/'],
+};
+---
+
+<!doctype html>
+<html lang="en" data-reading="auditor">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Preload the Auditor face: it renders the LCP hero headline -->
+    <link
+      rel="preload"
+      href="/fonts/source-serif-4-latin-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="theme-color" content="#0c0e13" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(person)} />
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Skip to content</a>
+    <slot />
+  </body>
+</html>

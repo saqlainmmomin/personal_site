@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saqlain Momin — The Lens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --build-bg:#0b0f14;
+    --build-fg:#d7e3ea;
+    --build-dim:#5d7283;
+    --build-accent:#5ad1a8;
+    --build-line:#1b2630;
+    --audit-bg:#f3f1ea;
+    --audit-fg:#1c1a16;
+    --audit-dim:#6b6760;
+    --audit-accent:#9a3b2e;
+    --audit-line:#d8d4c8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{overflow-x:hidden;font-family:"Spectral",Georgia,serif;background:var(--audit-bg)}
+  .mono{font-family:"IBM Plex Mono",monospace}
+
+  /* the two stacked, full-bleed panes. Auditor under, Builder clipped on top */
+  .stage{position:relative;width:100vw}
+  .pane{width:100vw;left:0}
+  .pane-audit{position:relative;background:var(--audit-bg);color:var(--audit-fg)}
+  .pane-build{position:absolute;top:0;left:0;height:100%;background:var(--build-bg);color:var(--build-fg);
+    overflow:hidden;will-change:clip-path;}
+  /* clip controlled by JS via --split */
+  .pane-build{clip-path:inset(0 calc(100% - var(--split,50%)) 0 0)}
+  .inner{max-width:1100px;margin:0 auto;padding:0 7vw}
+
+  /* divider handle */
+  .divider{position:absolute;top:0;bottom:0;width:2px;background:var(--build-accent);
+    left:var(--split,50%);z-index:50;cursor:ew-resize;transform:translateX(-1px)}
+  .divider::before{content:"";position:absolute;top:0;bottom:0;left:-18px;right:-18px}
+  .knob{position:fixed;top:50%;left:var(--split,50%);transform:translate(-50%,-50%);z-index:51;
+    width:46px;height:46px;border-radius:50%;background:var(--build-accent);color:#04231a;
+    display:flex;align-items:center;justify-content:center;cursor:ew-resize;
+    font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:600;box-shadow:0 4px 24px rgba(0,0,0,.35);
+    transition:transform .15s}
+  .knob:hover{transform:translate(-50%,-50%) scale(1.08)}
+  .knob span{pointer-events:none;letter-spacing:-1px}
+
+  /* fixed corner labels */
+  .corner{position:fixed;top:22px;z-index:48;font-family:"IBM Plex Mono",monospace;font-size:11px;
+    letter-spacing:.16em;text-transform:uppercase}
+  .corner-l{left:7vw;color:var(--build-accent)}
+  .corner-r{right:7vw;color:var(--audit-accent);text-align:right}
+  .corner small{display:block;font-size:9.5px;letter-spacing:.1em;opacity:.6;margin-top:3px}
+
+  /* shared block rhythm: each "row" is the same content in two registers,
+     laid out at identical vertical positions so the clip reveals the swap */
+  .block{padding:0 0;min-height:100vh;display:flex;flex-direction:column;justify-content:center}
+  .block.hero{min-height:100vh}
+  /* Builder hugs the left edge, Auditor hugs the right edge, so at a centered
+     seam both readings are visible at once and the drag trades one for the other. */
+  .pane-build .block{align-items:flex-start;text-align:left}
+  .pane-audit .block{align-items:flex-end;text-align:right}
+  .pane-audit h1,.pane-audit h2,.pane-audit .lead,.pane-audit .body{margin-left:auto}
+  .pane-audit .meta{align-items:flex-end}
+  .kicker{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    margin-bottom:22px}
+  .pane-build .kicker{color:var(--build-accent)}
+  .pane-audit .kicker{color:var(--audit-accent)}
+
+  h1{font-size:clamp(40px,7vw,92px);line-height:.98;font-weight:600;letter-spacing:-.02em;max-width:14ch}
+  .pane-build h1{font-family:"IBM Plex Mono",monospace;font-weight:500;letter-spacing:-.03em;font-size:clamp(34px,6vw,76px)}
+  .lead{font-size:clamp(19px,2.2vw,26px);line-height:1.45;max-width:30ch;margin-top:28px}
+  .pane-build .lead{color:var(--build-dim);font-family:"IBM Plex Mono",monospace;font-size:clamp(15px,1.6vw,18px);line-height:1.7}
+  .pane-audit .lead{color:var(--audit-dim)}
+
+  h2{font-size:clamp(28px,3.6vw,46px);line-height:1.05;font-weight:600;letter-spacing:-.015em;max-width:18ch}
+  .pane-build h2{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:clamp(22px,3vw,38px)}
+  .body{font-size:19px;line-height:1.6;max-width:40ch;margin-top:22px}
+  .pane-build .body{color:var(--build-dim);font-family:"IBM Plex Mono",monospace;font-size:14.5px;line-height:1.75}
+  .pane-audit .body{color:var(--audit-dim)}
+  .body strong{font-weight:600}
+  .pane-build .body strong{color:var(--build-fg)}
+  .pane-audit .body strong{color:var(--audit-fg)}
+
+  .meta{margin-top:30px;display:flex;flex-direction:column;gap:7px;font-family:"IBM Plex Mono",monospace;font-size:13px}
+  .pane-build .meta{color:var(--build-dim)}
+  .pane-audit .meta{color:var(--audit-dim)}
+  .meta .v{}
+  .pane-build .meta .v{color:var(--build-accent)}
+  .pane-audit .meta .v{color:var(--audit-accent)}
+
+  .scrollhint{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:48;
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;color:var(--audit-dim);
+    background:rgba(243,241,234,.7);padding:6px 12px;backdrop-filter:blur(4px)}
+  .proto-tag{position:fixed;left:14px;bottom:18px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;
+    letter-spacing:.1em;color:var(--audit-dim);z-index:48}
+
+  /* divider tracks scroll height, so make it absolute over full doc */
+  .stage{min-height:400vh}
+</style>
+</head>
+<body>
+  <div class="proto-tag">PROTOTYPE B · THE LENS</div>
+  <div class="corner corner-l">Builder<small>what I made</small></div>
+  <div class="corner corner-r">Auditor<small>what risk it closes</small></div>
+  <div class="scrollhint">drag the seam &harr; · scroll to continue</div>
+
+  <div class="stage" id="stage">
+
+    <!-- AUDITOR pane (base layer, right side shows through) -->
+    <div class="pane pane-audit">
+      <div class="inner">
+        <section class="block hero">
+          <div class="kicker">Cyber Strategy &amp; Governance / KPMG</div>
+          <h1>I assess where systems break.</h1>
+          <p class="lead">Four years auditing controls at enterprise scale. I know why a control exists, not just that someone ticked the box.</p>
+        </section>
+
+        <section class="block">
+          <div class="kicker">Exhibit / CyberAssess</div>
+          <h2>It closes the gap I watched repeat across every client.</h2>
+          <p class="body">Most compliance platforms accept what a company declares about itself. <strong>Self-attestation is not assurance.</strong> CyberAssess reads the actual evidence first, the way a seasoned auditor does, then asks only what a human still needs to answer. One assessment scores against six frameworks at once.</p>
+          <div class="meta">
+            <span>closes <span class="v">the self-attestation gap</span></span>
+            <span>validated <span class="v">0 missed gaps of 15 planted</span></span>
+            <span>covers <span class="v">DPDPA, ISO 27001, GDPR, HIPAA, NIST, PCI</span></span>
+          </div>
+        </section>
+
+        <section class="block">
+          <div class="kicker">Exhibit / CyberDD</div>
+          <h2>A three-day due-diligence review is already a control failure.</h2>
+          <p class="body">Attackers iterate at machine speed. If it takes three days to know whether an acquisition target is sound, the answer arrives after it matters. <strong>Speed is a control.</strong> Deterministic red flags fire before any model runs: no certificate is a deal-breaker regardless of what the AI thinks.</p>
+          <div class="meta">
+            <span>closes <span class="v">slow M&amp;A risk discovery</span></span>
+            <span>turnaround <span class="v">3 days → 60 seconds</span></span>
+          </div>
+        </section>
+
+        <section class="block">
+          <div class="kicker">Position</div>
+          <h2>You do not choose between building and auditing.</h2>
+          <p class="body">The interesting work lives exactly where they overlap. The standards exist; the migration does not. Frameworks lag reality by three to five years. I build into that lag.</p>
+          <div class="meta">
+            <span><span class="v">saqlainmmomin@gmail.com</span></span>
+            <span>linkedin · github</span>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- BUILDER pane (clipped overlay, left side) -->
+    <div class="pane pane-build">
+      <div class="inner">
+        <section class="block hero">
+          <div class="kicker">build &amp; ship / since 2020</div>
+          <h1>I build security tools.</h1>
+          <p class="lead">// async Python, FastAPI, Anthropic SDK, Swift, n8n.<br>// understand by shipping.</p>
+        </section>
+
+        <section class="block">
+          <div class="kicker">repo / cyberassess</div>
+          <h2>Six frameworks, 400 controls, one adaptive engine.</h2>
+          <p class="body">A three-phase engine cuts <strong>157 questions to about 35</strong>. Desk review pre-fills from documents, a tier engine assigns depth, a screening pass infers the rest. Scoring is deterministic and server-side: the model writes language, code decides the number.</p>
+          <div class="meta">
+            <span>stack <span class="v">Python 3.13 · FastAPI · SQLAlchemy</span></span>
+            <span>ai <span class="v">Anthropic SDK, prompt caching</span></span>
+            <span>human time <span class="v">5.2 hrs → 1.5 hrs</span></span>
+          </div>
+        </section>
+
+        <section class="block">
+          <div class="kicker">repo / cyberdd</div>
+          <h2>Six scanners, running in parallel.</h2>
+          <p class="body">Async Python so six scanners run <strong>concurrently</strong>, because the speed is the product. A deterministic red-flag detector runs before the AI analysis. React 19 on the front for fast iteration.</p>
+          <div class="meta">
+            <span>stack <span class="v">async Python / FastAPI + React 19</span></span>
+            <span>pattern <span class="v">hard rules before AI</span></span>
+          </div>
+        </section>
+
+        <section class="block">
+          <div class="kicker">also building</div>
+          <h2>iOS, automation, AI-integrated products.</h2>
+          <p class="body">Swift and SwiftUI on HealthKit. n8n and Raspberry Pi automation. Velocity, a capability tracker that scores AI developments against my own profile. <strong>Build first. Understand by shipping.</strong></p>
+          <div class="meta">
+            <span><span class="v">saqlainmmomin@gmail.com</span></span>
+            <span>github · linkedin</span>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="divider" id="divider"></div>
+  </div>
+  <div class="knob" id="knob"><span>&harr;</span></div>
+
+<script>
+  const stage = document.getElementById('stage');
+  const divider = document.getElementById('divider');
+  const knob = document.getElementById('knob');
+  let split = 50; // percent
+  let dragging = false;
+
+  function setSplit(px){
+    split = Math.max(6, Math.min(94, px / window.innerWidth * 100));
+    document.documentElement.style.setProperty('--split', split + '%');
+  }
+  document.documentElement.style.setProperty('--split', split + '%');
+
+  function startDrag(e){ dragging = true; e.preventDefault(); }
+  function moveDrag(e){
+    if(!dragging) return;
+    const x = (e.touches ? e.touches[0].clientX : e.clientX);
+    setSplit(x);
+  }
+  function endDrag(){ dragging = false; }
+
+  divider.addEventListener('mousedown', startDrag);
+  knob.addEventListener('mousedown', startDrag);
+  divider.addEventListener('touchstart', startDrag, {passive:false});
+  knob.addEventListener('touchstart', startDrag, {passive:false});
+  window.addEventListener('mousemove', moveDrag);
+  window.addEventListener('touchmove', moveDrag, {passive:false});
+  window.addEventListener('mouseup', endDrag);
+  window.addEventListener('touchend', endDrag);
+
+  // gentle idle reveal: when not dragging, nudge toward center-ish based on scroll
+  // keep divider visually anchored to viewport center line as you scroll
+  function frame(){
+    // divider is absolute within stage; keep it spanning viewport via fixed-like positioning
+    divider.style.top = window.scrollY + 'px';
+    divider.style.height = window.innerHeight + 'px';
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+</script>
+</body>
+</html>

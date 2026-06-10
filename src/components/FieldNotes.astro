@@ -1,0 +1,79 @@
+---
+import { getCollection } from 'astro:content';
+
+const notes = (await getCollection('notes')).sort(
+  (a, b) => a.data.order - b.data.order
+);
+---
+
+<section class="notes" id="notes" aria-labelledby="notes-h">
+  <div class="wrap">
+    <p class="eyebrow">Field notes</p>
+    <h2 id="notes-h">I publish a position, with the data attached.</h2>
+    <p class="lead">
+      Sixteen articles for security and GRC practitioners. The recurring thesis:
+      this is not IT security for AI tools, it is systems security for synthetic
+      cognition.
+    </p>
+
+    <ul class="list">
+      {
+        notes.map((n) => (
+          <li class="note">
+            <a href={n.data.url} target="_blank" rel="noopener">
+              <span class="hook">{n.data.hook}</span>
+              <span class="thesis">{n.data.thesis}</span>
+              <span class="go mono">read on LinkedIn &rarr;</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .notes {
+    background: var(--audit-bg);
+    color: var(--audit-fg);
+    padding: var(--section-gap) 0;
+    border-top: 1px solid var(--audit-line);
+  }
+  .eyebrow { color: var(--audit-accent); margin-bottom: var(--s-4); }
+  h2 {
+    font-family: var(--serif);
+    font-size: var(--fs-h2);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.04;
+    max-width: 18ch;
+  }
+  .lead {
+    font-size: var(--fs-lead);
+    color: var(--audit-dim);
+    max-width: 50ch;
+    margin-top: var(--s-4);
+    line-height: 1.45;
+  }
+  .list { list-style: none; margin-top: var(--s-7); }
+  .note { border-top: 1px solid var(--audit-line); }
+  .note:last-child { border-bottom: 1px solid var(--audit-line); }
+  .note a {
+    display: grid;
+    gap: var(--s-2);
+    padding: var(--s-5) 0;
+    text-decoration: none;
+    color: inherit;
+  }
+  .hook {
+    font-family: var(--serif);
+    font-size: clamp(21px, 2.4vw, 27px);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    transition: color var(--dur) var(--ease);
+  }
+  .note a:hover .hook, .note a:focus-visible .hook { color: var(--audit-accent); }
+  .thesis { color: var(--audit-dim); font-size: var(--fs-small); line-height: 1.5; max-width: 64ch; }
+  .go { font-size: 11.5px; letter-spacing: 0.08em; color: var(--audit-accent); margin-top: var(--s-1); }
+</style>

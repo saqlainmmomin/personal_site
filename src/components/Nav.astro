@@ -1,0 +1,56 @@
+---
+// Minimal in-page nav. Hidden over the hero, slides in once you scroll past it.
+// Its own solid dark bar, so it stays legible over every section.
+---
+<nav class="nav mono" id="nav" aria-label="Sections">
+  <a href="#top" class="brand">SM</a>
+  <ul>
+    <li><a href="#argument">Argument</a></li>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#notes">Notes</a></li>
+    <li><a href="#who">Who</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<style>
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-4);
+    padding: 12px var(--gutter);
+    background: rgba(7, 8, 11, 0.85);
+    backdrop-filter: blur(8px);
+    color: var(--win-fg);
+    border-bottom: 1px solid var(--win-grid);
+    transform: translateY(-100%);
+    transition: transform 260ms var(--ease);
+  }
+  .nav.visible { transform: translateY(0); }
+  .brand { font-weight: 600; letter-spacing: 0.06em; text-decoration: none; color: var(--win-fg); }
+  ul { list-style: none; display: flex; gap: clamp(12px, 2.4vw, 28px); }
+  .nav a { font-size: 12px; letter-spacing: 0.06em; text-decoration: none; color: var(--win-dim); transition: color var(--dur) var(--ease); }
+  .nav a:hover, .nav a:focus-visible { color: var(--win-fg); }
+  ul a { text-transform: uppercase; }
+  @media (max-width: 560px) {
+    li:nth-child(3), li:nth-child(4) { display: none; }
+  }
+</style>
+
+<script>
+  const nav = document.getElementById('nav');
+  if (nav) {
+    const io = new IntersectionObserver(
+      ([e]) => nav.classList.toggle('visible', !e.isIntersecting),
+      { rootMargin: '-65% 0px 0px 0px' }
+    );
+    const lens = document.getElementById('lens');
+    if (lens) io.observe(lens);
+  }
+</script>

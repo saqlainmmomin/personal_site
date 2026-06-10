@@ -1,0 +1,116 @@
+---
+// One dual-readable project row. Both readings render and occupy the same grid
+// cell; CSS shows one based on html[data-reading], crossfading on change.
+export interface Reading {
+  title: string;
+  body: string;
+  meta: string;
+}
+export interface Project {
+  tag: string;
+  lead?: boolean;
+  builder: Reading;
+  auditor: Reading;
+  // Filled from the per-project link map. null until confirmed.
+  link?: { label: string; href: string } | null;
+}
+const { project } = Astro.props as { project: Project };
+const { tag, lead, builder, auditor, link } = project;
+---
+
+<article class={`row${lead ? ' lead' : ''}`}>
+  <div class="tag mono">{tag}</div>
+  <div class="readings">
+    <div class="reading reading-audit">
+      <h3>{auditor.title}</h3>
+      <p class="body">{auditor.body}</p>
+      <div class="meta mono">{auditor.meta}</div>
+    </div>
+    <div class="reading reading-build" aria-hidden="true">
+      <h3>{builder.title}</h3>
+      <p class="body">{builder.body}</p>
+      <div class="meta mono">{builder.meta}</div>
+    </div>
+    {
+      link ? (
+        <a class="link mono" href={link.href} target="_blank" rel="noopener">
+          {link.label} &rarr;
+        </a>
+      ) : (
+        <span class="link mono case">case study</span>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .row {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: var(--s-6);
+    padding: var(--s-7) 0;
+    border-bottom: 1px solid var(--audit-line);
+    align-items: baseline;
+  }
+  :global(html[data-reading='builder']) .row { border-color: var(--build-line); }
+  .row.lead { padding: var(--s-8) 0; }
+
+  .tag {
+    font-size: var(--fs-label);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--audit-accent);
+    padding-top: 6px;
+  }
+  :global(html[data-reading='builder']) .tag { color: var(--build-accent); }
+
+  .readings { display: grid; }
+  .reading { grid-area: 1 / 1; transition: opacity 180ms var(--ease); }
+  .reading-build { opacity: 0; visibility: hidden; }
+  :global(html[data-reading='builder']) .reading-audit { opacity: 0; visibility: hidden; }
+  :global(html[data-reading='builder']) .reading-build { opacity: 1; visibility: visible; }
+
+  h3 {
+    font-size: var(--fs-h3);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.18;
+    max-width: 22ch;
+  }
+  .reading-audit h3 { font-family: var(--serif); }
+  .reading-build h3 { font-family: var(--mono); font-weight: 500; letter-spacing: -0.02em; }
+  .row.lead h3 { font-size: clamp(24px, 3vw, 34px); }
+
+  .body {
+    font-size: var(--fs-small);
+    line-height: 1.55;
+    margin-top: var(--s-3);
+    max-width: 56ch;
+  }
+  .reading-audit .body { font-family: var(--serif); color: var(--audit-dim); }
+  .reading-build .body { font-family: var(--mono); color: var(--build-dim); line-height: 1.7; }
+
+  .meta { font-size: 12.5px; margin-top: var(--s-4); letter-spacing: 0.02em; }
+  .reading-audit .meta { color: var(--audit-accent); }
+  .reading-build .meta { color: var(--build-accent); }
+
+  .link {
+    display: inline-block;
+    margin-top: var(--s-4);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 2px;
+  }
+  .link.case { border-bottom-style: dotted; opacity: 0.6; cursor: default; }
+  :global(html[data-reading='builder']) .link { color: var(--build-fg); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reading { transition: none; }
+  }
+  @media (max-width: 640px) {
+    .row { grid-template-columns: 1fr; gap: var(--s-3); }
+    .tag { padding-top: 0; }
+  }
+</style>

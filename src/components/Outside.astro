@@ -1,0 +1,56 @@
+---
+// Outside the work: the human dimension. All copy below is PLACEHOLDER, flagged
+// for Saqlain to replace (see CONTENT.md 4.6). Section title and strand labels
+// are adjustable. Kept dry and specific by design, not "passionate about X".
+const strands = [
+  {
+    label: 'Reading',
+    body: '[PLACEHOLDER] What you are reading now, and the recurring kind of thing you read. One or two specific titles or domains beat a vague genre. Ties naturally to tracking AI capability like a threat landscape.',
+  },
+  {
+    label: "What I'm chasing",
+    body: '[PLACEHOLDER] Where you are taking the work over the next few years. A concrete direction, not a mission statement.',
+  },
+  {
+    label: 'Off the clock',
+    body: '[PLACEHOLDER] Two or three specific things. Concrete beats categorical.',
+  },
+];
+---
+
+<section class="outside" id="outside" aria-labelledby="outside-h">
+  <div class="wrap">
+    <p class="eyebrow">Outside the work</p>
+    <h2 id="outside-h">The rest of it.</h2>
+    <div class="strands">
+      {
+        strands.map((s) => (
+          <div class="strand">
+            <h3 class="mono">{s.label}</h3>
+            <p data-placeholder>{s.body}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .outside {
+    background: var(--audit-bg);
+    color: var(--audit-fg);
+    padding: var(--section-gap) 0;
+    border-top: 1px solid var(--audit-line);
+  }
+  .eyebrow { color: var(--audit-accent); margin-bottom: var(--s-4); }
+  h2 { font-family: var(--serif); font-size: var(--fs-h2); font-weight: 600; letter-spacing: -0.02em; }
+  .strands { margin-top: var(--s-7); display: grid; gap: var(--s-6); }
+  .strand { display: grid; grid-template-columns: 180px 1fr; gap: var(--s-5); padding-top: var(--s-5); border-top: 1px solid var(--audit-line); }
+  h3 { font-size: var(--fs-label); letter-spacing: 0.08em; text-transform: uppercase; color: var(--audit-accent); font-weight: 500; padding-top: 4px; }
+  .strand p { font-size: var(--fs-body); line-height: 1.5; max-width: 56ch; }
+  /* Make placeholders visually obvious during build; harmless if left in. */
+  [data-placeholder] { color: var(--audit-dim); font-style: italic; }
+  @media (max-width: 560px) {
+    .strand { grid-template-columns: 1fr; gap: var(--s-2); }
+  }
+</style>

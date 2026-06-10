@@ -1,0 +1,340 @@
+---
+// The Closing Window: single-voice argument with a scroll-driven divergence
+// chart. Renders its FINAL state at build time (machine line grown, gap
+// shaded, captions stacked, stats at value) so it reads complete with no JS
+// and under prefers-reduced-motion. JS upgrades it to scroll-driven.
+import {
+  W,
+  H,
+  humanPath,
+  machinePath,
+  gapPath,
+  labelHumanXY,
+  labelMachineXY,
+} from '../lib/chart';
+
+const hPath = humanPath();
+const mPathFinal = machinePath(1);
+const gapFinal = gapPath(1);
+const lblH = labelHumanXY();
+const lblM = labelMachineXY(1);
+
+const steps = [
+  {
+    h: 'Two timelines, same starting point.',
+    p: 'A decade ago, defenders and attackers moved at roughly the same pace. Both bounded by human effort, human review, human salaries.',
+    src: null,
+  },
+  {
+    h: 'Then one of them stopped being human.',
+    p: 'AI task autonomy is doubling every 89 days. Vulnerability discovery windows collapse from months to minutes.',
+    src: 'source / METR task-horizon data',
+  },
+  {
+    h: "The defender's line barely moves.",
+    p: 'Frameworks lag reality by three to five years. ISO 27001 was updated in 2022, a decade overdue. NIST CSF only added Govern in 2024.',
+    src: 'source / ISO 27001:2022, NIST CSF 2.0',
+  },
+  {
+    h: 'This shaded gap is the risk.',
+    p: 'Every defensive delay is now measured against autonomous iteration. The structural disadvantage compounds daily. This is the space I build into.',
+    src: null,
+  },
+];
+
+const stats = [
+  {
+    count: 89,
+    suffix: ' days',
+    cls: 'm',
+    cap: 'The time it takes for AI task autonomy to <b>double</b>. Your patch cycle did not get twice as fast this quarter.',
+    src: 'METR',
+  },
+  {
+    count: 97,
+    suffix: 'M',
+    cls: 'm',
+    cap: 'Downloads weaponised in a single PyPI supply-chain attack. It was caught only because it had a bug that crashed machines. <b>That is luck, not a control.</b>',
+    src: 'PyPI transitive dependency attack',
+  },
+  {
+    count: null,
+    display: '3-5',
+    suffix: ' yrs',
+    cls: 'h',
+    cap: 'How far compliance frameworks lag the threats they are meant to govern. <b>The standards exist. The migration does not.</b>',
+    src: 'ISO 27001:2022 / NIST CSF 2.0 / post-quantum',
+  },
+];
+---
+
+<section class="window" id="argument" aria-labelledby="window-h">
+  <div class="wrap-wide intro">
+    <p class="eyebrow">The argument</p>
+    <h2 id="window-h">The window is closing.</h2>
+    <p class="lead">
+      Defenders run on human cycles. Quarterly scans, annual pentests, patch SLAs
+      measured in weeks. Attackers now run on machine cycles. The gap between the
+      two is the story of my work.
+    </p>
+  </div>
+
+  <!-- Screen-reader / no-JS text equivalent of the chart -->
+  <p class="visually-hidden">
+    Chart: from a shared starting point a decade ago, a human security cycle
+    rises gently and roughly linearly, while a machine-speed iteration curve
+    bends into exponential growth, opening a widening gap between the two.
+  </p>
+
+  <div class="scene" id="scene">
+    <div class="chart-sticky">
+      <div class="chart-box">
+        <div class="caption" id="caption">
+          {
+            steps.map((s, i) => (
+              <div class={`step${i === 0 ? ' active' : ''}`} data-step={i}>
+                <h3>{s.h}</h3>
+                <p>{s.p}</p>
+                {s.src && <div class="src mono">{s.src}</div>}
+              </div>
+            ))
+          }
+        </div>
+        <svg
+          id="chart"
+          viewBox={`0 0 ${W} ${H}`}
+          preserveAspectRatio="none"
+          aria-hidden="true"
+          role="presentation"
+        >
+          <g id="grid">
+            {
+              [0, 1, 2, 3, 4, 5].map((i) => {
+                const yy = 20 + i * ((H - 40 - 20) / 5);
+                return <line class="gridline" x1="30" y1={yy} x2="970" y2={yy} />;
+              })
+            }
+          </g>
+          <path id="gapArea" d={gapFinal} fill="var(--gap-fill)"></path>
+          <path id="human" class="line-human" d={hPath}></path>
+          <path id="machine" class="line-machine" d={mPathFinal}></path>
+          <text id="lblH" class="lbl-h" x={lblH.x} y={lblH.y} text-anchor="end">human security cycle</text>
+          <text id="lblM" class="lbl-m" x={lblM.x} y={lblM.y} text-anchor="end">machine-speed iteration</text>
+          <text class="axis-label" x="6" y={H - 8}>2016</text>
+          <text class="axis-label" x="918" y={H - 8}>2026</text>
+          <text class="axis-label" x="6" y="14">capability / speed</text>
+        </svg>
+      </div>
+    </div>
+    <div class="steps" aria-hidden="true">
+      {steps.map((_, i) => <div class="step-trigger" data-trigger={i}></div>)}
+    </div>
+  </div>
+
+  <div class="stats wrap-wide">
+    {
+      stats.map((s) => (
+        <div class="stat">
+          <div
+            class={`num ${s.cls} mono`}
+            data-count={s.count ?? ''}
+            data-suffix={s.suffix}
+          >
+            {s.count !== null ? `${s.count}${s.suffix}` : `${s.display}${s.suffix}`}
+          </div>
+          <p class="cap" set:html={s.cap} />
+          <div class="src mono">{s.src}</div>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .window {
+    background: var(--win-bg);
+    color: var(--win-fg);
+    padding-top: var(--section-gap);
+  }
+  .intro { padding-bottom: var(--s-7); }
+  .window .eyebrow { color: var(--machine); }
+  .window h2 {
+    font-family: var(--serif);
+    font-size: var(--fs-display);
+    font-weight: 600;
+    line-height: 0.96;
+    letter-spacing: -0.02em;
+  }
+  .window .lead {
+    font-size: var(--fs-lead);
+    color: var(--win-dim);
+    max-width: 46ch;
+    margin-top: var(--s-5);
+    line-height: 1.5;
+  }
+
+  .scene { position: relative; }
+  .chart-sticky {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+  .chart-box {
+    width: 100%;
+    max-width: var(--max-wide);
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+    position: relative;
+  }
+  svg { width: 100%; height: min(62vh, 520px); display: block; overflow: visible; }
+  .gridline { stroke: var(--win-grid); stroke-width: 1; }
+  .line-human { fill: none; stroke: var(--human); stroke-width: 2.5; }
+  .line-machine { fill: none; stroke: var(--machine); stroke-width: 2.5; }
+  .axis-label { font-family: var(--mono); font-size: 11px; fill: var(--win-dim); letter-spacing: 0.06em; }
+  .lbl-h { fill: var(--human); font-family: var(--mono); font-size: 13px; font-weight: 500; }
+  .lbl-m { fill: var(--machine); font-family: var(--mono); font-size: 13px; font-weight: 500; }
+
+  .caption { position: absolute; left: var(--gutter); top: 8%; max-width: 30ch; z-index: 2; }
+  .step h3 {
+    font-family: var(--serif);
+    font-size: var(--fs-h3);
+    font-weight: 600;
+    line-height: 1.15;
+    margin-bottom: var(--s-3);
+  }
+  .step p { font-size: var(--fs-small); color: var(--win-dim); line-height: 1.55; }
+  .step .src { font-size: 11px; color: var(--win-dim); margin-top: var(--s-3); opacity: 0.7; }
+
+  /* When JS drives the scene, show one step at a time; otherwise show all. */
+  .scene[data-js] .step { display: none; }
+  .scene[data-js] .step.active { display: block; animation: fade 0.5s var(--ease); }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .step-trigger { height: 90vh; }
+  .scene:not([data-js]) .steps { display: none; }
+
+  /* Stat band */
+  .stats {
+    padding: var(--section-gap) var(--gutter);
+    border-top: 1px solid var(--win-grid);
+  }
+  .stat { padding: var(--s-8) 0; border-bottom: 1px solid var(--win-grid); }
+  .stat:last-child { border-bottom: 0; }
+  .num {
+    font-size: var(--fs-stat);
+    line-height: 0.9;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+  .num.m { color: var(--machine); }
+  .num.h { color: var(--human); }
+  .cap { font-size: var(--fs-lead); color: var(--win-dim); margin-top: var(--s-4); max-width: 42ch; line-height: 1.5; }
+  .cap :global(b) { color: var(--win-fg); font-weight: 500; }
+  .stat .src { font-size: 11px; color: var(--win-dim); margin-top: var(--s-3); letter-spacing: 0.04em; opacity: 0.7; }
+
+  @media (max-width: 720px) {
+    .caption { position: static; max-width: none; margin-bottom: var(--s-5); }
+    .chart-sticky { height: auto; padding: var(--s-7) 0; display: block; }
+    .scene[data-js] .step { display: block; }
+    .scene[data-js] .steps { display: none; }
+  }
+</style>
+
+<script>
+  import { machinePath, gapPath, labelMachineXY } from '../lib/chart';
+
+  const scene = document.getElementById('scene');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mqNarrow = window.matchMedia('(max-width: 720px)');
+
+  const machine = document.getElementById('machine');
+  const gap = document.getElementById('gapArea');
+  const lblM = document.getElementById('lblM');
+
+  function renderMachine(prog: number) {
+    const p = Math.max(0.001, prog);
+    machine?.setAttribute('d', machinePath(p));
+    gap?.setAttribute('d', gapPath(p));
+    const m = labelMachineXY(p);
+    lblM?.setAttribute('y', String(m.y));
+  }
+
+  // Scroll-drive only when motion is allowed. The narrow/wide decision is
+  // re-evaluated on viewport change so resizing across the breakpoint recovers.
+  if (scene && !reduce) {
+    const captions = Array.from(scene.querySelectorAll('.caption .step'));
+
+    function update() {
+      if (mqNarrow.matches) return;
+      const rect = scene!.getBoundingClientRect();
+      const total = scene!.offsetHeight - window.innerHeight;
+      const prog = total > 0 ? Math.max(0, Math.min(1, -rect.top / total)) : 0;
+      renderMachine(prog);
+      const idx = Math.min(3, Math.floor(prog * 4));
+      captions.forEach((c, i) => c.classList.toggle('active', i === idx));
+    }
+
+    function applyMode() {
+      if (mqNarrow.matches) {
+        // Narrow: static final chart, every caption shown (handled by CSS).
+        scene!.removeAttribute('data-js');
+        renderMachine(1);
+        captions.forEach((c) => c.classList.remove('active'));
+      } else {
+        scene!.dataset.js = '';
+        update();
+      }
+    }
+
+    let ticking = false;
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(() => {
+            ticking = false;
+            update();
+          });
+        }
+      },
+      { passive: true }
+    );
+    mqNarrow.addEventListener('change', applyMode);
+    applyMode();
+  }
+
+  // ---- Count-up stats (motion allowed only; final value already in DOM) ----
+  if (!reduce) {
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          const el = e.target as HTMLElement;
+          if (e.isIntersecting && !el.dataset.done && el.dataset.count) {
+            el.dataset.done = '1';
+            const end = Number(el.dataset.count);
+            const suf = el.dataset.suffix || '';
+            const t0 = performance.now();
+            const dur = 1100;
+            function tick(now: number) {
+              const p = Math.min(1, (now - t0) / dur);
+              const eased = 1 - Math.pow(1 - p, 3);
+              el.textContent = Math.round(end * eased) + suf;
+              if (p < 1) requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+          }
+        });
+      },
+      { threshold: 0.6 }
+    );
+    document
+      .querySelectorAll<HTMLElement>('.num[data-count]')
+      .forEach((el) => {
+        if (el.dataset.count) obs.observe(el);
+      });
+  }
+</script>
