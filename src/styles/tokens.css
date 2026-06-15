@@ -1,72 +1,111 @@
 /* ============================================================
-   Self-hosted fonts (latin subset, woff2). Preloaded in Layout.
+   Self-hosted IBM Plex (latin subset, woff2). One superfamily:
+   Serif = Auditor display/body, Sans = Builder display,
+   Mono = Builder body + all meta/labels. Serif 600 and Mono 400
+   are preloaded in Layout (most-used above the fold).
    ============================================================ */
 @font-face {
-  font-family: 'Source Serif 4';
-  font-style: normal;
-  font-weight: 400 600;
-  font-display: swap;
-  src: url('/fonts/source-serif-4-latin-normal.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Source Serif 4';
-  font-style: italic;
-  font-weight: 400 600;
-  font-display: swap;
-  src: url('/fonts/source-serif-4-latin-italic.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'JetBrains Mono';
+  font-family: 'IBM Plex Serif';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('/fonts/jetbrains-mono-latin-400.woff2') format('woff2');
+  src: url('/fonts/ibm-plex-serif-latin-400-normal.woff2') format('woff2');
 }
 @font-face {
-  font-family: 'JetBrains Mono';
+  font-family: 'IBM Plex Serif';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-serif-latin-400-italic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Serif';
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url('/fonts/jetbrains-mono-latin-500.woff2') format('woff2');
+  src: url('/fonts/ibm-plex-serif-latin-500-normal.woff2') format('woff2');
 }
 @font-face {
-  font-family: 'JetBrains Mono';
+  font-family: 'IBM Plex Serif';
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url('/fonts/jetbrains-mono-latin-600.woff2') format('woff2');
+  src: url('/fonts/ibm-plex-serif-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-sans-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-sans-latin-500-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-sans-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-latin-500-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-latin-600-normal.woff2') format('woff2');
 }
 
 :root {
-  /* ---- Builder register (dark, technical) ---- */
-  --build-bg: #0c0e13;
-  --build-bg-2: #12151c;
-  --build-fg: #e3e8ee;
-  --build-dim: #8a97a8;
-  --build-accent: #6ea8fe;
-  --build-line: #1d2530;
+  /* ---- Auditor register (earthy, warm, natural) ---- */
+  --audit-bg:      #F0EBE3;   /* warm ivory — parchment */
+  --audit-bg-2:    #E6DFD3;   /* oatmeal — secondary surfaces */
+  --audit-fg:      #2C2420;   /* espresso — primary text */
+  --audit-dim:     #6B5E54;   /* cedar — secondary text */
+  --audit-accent:  #4C583E;   /* cypress green — accent */
+  --audit-line:    #D4CCC0;   /* warm sand — borders */
 
-  /* ---- Auditor register (light, document) ---- */
-  --audit-bg: #f3f3f1;
-  --audit-bg-2: #eceae4;
-  --audit-fg: #1a1a17;
-  --audit-dim: #55534d;
-  --audit-accent: #0e6b5e;
-  --audit-line: #dcdcd6;
+  /* ---- Builder register (dark, atmospheric, warm metallics) ---- */
+  --build-bg:      #0C1519;   /* chinese black */
+  --build-bg-2:    #162127;   /* dark jungle green */
+  --build-fg:      #E8DFD4;   /* warm cream — not cold white */
+  --build-dim:     #8A7B6E;   /* weathered bronze */
+  --build-accent:  #CF9D7B;   /* antique brass — warm copper */
+  --build-line:    #1E2A30;   /* deep teal-charcoal */
 
-  /* ---- Window register (single voice, dark) ---- */
-  --win-bg: #07080b;
-  --win-bg-2: #0c0e13;
-  --win-fg: #e8ecf2;
-  --win-dim: #6f7a8a;
-  --win-grid: #161a22;
-  --human: #6ea8fe;
-  --machine: #f5a623;
-  --gap-fill: rgba(245, 166, 35, 0.10);
+  /* ---- Window register (shared dark — ClosingWindow, Contact) ---- */
+  --win-bg:    #07080b;
+  --win-bg-2:  #0c0e13;
+  --win-fg:    #E8DFD4;       /* warm cream, matches builder fg */
+  --win-dim:   #6B5E54;       /* cedar */
+  --win-grid:  #1A1E22;
+  --human:     #768064;       /* olive green — human line */
+  --machine:   #CF9D7B;       /* antique brass — machine line */
+  --gap-fill:  rgba(207, 157, 123, 0.10);
 
   /* ---- Type ---- */
-  --serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
-  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --serif: 'IBM Plex Serif', Georgia, 'Times New Roman', serif;
+  --sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   --fs-display: clamp(44px, 7vw, 88px);
   --fs-h2: clamp(30px, 4vw, 50px);

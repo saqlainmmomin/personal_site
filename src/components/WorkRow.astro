@@ -64,11 +64,11 @@ const { tag, lead, builder, auditor, link } = project;
   }
   :global(html[data-reading='builder']) .tag { color: var(--build-accent); }
 
-  .readings { display: grid; }
-  .reading { grid-area: 1 / 1; transition: opacity 180ms var(--ease); }
-  .reading-build { opacity: 0; visibility: hidden; }
-  :global(html[data-reading='builder']) .reading-audit { opacity: 0; visibility: hidden; }
-  :global(html[data-reading='builder']) .reading-build { opacity: 1; visibility: visible; }
+  .readings { position: relative; }
+  .reading { transition: opacity 180ms var(--ease); }
+  .reading-build { opacity: 0; visibility: hidden; position: absolute; top: 0; left: 0; width: 100%; }
+  :global(html[data-reading='builder']) .reading-audit { opacity: 0; visibility: hidden; position: absolute; top: 0; left: 0; width: 100%; }
+  :global(html[data-reading='builder']) .reading-build { opacity: 1; visibility: visible; position: static; }
 
   h3 {
     font-size: var(--fs-h3);
@@ -78,7 +78,7 @@ const { tag, lead, builder, auditor, link } = project;
     max-width: 22ch;
   }
   .reading-audit h3 { font-family: var(--serif); }
-  .reading-build h3 { font-family: var(--mono); font-weight: 500; letter-spacing: -0.02em; }
+  .reading-build h3 { font-family: var(--sans); font-weight: 500; }
   .row.lead h3 { font-size: clamp(24px, 3vw, 34px); }
 
   .body {

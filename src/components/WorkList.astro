@@ -6,62 +6,62 @@ import type { Project } from './WorkRow.astro';
 // decision). Fill href/label from the confirmed per-project map before launch.
 const projects: Project[] = [
   {
-    tag: 'compliance maturity platform',
+    tag: 'full-scope audit platform',
     lead: true,
     builder: {
-      title: 'Six frameworks, 400 controls, one adaptive engine.',
-      body: 'A three-phase engine cuts 157 questions to about 35. Desk review pre-fills from documents, a tier engine assigns depth, a screening pass infers the rest. Scoring is deterministic and server-side: the model writes language, code decides the number.',
-      meta: 'Python 3.13 · FastAPI · Anthropic SDK · SQLAlchemy',
+      title: 'Multi-call Claude pipeline with a strict rule: the model writes language, the code decides the number.',
+      body: 'Six compliance frameworks defined as Python dicts — version-controlled, embeddable directly into Claude’s system prompt, never stored in the database. A framework abstraction layer maps overlapping controls into Unified Control Clusters so the questionnaire de-duplicates at the data level. The Claude pipeline separates evidence extraction from gap analysis, with prompt caching on the static requirements block to keep cost flat across assessments. Every response tracks its source — human, document, inferred, or overridden — from input through to the final PDF. A dependency DAG sequences the remediation roadmap so fixes respect implementation order. Root cause clustering groups gaps by category (policy, process, technology, people, governance) to generate strategic initiatives, not just a list of findings. No SPA — Jinja2 + HTMX, full server round-trips, zero client state.',
+      meta: 'Python 3.13 · FastAPI · Anthropic SDK · SQLAlchemy · Jinja2 + HTMX',
     },
     auditor: {
-      title: 'It closes the self-attestation gap I watched repeat across every client.',
-      body: 'Most platforms accept what a company declares about itself. Self-attestation is not assurance. CyberAssess reads the evidence first, the way a seasoned auditor does, then asks only what a human still needs to answer. Validated against 15 planted gaps across three synthetic companies: zero missed.',
-      meta: '6 frameworks · 400 controls · 157 to 35 questions · 0 missed of 15',
+      title: 'Built for the way an auditor actually works — not the way software vendors assume they do.',
+      body: 'CyberAssess reads the evidence before it asks a single question. Every uploaded document is reviewed first — the tool arrives with a picture of what’s already answered, what’s partial, and what’s missing. Questions then adapt to what actually requires human judgement. Controls that map to multiple frameworks are assessed once, not once per standard. The result is end-to-end coverage across an organisation’s compliance landscape without the time it would normally cost.',
+      meta: 'DPDPA · ISO 27001 · GDPR · HIPAA · NIST CSF · PCI-DSS · SOC 2 + GLBA planned',
     },
-    link: null,
+    link: { label: 'GitHub', href: 'https://github.com/saqlainmmomin/Cyber' },
   },
   {
-    tag: 'cyber due diligence for M&A',
+    tag: 'vendor pre-onboarding screen',
     lead: true,
     builder: {
-      title: 'Six scanners, running in parallel.',
-      body: 'Async Python so the scanners run concurrently, because the speed is the product. A deterministic red-flag detector runs before the AI analysis. React 19 on the front for fast iteration.',
+      title: 'Six async scanners and a hard-rules detector that runs before the AI.',
+      body: 'Scanners run concurrently — speed is the product. A deterministic red-flag layer fires first (NEGOTIATE / INVESTIGATE / WALK_AWAY verdicts), keeping the model in its lane: interpretation, not gatekeeping. React 19 on the front for fast iteration.',
       meta: 'async Python · FastAPI · React 19',
     },
     auditor: {
-      title: 'A three-day due-diligence review is already a control failure.',
-      body: 'Attackers iterate at machine speed. If it takes three days to know whether a target is sound, the answer arrives after it matters. Speed is a control. No certificate is a deal-breaker regardless of what the model thinks.',
-      meta: '6 concurrent scanners · 3 days to 60 seconds',
+      title: 'Know what a vendor’s external signals say before you open the door.',
+      body: 'Before a vendor questionnaire, before a contract, before access is granted — Recon reads what’s already publicly visible. Six scanners run against a domain simultaneously: DNS configuration, SSL/TLS posture, tech stack, breach exposure, security headers, and organisational signals. A red-flag detector runs before any AI interpretation. No access required, no questionnaire to fill. One domain, 60 seconds.',
+      meta: '6 scanners · public signals only · 60 seconds',
     },
-    link: null,
+    link: { label: 'GitHub', href: 'https://github.com/saqlainmmomin/Verified' },
   },
   {
-    tag: 'evidence-based compliance',
+    tag: 'reinforcement learning · game theory',
     builder: {
-      title: 'Full-stack on Next.js 14 and Supabase.',
-      body: 'Auth, storage, and row-level security out of the box, Docker for deployment flexibility.',
-      meta: 'Next.js 14 · Supabase · Docker',
+      title: 'Reinforcement learning environments built in free time.',
+      body: 'Each simulation: define an environment, set a reward signal, let the agent learn. The prisoner’s dilemma is interactive — pick a strategy and watch it run against a population over thousands of iterations. A grid-world snake agent, a spacecraft landing sequence, a car-driving environment. Built in Python and PyTorch. Some finished, some still in progress.',
+      meta: 'Python · PyTorch · RL environments',
     },
     auditor: {
-      title: 'Built to kill self-attestation.',
-      body: 'An AI analyzes the actual document, a human confirms. That is the minimum standard that should exist, and almost no tooling meets it.',
-      meta: 'evidence first · human confirms',
+      title: 'What happens when you let a system learn from rules alone.',
+      body: 'A snake that taught itself to survive. A prisoner’s dilemma you can play — pick a strategy, run it against a population, watch cooperation emerge or collapse. A landing sequence a reinforcement agent learned without being told what “landing” looks like. These are experiments, not products. Simple environments, emergent behaviour, and the occasional surprise when the agent finds something you didn’t plan for.',
+      meta: 'Python · PyTorch · reinforcement learning',
     },
-    link: null,
+    link: { label: 'GitHub', href: 'https://github.com/saqlainmmomin/Prisoners_dilemma' },
   },
   {
-    tag: 'AI capability tracker',
+    tag: 'personal AI signal tracker',
     builder: {
-      title: 'A capability tracker scored against my own profile.',
-      body: 'React, Express, SQLite, Gemini, an n8n workflow that ingests AI news automatically.',
+      title: 'A relevance engine for AI news, scored against your own profile.',
+      body: 'n8n ingests AI developments automatically. Gemini classifies each one as opportunity, disruption, or knowledge gap and scores its relevance against your uploaded CV or manual profile. Calibration mode lets you query specific upcoming tasks. React + Express front, SQLite back, weekly digest output.',
       meta: 'React · Express · SQLite · Gemini · n8n',
     },
     auditor: {
-      title: 'I track AI capability the way I track a threat landscape.',
-      body: 'Quarterly shifts matter. Generic AI news is noise; relevance to the work is the signal.',
-      meta: 'quarterly shifts · signal over noise',
+      title: 'I track AI capability the way I track a threat landscape — against what actually affects my work.',
+      body: 'AI developments are everywhere — posts, threads, announcements, most of it hype, very little of it signal. And almost none of it helps you work out what any of it means for your specific work. Velocity filters against a professional profile: each development is scored as an opportunity, a disruption, or a knowledge gap — relative to what you actually do. Before taking on work AI might already handle, a calibration test answers it directly.',
+      meta: 'relevance scoring · personal profile · weekly digest',
     },
-    link: null,
+    link: { label: 'GitHub', href: 'https://github.com/saqlainmmomin/Velocity' },
   },
 ];
 ---
@@ -118,7 +118,7 @@ const projects: Project[] = [
     letter-spacing: -0.02em;
     line-height: 1.02;
   }
-  :global(html[data-reading='builder']) h2 { font-family: var(--mono); font-weight: 500; }
+  :global(html[data-reading='builder']) h2 { font-family: var(--sans); font-weight: 500; }
   .lead {
     font-size: var(--fs-lead);
     color: var(--audit-dim);

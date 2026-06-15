@@ -43,10 +43,18 @@ const person = {
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
 
-    <!-- Preload the Auditor face: it renders the LCP hero headline -->
+    <!-- Preload the most-used faces above the fold: Serif 600 renders the LCP
+         hero name/headline (Auditor); Mono 400 renders eyebrows, nav, labels. -->
     <link
       rel="preload"
-      href="/fonts/source-serif-4-latin-normal.woff2"
+      href="/fonts/ibm-plex-serif-latin-600-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/ibm-plex-mono-latin-400-normal.woff2"
       as="font"
       type="font/woff2"
       crossorigin
