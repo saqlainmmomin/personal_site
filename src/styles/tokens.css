@@ -74,6 +74,34 @@
   font-display: swap;
   src: url('/fonts/ibm-plex-mono-latin-600-normal.woff2') format('woff2');
 }
+@font-face {
+  font-family: 'Big Shoulders Display';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/big-shoulders-display-latin-500-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Big Shoulders Display';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/big-shoulders-display-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Big Shoulders Display';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/big-shoulders-display-latin-700-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Big Shoulders Display';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/big-shoulders-display-latin-800-normal.woff2') format('woff2');
+}
 
 :root {
   /* ---- Auditor register (earthy, warm, natural) ---- */
@@ -106,6 +134,7 @@
   --serif: 'IBM Plex Serif', Georgia, 'Times New Roman', serif;
   --sans: 'IBM Plex Sans', system-ui, sans-serif;
   --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --display: 'Big Shoulders Display', 'IBM Plex Sans', system-ui, sans-serif;
 
   --fs-display: clamp(44px, 7vw, 88px);
   --fs-h2: clamp(30px, 4vw, 50px);

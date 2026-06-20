@@ -1,5 +1,6 @@
 ---
 import '../styles/tokens.css';
+import RetuneOverlay from '../components/RetuneOverlay';
 
 interface Props {
   title?: string;
@@ -43,11 +44,18 @@ const person = {
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
 
-    <!-- Preload the most-used faces above the fold: Serif 600 renders the LCP
-         hero name/headline (Auditor); Mono 400 renders eyebrows, nav, labels. -->
+    <!-- Preload the most-used faces above the fold: Big Shoulders Display 700/800
+         render the LCP hero role + name; Mono 400 renders eyebrows, nav, labels. -->
     <link
       rel="preload"
-      href="/fonts/ibm-plex-serif-latin-600-normal.woff2"
+      href="/fonts/big-shoulders-display-latin-700-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/big-shoulders-display-latin-800-normal.woff2"
       as="font"
       type="font/woff2"
       crossorigin
@@ -74,6 +82,7 @@ const person = {
   <body>
     <a href="#main" class="skip-link">Skip to content</a>
     <slot />
+    <RetuneOverlay client:only="react" />
 
     <script>
       import Lenis from 'lenis';
