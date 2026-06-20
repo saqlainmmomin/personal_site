@@ -9,8 +9,10 @@ const notes = defineCollection({
     title: z.string(),
     hook: z.string(),
     thesis: z.string(),
-    url: z.string(), // canonical LinkedIn URL; placeholder until provided
+    url: z.string(),
     order: z.number(),
+    date: z.string().optional(),
+    cover: z.string().optional(),
   }),
 });
 

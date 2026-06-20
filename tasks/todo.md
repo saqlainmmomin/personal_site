@@ -90,3 +90,36 @@ prelude above Lens / WebGL fragment shader / ogl allowed / images generated exte
 - Framing: keep the chalice (socrates-full) and the gap (hands-adam) near image center, or give me the
   cup's normalized x/y and I'll set the zoom focal in `socrates-shader.ts`.
 - webp available via `cwebp` (no avifenc/ImageMagick) for the later `<picture>` optimization.
+
+---
+
+# Project Screenshots — "proof, not a text box" (2026-06-16)
+
+Goal: give each of the 4 work rows real visual proof. Mix: clean screenshots + annotated
+callouts where they add signal + GIFs for the RL sims. Dual-reading aware (auditor/builder).
+Pipeline: capture PNG → AVIF/WebP/PNG (cwebp + existing watcher) → `public/img/projects/` →
+`<figure>` in WorkRow.astro, lazy-loaded, themed to palette, below the fold (LCP safe).
+
+## Decisions locked
+- [x] Project #2 = Recon. Repo renamed cyberdd → github.com/saqlainmmomin/Recon. Site link fixed.
+- [x] Style: clean SS + annotated callouts + GIFs for RL.
+
+## Per-project capture
+### 1. CyberAssess (LEAD) — ~/dpdpa-gap-tool — FastAPI+HTMX ✅ local
+- [ ] Boot + seed (Meridian / Helix / Vantara fixtures)
+- [ ] AUDITOR: board-ready PDF gap report page (severity + answer-source pills) — annotated
+- [ ] BUILDER: adaptive questionnaire w/ tier badges (deep/standard/quick-confirm)
+### 2. Recon (LEAD) — github/Recon — clone needed
+- [ ] Clone + run; check scanner API keys
+- [ ] 60-second scan result: 6 scanner panels + red-flag verdict — annotated
+### 3. RL · game theory — github/Prisoners_dilemma (+ Usain-Bot) — clone needed
+- [ ] Clone + run
+- [ ] GIF: interactive prisoner's-dilemma sim; optional GIF: snake agent
+### 4. Velocity — ~/Velocity — React+Express ✅ local
+- [ ] Boot (Gemini key? UI should render from SQLite)
+- [ ] "Mission Control" dashboard — scored developments w/ opportunity/disruption/gap badges
+
+## Wire-up
+- [ ] Extend `Project` type with `image` (+ optional builder variant) + `caption`
+- [ ] Render `<figure>` in WorkRow.astro, palette-themed, lazy, AVIF+fallback
+- [ ] Verify in preview (mobile + reduced-motion); commit

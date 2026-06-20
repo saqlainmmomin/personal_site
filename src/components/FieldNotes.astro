@@ -7,27 +7,51 @@ const notes = (await getCollection('notes')).sort(
 ---
 
 <section class="notes" id="notes" aria-labelledby="notes-h">
-  <div class="wrap">
-    <p class="eyebrow">Field notes</p>
-    <h2 id="notes-h">I publish a position, with the data attached.</h2>
-    <p class="lead">
-      Fifteen articles for security and GRC practitioners. The recurring thesis:
-      this is not IT security for AI tools, it is systems security for synthetic
-      cognition.
-    </p>
+  <div class="wrap-wide">
+    <header class="notes-head">
+      <p class="eyebrow" data-reveal>Field notes</p>
+      <h2 id="notes-h" data-reveal>I publish a position, with the data attached.</h2>
+      <p class="lead" data-reveal>
+        Fifteen articles for security and GRC practitioners. The recurring thesis:
+        this is not IT security for AI tools, it is systems security for synthetic
+        cognition.
+      </p>
+    </header>
 
-    <ul class="list">
-      {
-        notes.map((n) => (
-          <li class="note">
-            <a href={n.data.url} target="_blank" rel="noopener">
-              <span class="hook">{n.data.hook}</span>
-              <span class="thesis">{n.data.thesis}</span>
+    <ul class="grid" role="list">
+      {notes.map((n, i) => (
+        <li
+          class="card-li"
+          data-reveal
+          style={`--reveal-delay:${i % 2 === 1 ? 100 : 0}ms`}
+        >
+          <a href={n.data.url} target="_blank" rel="noopener" class="card">
+            <div class="card-media">
+              {n.data.cover
+                ? (
+                  <img
+                    src={n.data.cover}
+                    alt=""
+                    loading="lazy"
+                    class="card-img"
+                  />
+                )
+                : <div class="card-placeholder" aria-hidden="true"></div>
+              }
+              <div class="card-overlay" aria-hidden="true">
+                {n.data.date && (
+                  <time class="card-date mono">{n.data.date}</time>
+                )}
+                <p class="card-hook">{n.data.hook}</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <p class="card-thesis">{n.data.thesis}</p>
               <span class="go mono">read on LinkedIn &rarr;</span>
-            </a>
-          </li>
-        ))
-      }
+            </div>
+          </a>
+        </li>
+      ))}
     </ul>
   </div>
 </section>
@@ -45,8 +69,15 @@ const notes = (await getCollection('notes')).sort(
     color: var(--build-fg);
     border-top-color: var(--build-line);
   }
+
+  /* ---- Header ---- */
+  .notes-head {
+    max-width: var(--max-read);
+    margin-bottom: clamp(40px, 6vw, 72px);
+  }
   .eyebrow { color: var(--audit-accent); margin-bottom: var(--s-4); }
   :global(html[data-reading='builder']) .eyebrow { color: var(--build-accent); }
+
   h2 {
     font-family: var(--serif);
     font-size: var(--fs-h2);
@@ -56,6 +87,7 @@ const notes = (await getCollection('notes')).sort(
     max-width: 18ch;
   }
   :global(html[data-reading='builder']) h2 { font-family: var(--sans); font-weight: 500; }
+
   .lead {
     font-size: var(--fs-lead);
     color: var(--audit-dim);
@@ -64,32 +96,134 @@ const notes = (await getCollection('notes')).sort(
     line-height: 1.45;
   }
   :global(html[data-reading='builder']) .lead { color: var(--build-dim); font-family: var(--mono); font-size: var(--fs-body); }
-  .list { list-style: none; margin-top: var(--s-7); }
-  .note { border-top: 1px solid var(--audit-line); }
-  .note:last-child { border-bottom: 1px solid var(--audit-line); }
-  :global(html[data-reading='builder']) .note { border-top-color: var(--build-line); }
-  :global(html[data-reading='builder']) .note:last-child { border-bottom-color: var(--build-line); }
-  .note a {
+
+  /* ---- Card grid ---- */
+  .grid {
+    list-style: none;
     display: grid;
-    gap: var(--s-2);
-    padding: var(--s-5) 0;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+  }
+
+  /* ---- Individual card ---- */
+  .card {
+    display: flex;
+    flex-direction: column;
     text-decoration: none;
     color: inherit;
   }
-  .hook {
-    font-family: var(--serif);
-    font-size: clamp(21px, 2.4vw, 27px);
-    font-weight: 600;
-    line-height: 1.2;
-    letter-spacing: -0.01em;
-    transition: color var(--dur) var(--ease);
+
+  /* Image container */
+  .card-media {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 3 / 2;
+    background: var(--win-bg);
   }
-  :global(html[data-reading='builder']) .hook { font-family: var(--sans); }
-  .note a:hover .hook, .note a:focus-visible .hook { color: var(--audit-accent); }
-  :global(html[data-reading='builder']) .note a:hover .hook,
-  :global(html[data-reading='builder']) .note a:focus-visible .hook { color: var(--build-accent); }
-  .thesis { color: var(--audit-dim); font-size: var(--fs-small); line-height: 1.5; max-width: 64ch; }
-  :global(html[data-reading='builder']) .thesis { color: var(--build-dim); }
-  .go { font-size: 11.5px; letter-spacing: 0.08em; color: var(--audit-accent); margin-top: var(--s-1); }
+
+  .card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transform: scale(1.06);
+    transition: transform 0.8s cubic-bezier(0.25, 0, 0, 1);
+    filter: grayscale(15%);
+  }
+  .card:hover .card-img,
+  .card:focus-visible .card-img {
+    transform: scale(1.0);
+  }
+
+  /* Placeholder when no cover image */
+  .card-placeholder {
+    width: 100%;
+    height: 100%;
+    background-image: url('/img/final-dither.avif');
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.35) contrast(1.1);
+    transform: scale(1.06);
+    transition: transform 0.8s cubic-bezier(0.25, 0, 0, 1);
+  }
+  .card:hover .card-placeholder,
+  .card:focus-visible .card-placeholder {
+    transform: scale(1.0);
+  }
+
+  /* Text overlay on image */
+  .card-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(14px, 2vw, 24px);
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.25) 0%,
+      rgba(0, 0, 0, 0) 35%,
+      rgba(0, 0, 0, 0) 50%,
+      rgba(0, 0, 0, 0.72) 100%
+    );
+    pointer-events: none;
+  }
+
+  .card-date {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.65);
+    align-self: flex-start;
+  }
+
+  .card-hook {
+    font-family: var(--serif);
+    font-size: clamp(14px, 1.6vw, 20px);
+    font-weight: 600;
+    line-height: 1.22;
+    letter-spacing: -0.01em;
+    color: #fff;
+    max-width: 28ch;
+  }
+  :global(html[data-reading='builder']) .card-hook { font-family: var(--sans); font-weight: 500; }
+
+  /* Body below the image */
+  .card-body {
+    padding: clamp(12px, 1.4vw, 18px) 0 clamp(16px, 2vw, 24px);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    flex: 1;
+  }
+
+  .card-thesis {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--audit-dim);
+    max-width: 52ch;
+  }
+  :global(html[data-reading='builder']) .card-thesis { color: var(--build-dim); }
+
+  .go {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--audit-accent);
+    text-transform: uppercase;
+  }
   :global(html[data-reading='builder']) .go { color: var(--build-accent); }
+
+  /* Hover accent on hook text */
+  .card:hover .card-hook,
+  .card:focus-visible .card-hook {
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.4);
+    text-underline-offset: 3px;
+  }
+
+  /* Responsive: single column on narrow screens */
+  @media (max-width: 640px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>
