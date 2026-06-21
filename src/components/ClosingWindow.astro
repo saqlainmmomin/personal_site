@@ -103,7 +103,6 @@ const stats = [
         <svg
           id="chart"
           viewBox={`0 0 ${W} ${H}`}
-          preserveAspectRatio="none"
           aria-hidden="true"
           role="presentation"
         >
@@ -185,11 +184,15 @@ const stats = [
   .chart-box {
     width: 100%;
     max-width: var(--max-wide);
+    min-height: min(62vh, 520px);
     margin: 0 auto;
     padding: 0 var(--gutter);
     position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
-  svg { width: 100%; height: min(62vh, 520px); display: block; overflow: visible; }
+  svg { width: 100%; aspect-ratio: 1000 / 520; height: auto; max-height: 520px; display: block; overflow: visible; }
   .gridline { stroke: var(--win-grid); stroke-width: 1; }
   .line-human { fill: none; stroke: var(--human); stroke-width: 2.5; }
   .line-machine { fill: none; stroke: var(--machine); stroke-width: 2.5; }
@@ -237,6 +240,7 @@ const stats = [
 
   @media (max-width: 720px) {
     .caption { max-width: 26ch; }
+    .step-trigger { height: 170vh; }
   }
 </style>
 
