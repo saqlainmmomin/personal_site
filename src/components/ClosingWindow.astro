@@ -236,10 +236,7 @@ const stats = [
   .stat .src { font-size: 11px; color: var(--win-dim); margin-top: var(--s-3); letter-spacing: 0.04em; opacity: 0.7; }
 
   @media (max-width: 720px) {
-    .caption { position: static; max-width: none; margin-bottom: var(--s-5); }
-    .chart-sticky { position: static; height: auto; padding: var(--s-7) 0; display: block; }
-    .scene[data-js] .step { display: block; }
-    .scene[data-js] .steps { display: none; }
+    .caption { max-width: 26ch; }
   }
 </style>
 
@@ -248,7 +245,6 @@ const stats = [
 
   const scene = document.getElementById('scene');
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const mqNarrow = window.matchMedia('(max-width: 720px)');
 
   const machine = document.getElementById('machine');
   const gap = document.getElementById('gapArea');
@@ -262,40 +258,19 @@ const stats = [
     lblM?.setAttribute('y', String(m.y));
   }
 
-  // Scroll-drive only when motion is allowed. The narrow/wide decision is
-  // re-evaluated on viewport change so resizing across the breakpoint recovers.
+  // Scroll-drive the chart and step through captions, same on every viewport:
+  // the chart stays pinned for the height of .steps, and scroll position
+  // through that range maps to both curve progress and the active caption.
   if (scene && !reduce) {
     const captions = Array.from(scene.querySelectorAll('.caption .step'));
 
-    // Narrow layout has no sticky pin and shows every caption stacked, so
-    // there's no step-trigger scroll range to drive progress from. Instead
-    // the curve grows in as the chart itself scrolls through the viewport.
-    function narrowProgress(): number {
-      const svg = document.getElementById('chart');
-      if (!svg) return 1;
-      const rect = svg.getBoundingClientRect();
-      const vh = window.innerHeight;
-      const startY = vh * 0.9;
-      const endY = vh * 0.2;
-      return Math.max(0, Math.min(1, (startY - rect.top) / (startY - endY)));
-    }
-
     function update() {
-      if (mqNarrow.matches) {
-        renderMachine(narrowProgress());
-        return;
-      }
       const rect = scene!.getBoundingClientRect();
       const total = scene!.offsetHeight - window.innerHeight;
       const prog = total > 0 ? Math.max(0, Math.min(1, -rect.top / total)) : 0;
       renderMachine(prog);
       const idx = Math.min(3, Math.floor(prog * 4));
       captions.forEach((c, i) => c.classList.toggle('active', i === idx));
-    }
-
-    function applyMode() {
-      scene!.dataset.js = '';
-      update();
     }
 
     let ticking = false;
@@ -312,8 +287,8 @@ const stats = [
       },
       { passive: true }
     );
-    mqNarrow.addEventListener('change', applyMode);
-    applyMode();
+    scene.dataset.js = '';
+    update();
   }
 
   // ---- Count-up stats (motion allowed only; final value already in DOM) ----
