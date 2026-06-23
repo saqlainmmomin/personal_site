@@ -2,34 +2,46 @@
 // One dual-readable project row. Both readings render and occupy the same grid
 // cell; CSS shows one based on html[data-reading], crossfading on change.
 export interface Reading {
-  title: string;
+  description: string;
   body: string;
   meta: string;
 }
 export interface Project {
   tag: string;
+  name: string;
   lead?: boolean;
   builder: Reading;
   auditor: Reading;
   // Filled from the per-project link map. null until confirmed.
   link?: { label: string; href: string } | null;
+  image?: {
+    src: string;
+    webp?: string;
+    alt: string;
+    poster?: string;
+    video?: string;
+    label: string;
+  };
 }
 const { project } = Astro.props as { project: Project };
-const { tag, lead, builder, auditor, link } = project;
+const { tag, name, lead, builder, auditor, link, image } = project;
 ---
 
 <article class={`row${lead ? ' lead' : ''}`}>
   <div class="tag mono">{tag}</div>
   <div class="readings">
-    <div class="reading reading-audit">
-      <h3>{auditor.title}</h3>
-      <p class="body">{auditor.body}</p>
-      <div class="meta mono">{auditor.meta}</div>
-    </div>
-    <div class="reading reading-build" aria-hidden="true">
-      <h3>{builder.title}</h3>
-      <p class="body">{builder.body}</p>
-      <div class="meta mono">{builder.meta}</div>
+    <h3>{name}</h3>
+    <div class="reading-stack">
+      <div class="reading reading-audit">
+        <p class="desc">{auditor.description}</p>
+        <p class="body">{auditor.body}</p>
+        <div class="meta mono">{auditor.meta}</div>
+      </div>
+      <div class="reading reading-build" aria-hidden="true">
+        <p class="desc">{builder.description}</p>
+        <p class="body">{builder.body}</p>
+        <div class="meta mono">{builder.meta}</div>
+      </div>
     </div>
     {
       link ? (
@@ -40,6 +52,24 @@ const { tag, lead, builder, auditor, link } = project;
         <span class="link mono case">case study</span>
       )
     }
+    {image && (
+      <figure class="preview">
+        <div class="preview-bar mono">{image.label}</div>
+        {image.video ? (
+          <>
+            <video autoplay muted loop playsinline poster={image.poster} class="preview-video">
+              <source src={image.video} type="video/mp4" />
+            </video>
+            <img src={image.poster} alt={image.alt} class="preview-poster" aria-hidden="true" />
+          </>
+        ) : (
+          <picture>
+            {image.webp && <source type="image/webp" srcset={image.webp} />}
+            <img src={image.src} alt={image.alt} loading="lazy" decoding="async" />
+          </picture>
+        )}
+      </figure>
+    )}
   </div>
 </article>
 
@@ -65,21 +95,32 @@ const { tag, lead, builder, auditor, link } = project;
   :global(html[data-reading='builder']) .tag { color: var(--build-accent); }
 
   .readings { position: relative; }
+  .reading-stack { position: relative; }
   .reading { transition: opacity 180ms var(--ease); }
   .reading-build { opacity: 0; visibility: hidden; position: absolute; top: 0; left: 0; width: 100%; }
   :global(html[data-reading='builder']) .reading-audit { opacity: 0; visibility: hidden; position: absolute; top: 0; left: 0; width: 100%; }
   :global(html[data-reading='builder']) .reading-build { opacity: 1; visibility: visible; position: static; }
 
-  h3 {
+  .readings > h3 {
+    font-family: var(--serif);
     font-size: var(--fs-h3);
     font-weight: 600;
     letter-spacing: -0.01em;
     line-height: 1.18;
     max-width: 22ch;
   }
-  .reading-audit h3 { font-family: var(--serif); }
-  .reading-build h3 { font-family: var(--sans); font-weight: 500; }
-  .row.lead h3 { font-size: clamp(24px, 3vw, 34px); }
+  :global(html[data-reading='builder']) .readings > h3 { font-family: var(--sans); font-weight: 500; }
+  .row.lead .readings > h3 { font-size: clamp(24px, 3vw, 34px); }
+
+  .desc {
+    font-size: var(--fs-body);
+    font-weight: 500;
+    line-height: 1.4;
+    margin-top: var(--s-3);
+    max-width: 40ch;
+  }
+  .reading-audit .desc { font-family: var(--serif); color: var(--audit-fg); }
+  .reading-build .desc { font-family: var(--mono); color: var(--build-fg); }
 
   .body {
     font-size: var(--fs-small);
@@ -106,11 +147,39 @@ const { tag, lead, builder, auditor, link } = project;
   .link.case { border-bottom-style: dotted; opacity: 0.6; cursor: default; }
   :global(html[data-reading='builder']) .link { color: var(--build-fg); }
 
+  .preview {
+    margin-top: var(--s-6);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--audit-line);
+    max-width: 640px;
+  }
+  :global(html[data-reading='builder']) .preview { border-color: var(--build-line); }
+  .preview-bar {
+    padding: 7px 14px;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    color: var(--audit-dim);
+    background: var(--audit-bg-2);
+    border-bottom: 1px solid var(--audit-line);
+  }
+  :global(html[data-reading='builder']) .preview-bar {
+    color: var(--build-dim);
+    background: var(--build-bg-2);
+    border-color: var(--build-line);
+  }
+  .preview video,
+  .preview picture img { display: block; width: 100%; height: auto; }
+  .preview-poster { display: none; width: 100%; height: auto; }
+
   @media (prefers-reduced-motion: reduce) {
     .reading { transition: none; }
+    .preview-video { display: none; }
+    .preview-poster { display: block; }
   }
   @media (max-width: 640px) {
     .row { grid-template-columns: 1fr; gap: var(--s-3); }
     .tag { padding-top: 0; }
+    .preview { max-width: 100%; }
   }
 </style>
