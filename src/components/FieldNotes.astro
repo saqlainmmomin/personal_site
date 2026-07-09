@@ -1,9 +1,22 @@
 ---
 import { getCollection } from 'astro:content';
 
-const notes = (await getCollection('notes')).sort(
+// Curated to 6 strongest by hook/thesis strength (the plan instructs by
+// editorial judgment). Full set of 15 accessible via the LinkedIn link below.
+const allNotes = (await getCollection('notes')).sort(
   (a, b) => a.data.order - b.data.order
 );
+
+const curatedSlugs = new Set([
+  'recursion-tightening',       // core thesis: AI agents have production access
+  'control-problem-deployment', // foundational framing: the control problem is now a deployment problem
+  'invisible-exponential',      // directly supports the divergence chart (89-day doubling)
+  'ai-surpasses-researchers',   // concrete, recent, impactful
+  'pypi-weaponized',            // concrete supply-chain proof
+  'everything-context',         // unique angle, practical for GRC
+]);
+
+const notes = allNotes.filter((n) => curatedSlugs.has(n.id));
 ---
 
 <section class="notes" id="notes" aria-labelledby="notes-h">
@@ -53,6 +66,17 @@ const notes = (await getCollection('notes')).sort(
         </li>
       ))}
     </ul>
+
+    <footer class="all-link-wrap" data-reveal>
+      <a
+        href="https://www.linkedin.com/in/saqlain-musa/"
+        target="_blank"
+        rel="noopener"
+        class="all-link mono"
+      >
+        all 15 on LinkedIn &rarr;
+      </a>
+    </footer>
   </div>
 </section>
 
@@ -218,6 +242,36 @@ const notes = (await getCollection('notes')).sort(
     text-decoration: underline;
     text-decoration-color: rgba(255, 255, 255, 0.4);
     text-underline-offset: 3px;
+  }
+
+  /* ---- "all 15 on LinkedIn" link ---- */
+  .all-link-wrap {
+    margin-top: var(--s-8);
+    text-align: center;
+  }
+  .all-link {
+    display: inline-block;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    border-bottom: 1px solid var(--audit-accent);
+    color: var(--audit-accent);
+    padding-bottom: 3px;
+    transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  }
+  :global(html[data-reading='builder']) .all-link {
+    color: var(--build-accent);
+    border-color: var(--build-accent);
+  }
+  .all-link:hover,
+  .all-link:focus-visible {
+    color: var(--audit-fg);
+    border-color: var(--audit-fg);
+  }
+  :global(html[data-reading='builder']) .all-link:hover,
+  :global(html[data-reading='builder']) .all-link:focus-visible {
+    color: var(--build-fg);
+    border-color: var(--build-fg);
   }
 
   /* Responsive: single column on narrow screens */
