@@ -11,6 +11,10 @@ const links = [
   <div class="wrap">
     <p class="eyebrow">Contact</p>
     <h2>The frameworks will catch up eventually. I would rather be early.</h2>
+    <p class="availability">
+      Open to senior GRC / security engineering roles and advisory work.
+    </p>
+    <a class="cta mono" href="mailto:saqlainmmomin@gmail.com">Email me</a>
     <div class="links mono">
       {
         links.map((l) => (
@@ -22,6 +26,7 @@ const links = [
           </a>
         ))
       }
+      <a href="/cv.pdf" download>CV (PDF)</a>
     </div>
   </div>
 </footer>
@@ -43,8 +48,28 @@ const links = [
     max-width: 20ch;
     margin: 0 auto;
   }
+  .availability {
+    font-size: var(--fs-body);
+    color: var(--win-dim);
+    max-width: 42ch;
+    margin: var(--s-5) auto 0;
+    line-height: 1.5;
+  }
+  .cta {
+    display: inline-block;
+    margin-top: var(--s-5);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--win-fg);
+    border-bottom: 2px solid var(--machine);
+    padding-bottom: 4px;
+    transition: border-color var(--dur) var(--ease);
+  }
+  .cta:hover, .cta:focus-visible { border-color: var(--win-fg); }
   .links {
-    margin-top: var(--s-7);
+    margin-top: var(--s-6);
     display: flex;
     gap: var(--s-5);
     justify-content: center;

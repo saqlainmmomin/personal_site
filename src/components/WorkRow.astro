@@ -12,6 +12,7 @@ export interface Project {
   lead?: boolean;
   builder: Reading;
   auditor: Reading;
+  outcomes?: string[];
   // Filled from the per-project link map. null until confirmed.
   link?: { label: string; href: string } | null;
   image?: {
@@ -19,12 +20,13 @@ export interface Project {
     webp?: string;
     alt: string;
     poster?: string;
+    posterWebp?: string;
     video?: string;
     label: string;
   };
 }
 const { project } = Astro.props as { project: Project };
-const { tag, name, lead, builder, auditor, link, image } = project;
+const { tag, name, lead, builder, auditor, outcomes, link, image } = project;
 ---
 
 <article class={`row${lead ? ' lead' : ''}`}>
@@ -43,6 +45,11 @@ const { tag, name, lead, builder, auditor, link, image } = project;
         <div class="meta mono">{builder.meta}</div>
       </div>
     </div>
+    {outcomes && outcomes.length > 0 && (
+      <ul class="outcomes mono">
+        {outcomes.map((o) => <li>{o}</li>)}
+      </ul>
+    )}
     {
       link ? (
         <a class="link mono" href={link.href} target="_blank" rel="noopener">
@@ -57,10 +64,13 @@ const { tag, name, lead, builder, auditor, link, image } = project;
         <div class="preview-bar mono">{image.label}</div>
         {image.video ? (
           <>
-            <video autoplay muted loop playsinline poster={image.poster} class="preview-video">
+            <video autoplay muted loop playsinline poster={image.posterWebp ?? image.poster} class="preview-video">
               <source src={image.video} type="video/mp4" />
             </video>
-            <img src={image.poster} alt={image.alt} class="preview-poster" aria-hidden="true" />
+            <picture class="preview-fallback">
+              {image.posterWebp && <source type="image/webp" srcset={image.posterWebp} />}
+              <img src={image.poster} alt={image.alt} aria-hidden="true" />
+            </picture>
           </>
         ) : (
           <picture>
@@ -135,6 +145,28 @@ const { tag, name, lead, builder, auditor, link, image } = project;
   .reading-audit .meta { color: var(--audit-accent); }
   .reading-build .meta { color: var(--build-accent); }
 
+  .outcomes {
+    list-style: none;
+    margin-top: var(--s-4);
+    display: grid;
+    gap: 6px;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    color: var(--audit-dim);
+  }
+  :global(html[data-reading='builder']) .outcomes { color: var(--build-dim); }
+  .outcomes li {
+    padding-left: 1em;
+    position: relative;
+  }
+  .outcomes li::before {
+    content: '·';
+    position: absolute;
+    left: 0;
+    color: var(--audit-accent);
+  }
+  :global(html[data-reading='builder']) .outcomes li::before { color: var(--build-accent); }
+
   .link {
     display: inline-block;
     margin-top: var(--s-4);
@@ -170,12 +202,12 @@ const { tag, name, lead, builder, auditor, link, image } = project;
   }
   .preview video,
   .preview picture img { display: block; width: 100%; height: auto; }
-  .preview-poster { display: none; width: 100%; height: auto; }
+  .preview-fallback { display: none; width: 100%; height: auto; }
 
   @media (prefers-reduced-motion: reduce) {
     .reading { transition: none; }
     .preview-video { display: none; }
-    .preview-poster { display: block; }
+    .preview-fallback { display: block; }
   }
   @media (max-width: 640px) {
     .row { grid-template-columns: 1fr; gap: var(--s-3); }

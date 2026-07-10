@@ -9,6 +9,7 @@
     <li><a href="#argument">Window</a></li>
     <li><a href="#notes">Notes</a></li>
     <li><a href="#who">Who</a></li>
+    <li><a href="/cv.pdf" download>CV</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
 </nav>
@@ -39,7 +40,8 @@
   .nav a:hover, .nav a:focus-visible { color: var(--win-fg); }
   ul a { text-transform: uppercase; }
   @media (max-width: 560px) {
-    li:nth-child(3), li:nth-child(4) { display: none; }
+    ul { gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    .nav a { font-size: 10px; letter-spacing: 0.04em; }
   }
 </style>
 

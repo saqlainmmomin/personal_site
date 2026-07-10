@@ -19,6 +19,15 @@ const facts = [
       assessments and board-level reporting.
     </p>
 
+    <div class="impact">
+      <h3 class="mono">Impact</h3>
+      <ul>
+        <li>Led 15+ security engagements across BFSI, real estate, and e-commerce</li>
+        <li>Built vendor risk programs covering 50+ vendor ecosystems</li>
+        <li>Delivered end-to-end compliance reviews against NIST CSF, OWASP Top 10, PCI DSS</li>
+      </ul>
+    </div>
+
     <dl class="facts">
       {
         facts.map((f) => (
@@ -53,6 +62,35 @@ const facts = [
   :global(html[data-reading='builder']) h2 { font-family: var(--sans); font-weight: 500; }
   .lead { font-size: var(--fs-lead); color: var(--audit-dim); max-width: 52ch; margin-top: var(--s-4); line-height: 1.45; }
   :global(html[data-reading='builder']) .lead { color: var(--build-dim); font-family: var(--mono); font-size: var(--fs-body); }
+
+  .impact { margin-top: var(--s-7); }
+  .impact h3 {
+    font-size: var(--fs-label);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--audit-accent);
+    margin-bottom: var(--s-4);
+  }
+  :global(html[data-reading='builder']) .impact h3 { color: var(--build-accent); }
+  .impact ul {
+    list-style: none;
+    display: grid;
+    gap: var(--s-3);
+    max-width: 56ch;
+  }
+  .impact li {
+    font-size: var(--fs-body);
+    line-height: 1.45;
+    padding-left: 1.2em;
+    position: relative;
+  }
+  .impact li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--audit-accent);
+  }
+  :global(html[data-reading='builder']) .impact li::before { color: var(--build-accent); }
 
   .facts { margin-top: var(--s-7); border-top: 1px solid var(--audit-line); }
   :global(html[data-reading='builder']) .facts { border-top-color: var(--build-line); }
