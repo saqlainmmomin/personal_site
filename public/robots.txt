@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://saqlainmomin.com/sitemap-index.xml

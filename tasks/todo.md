@@ -1,3 +1,18 @@
+# SITE-V2 PIVOT (2026-07-14) — everything below is the superseded Astro plan
+
+The Claude-designed single-file site (`site-v2/index.html`, live at saqlainswebsite.vercel.app)
+replaces the Astro scrollytelling build. Refined this session: name fixed (Momin), hero = name +
+"GRC Professional", engagements = 5 NDA-safe capability lines (TPRM / ISO impl+audit / CMA / BCMS /
+risk & monitoring), no recycled 15+/50+ metrics, demos behind View-demo toggles, Writing section
+(6 field notes → LinkedIn), real contacts + CV.
+
+- [ ] Saqlain: confirm KPMG title wording ("Cyber Strategy & Governance" vs CV's "Assistant Manager, Cybersecurity")
+- [ ] Saqlain: eyeball demo toggles + videos in a real browser (embedded pane suspends video)
+- [ ] Commit site-v2/ and point the Vercel project's root directory at `site-v2`
+- [ ] Decide fate of the Astro build (src/) once v2 is confirmed live
+
+---
+
 # Personal site - build plan
 
 ## Phase 0 - Decisions (in progress)
