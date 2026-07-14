@@ -4,13 +4,7 @@
     {
       "name": "site",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--", "--port", "4327"],
-      "port": 4327
-    },
-    {
-      "name": "site-v2",
-      "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "4173", "--directory", "site-v2"],
+      "runtimeArgs": ["run", "dev"],
       "port": 4173
     }
   ]

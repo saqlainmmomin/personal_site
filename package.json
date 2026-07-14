@@ -1,0 +1,13 @@
+{
+  "name": "saqlain-momin-portfolio",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "python3 -m http.server 4173 --directory site-v2",
+    "test": "node site-v2/smoke-test.mjs"
+  },
+  "devDependencies": {
+    "css-tree": "3.2.1",
+    "parse5": "7.3.0"
+  }
+}
