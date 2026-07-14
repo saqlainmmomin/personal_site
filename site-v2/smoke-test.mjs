@@ -10,6 +10,7 @@ const { parse: parseCss } = require('css-tree');
 
 const root = dirname(fileURLToPath(import.meta.url));
 const PRODUCTION_ORIGIN = 'https://saqlainswebsite.vercel.app';
+const RECURSION_LINK = 'https://www.linkedin.com/posts/saqlain-musa_artificialabrintelligence-cybersecurity-activity-7422552460696698880-RLNL?utm_source=share&utm_medium=member_desktop&rcm=ACoAACD3yM8BSyqSc7F2ugwZkJdAE3Rl_HWABmA';
 const EXPECTED_FIELD_NOTE_IMAGES = 6;
 const EXPECTED_PROJECTS = 4;
 const htmlPath = join(root, 'index.html');
@@ -62,6 +63,14 @@ function nodeById(id) {
 
 function classIncludes(node, className) {
   return (attributes(node).class ?? '').split(/\s+/).includes(className);
+}
+
+function descendants(node, predicate) {
+  const matches = [];
+  walk(node, current => {
+    if (current !== node && predicate(current)) matches.push(current);
+  });
+  return matches;
 }
 
 function assertNonemptyFile(path, label) {
@@ -125,10 +134,23 @@ assert.equal(attributes(dialog)['aria-describedby'], 'dialogDescription');
 const projectElements = nodesByTag('article').filter(node => attributes(node)['data-project']);
 const projectTriggers = nodesByTag('button').filter(node => classIncludes(node, 'project-demo'));
 assert.equal(projectElements.length, EXPECTED_PROJECTS, 'Expected one flagship and three supporting projects');
-assert.equal(projectTriggers.length, EXPECTED_PROJECTS * 2, 'Every project needs two accessible demo triggers');
+assert.equal(projectTriggers.length, EXPECTED_PROJECTS * 2 - 1, 'CyberAssess needs one demo trigger; supporting projects need two');
+
+const cyberAssess = projectElements.find(node => attributes(node)['data-project'] === 'cyberassess');
+assert.ok(cyberAssess, 'CyberAssess project is required');
+assert.equal(descendants(cyberAssess, node => classIncludes(node, 'project-demo')).length, 1, 'CyberAssess should open its demo from one button');
+assert.equal(descendants(cyberAssess, node => node.tagName === 'img').length, 0, 'CyberAssess flagship card should be text-only');
+
+const featuredNote = nodesByTag('a').find(node => classIncludes(node, 'note-featured'));
+assert.equal(attributes(featuredNote).href, RECURSION_LINK, 'Featured Field Note should use the supplied LinkedIn URL');
 
 assert.match(html, /@media\(prefers-reduced-motion:reduce\)/, 'Reduced-motion styles are required');
-assert.match(html, /new ResizeObserver/, 'Hero particles should resize with their container');
+const particleCanvas = nodeById('particleCanvas');
+assert.ok(particleCanvas, 'Site-wide particle canvas is required');
+assert.equal(particleCanvas.parentNode.tagName, 'body', 'Particle canvas should be site-wide, not nested in the hero');
+assert.match(html, /#particleCanvas\{/, 'Particle canvas needs site-wide positioning styles');
+assert.match(html, /\.is-scrolled nav/, 'Scrolled navigation needs an isolated visual surface');
+assert.match(html, /\.is-scrolled \.status-bar/, 'Availability status should leave when scrolling begins');
 assert.match(html, /projectDialog\.showModal/, 'Project demos should use a modal dialog');
 assert.match(html, /dialogMedia\.replaceChildren/, 'Dialog media should be removed when closed');
 assert.match(html, /navLinks\.classList/, 'Mobile navigation should use progressive enhancement');

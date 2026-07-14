@@ -1,3 +1,23 @@
+# SITE-V2 FINAL INTERACTION POLISH (2026-07-14)
+
+Assumptions: keep the desktop navigation available while scrolling, but give it an opaque
+scrolled state; dismiss the hero availability status as soon as scrolling begins; keep the
+particle field ambient across the site, with stronger hero contrast and quieter body contrast.
+
+- [x] Add smoke-test coverage for the global particle field, scrolled chrome, text-only CyberAssess card, and corrected Field Note URL
+- [x] Implement site-wide cursor particles with hero/body prominence states and reduced-motion safeguards
+- [x] Add scroll-safe navigation treatment and dismiss the availability status on scroll
+- [x] Remove the CyberAssess poster trigger while retaining its accessible View demo dialog flow
+- [x] Update the featured Field Note LinkedIn link
+- [x] Run automated checks and verify desktop/mobile interactions in a browser
+
+Verification: `npm test`, inline HTML/CSS/JavaScript parsing, `git diff --check`, and live
+browser checks at 1440px and 390px. Confirmed scroll-state chrome, hero/body particle contrast,
+no horizontal overflow, the text-only CyberAssess layout, demo open/close cleanup and focus
+return, mobile navigation, the corrected LinkedIn href, and a clean browser console.
+
+---
+
 # SITE-V2 POLISH IMPLEMENTATION (2026-07-14)
 
 Locked decisions: 7/5 evidence-rail hero; exact title "Assistant Manager, Cyber Strategy & Governance";

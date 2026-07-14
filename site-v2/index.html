@@ -146,8 +146,19 @@
     justify-content:space-between;
     gap:24px;
     padding:20px var(--page-pad);
+    border-bottom:1px solid transparent;
+    background:transparent;
     color:#fff;
     mix-blend-mode:difference;
+    transition:background .25s ease,border-color .25s ease,box-shadow .25s ease,color .25s ease;
+  }
+  .is-scrolled nav{
+    border-color:var(--line);
+    background:rgba(242,239,232,.96);
+    color:var(--ink);
+    box-shadow:0 10px 30px rgba(13,13,13,.06);
+    mix-blend-mode:normal;
+    backdrop-filter:blur(14px);
   }
   .logo{
     display:flex;
@@ -201,7 +212,9 @@
     color:var(--muted);
     text-align:right;
     pointer-events:none;
+    transition:opacity .2s ease,transform .2s ease;
   }
+  .is-scrolled .status-bar{opacity:0;transform:translateY(12px);}
   .status-bar .live{
     display:flex;
     align-items:center;
@@ -260,7 +273,6 @@
     text-transform:uppercase;
     transition:opacity .25s ease;
   }
-  .status-bar.is-hidden{opacity:0;pointer-events:none;}
   .sec-head h2{
     max-width:17ch;
     font-family:'Instrument Serif',serif;
@@ -350,10 +362,10 @@
     overflow:hidden;
     padding:0 var(--page-pad);
   }
-  #heroParticleCanvas{
-    position:absolute;
+  #particleCanvas{
+    position:fixed;
     inset:0;
-    z-index:0;
+    z-index:1;
     width:100%;height:100%;
     pointer-events:none;
   }
@@ -609,18 +621,17 @@
 
   /* PROJECTS */
   .project-featured{
-    display:grid;
-    grid-template-columns:5fr 7fr;
     overflow:hidden;
-    min-height:530px;
     background:var(--ink);
     color:var(--bg);
   }
   .project-copy{
-    display:flex;
-    flex-direction:column;
+    display:grid;
+    grid-template-columns:minmax(240px,.8fr) minmax(0,1.2fr);
+    gap:clamp(44px,7vw,112px);
     padding:clamp(32px,4.2vw,62px);
   }
+  .project-lead,.project-support{display:flex;flex-direction:column;}
   .project-copy h3,.project-card h3{
     font-family:'Instrument Serif',serif;
     font-weight:400;
@@ -631,7 +642,7 @@
     font-size:clamp(58px,7vw,96px);
     line-height:.92;
   }
-  .project-copy > p{max-width:44ch;color:#D3CEC4;font-size:14px;line-height:1.7;}
+  .project-lead > p{max-width:48ch;color:#D3CEC4;font-size:14px;line-height:1.7;}
   .project-facts{
     display:grid;
     grid-template-columns:repeat(2,minmax(0,1fr));
@@ -669,17 +680,6 @@
     color:var(--ink);
     font-family:'JetBrains Mono',monospace;
     font-size:9.5px;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-  }
-  .synthetic-label{
-    position:absolute;
-    top:18px;left:18px;
-    padding:7px 9px;
-    background:rgba(13,13,13,.88);
-    color:#fff;
-    font-family:'JetBrains Mono',monospace;
-    font-size:8.5px;
     letter-spacing:.08em;
     text-transform:uppercase;
   }
@@ -909,7 +909,7 @@
     .hero-footer{grid-template-columns:1fr auto;margin-top:52px;}
     .hero-footer span:nth-child(2){display:none;}
     .career-intro,.credentials-grid{grid-template-columns:1fr;}
-    .project-featured{grid-template-columns:1fr;}
+    .project-copy{grid-template-columns:1fr;}
     .project-poster{min-height:300px;aspect-ratio:16/9;}
     .note-featured{grid-template-columns:1fr;}
     .note-featured-media{aspect-ratio:16/10;}
@@ -988,7 +988,7 @@
     }
     .marquee-track,.status-bar .live::before{animation:none!important;}
     .status-bar{transition:none!important;}
-    .cursor,#heroParticleCanvas{display:none!important;}
+    .cursor,#particleCanvas{display:none!important;}
     .project-poster img,.note-card img,.note-featured img{transition:none!important;transform:none!important;}
   }
 </style>
@@ -996,6 +996,7 @@
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 <div class="cursor" id="cursor" aria-hidden="true"></div>
+<canvas id="particleCanvas" aria-hidden="true"></canvas>
 
 <nav aria-label="Primary">
   <a class="logo" href="#top">S. MOMIN / KPMG BLR</a>
@@ -1018,7 +1019,6 @@
 
 <main id="main">
   <section class="hero" id="top">
-    <canvas id="heroParticleCanvas" aria-hidden="true"></canvas>
     <div class="hero-grid wrap">
       <div class="hero-primary">
         <p class="eyebrow fade-up">GRC PROFESSIONAL · PORTFOLIO · 2026</p>
@@ -1187,25 +1187,24 @@
 
       <article class="project-featured fade-up" data-project="cyberassess" data-media-type="video" data-media="img/projects/cyberassess-demo.mp4" data-poster="img/projects/cyberassess-demo-poster.webp" data-media-label="CyberAssess product walkthrough using synthetic demo data" data-dialog-description="Synthetic demo data. A walkthrough of a completed multi-framework gap report, from overall scoring to high-risk gaps and requirement-level findings.">
         <div class="project-copy">
-          <div class="mono-label">B-01 / FLAGSHIP · AI-ENABLED GRC</div>
-          <h3>CyberAssess</h3>
-          <p>A compliance assessment platform that reads evidence before it asks a question. Six frameworks are assessed in one pass, with adaptive questioning and deterministic scoring: the model writes, code decides. Product media uses synthetic demo data.</p>
-          <dl class="project-facts">
-            <div><dt>Problem</dt><dd>Repetitive evidence collection</dd></div>
-            <div><dt>User</dt><dd>Audit and compliance teams</dd></div>
-            <div><dt>Coverage</dt><dd>Six security and privacy frameworks</dd></div>
-            <div><dt>Principle</dt><dd>Deterministic decisions</dd></div>
-          </dl>
-          <div class="project-actions">
-            <button class="button-secondary project-demo" type="button">View demo</button>
-            <a class="text-link" href="https://github.com/saqlainmmomin/Cyber" target="_blank" rel="noopener">GitHub ↗</a>
+          <div class="project-lead">
+            <div class="mono-label">B-01 / FLAGSHIP · AI-ENABLED GRC</div>
+            <h3>CyberAssess</h3>
+            <p>A compliance assessment platform that reads evidence before it asks a question. Six frameworks are assessed in one pass, with adaptive questioning and deterministic scoring: the model writes, code decides. Product media uses synthetic demo data.</p>
+          </div>
+          <div class="project-support">
+            <dl class="project-facts">
+              <div><dt>Problem</dt><dd>Repetitive evidence collection</dd></div>
+              <div><dt>User</dt><dd>Audit and compliance teams</dd></div>
+              <div><dt>Coverage</dt><dd>Six security and privacy frameworks</dd></div>
+              <div><dt>Principle</dt><dd>Deterministic decisions</dd></div>
+            </dl>
+            <div class="project-actions">
+              <button class="button-secondary project-demo" type="button">View demo</button>
+              <a class="text-link" href="https://github.com/saqlainmmomin/Cyber" target="_blank" rel="noopener">GitHub ↗</a>
+            </div>
           </div>
         </div>
-        <button class="project-poster project-demo" type="button" aria-label="Open the CyberAssess product demo">
-          <img src="img/projects/cyberassess-demo-poster.webp" width="960" height="600" alt="CyberAssess gap report showing overall score, high-risk gaps, and requirement-level findings">
-          <span class="synthetic-label">Synthetic demo data</span>
-          <span class="poster-action">Play product walkthrough ↗</span>
-        </button>
       </article>
 
       <div class="project-grid">
@@ -1356,7 +1355,7 @@
         </div>
       </header>
 
-      <a class="note-featured fade-up" href="https://www.linkedin.com/posts/saqlain-musa_aiagentsecurity-aisecurity-cybersecurity-activity-7446889630798503937-VWeA" target="_blank" rel="noopener">
+      <a class="note-featured fade-up" href="https://www.linkedin.com/posts/saqlain-musa_artificialabrintelligence-cybersecurity-activity-7422552460696698880-RLNL?utm_source=share&amp;utm_medium=member_desktop&amp;rcm=ACoAACD3yM8BSyqSc7F2ugwZkJdAE3Rl_HWABmA" target="_blank" rel="noopener">
         <div class="note-featured-media">
           <img src="img/notes/recursion-tightening.webp" width="1200" height="1106" alt="A visual map of the tightening feedback loop between increasingly capable AI agents and the systems they can access">
         </div>
@@ -1675,24 +1674,46 @@
     resetProjectDialog();
   });
 
-  // Hero-only particle field
+  // Keep fixed chrome legible without letting it compete with the page.
+  let chromeFrame = 0;
+  let pageIsScrolled = null;
+
+  function paintChromeState() {
+    const nextIsScrolled = window.scrollY > 12;
+    if (nextIsScrolled !== pageIsScrolled) {
+      document.body.classList.toggle('is-scrolled', nextIsScrolled);
+      pageIsScrolled = nextIsScrolled;
+    }
+    chromeFrame = 0;
+  }
+
+  function syncChromeState() {
+    if (!chromeFrame) chromeFrame = window.requestAnimationFrame(paintChromeState);
+  }
+
+  window.addEventListener('scroll', syncChromeState, { passive: true });
+  paintChromeState();
+
+  // Site-wide particle field with a stronger hero state.
   const hero = document.querySelector('.hero');
-  const statusBar = document.querySelector('.status-bar');
-  const canvas = document.getElementById('heroParticleCanvas');
+  const canvas = document.getElementById('particleCanvas');
   const context = canvas.getContext('2d');
+  const particleStyles = {
+    hero: { fill: .34, line: .15, pull: .04 },
+    body: { fill: .1, line: .035, pull: .016 }
+  };
   let particles = [];
   let canvasWidth = 0;
   let canvasHeight = 0;
   let canvasPixelRatio = 0;
   let animationFrame = 0;
   let heroIsVisible = true;
-  let particleResizeObserver = null;
-  let particleVisibilityObserver = null;
-  let heroBounds = hero.getBoundingClientRect();
+  let particleSystemActive = false;
+  let heroVisibilityObserver = null;
   const pointer = { x: -1000, y: -1000 };
 
   function createParticles() {
-    const count = window.innerWidth < 720 ? 18 : 42;
+    const count = window.innerWidth < 720 ? 20 : 54;
     particles = Array.from({ length: count }, function () {
       return {
         x: Math.random() * canvasWidth,
@@ -1705,11 +1726,9 @@
   }
 
   function resizeCanvas() {
-    const bounds = hero.getBoundingClientRect();
     const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-    const nextWidth = Math.max(1, Math.round(bounds.width));
-    const nextHeight = Math.max(1, Math.round(bounds.height));
-    heroBounds = bounds;
+    const nextWidth = Math.max(1, Math.round(window.innerWidth));
+    const nextHeight = Math.max(1, Math.round(window.innerHeight));
     if (nextWidth === canvasWidth && nextHeight === canvasHeight && pixelRatio === canvasPixelRatio) return;
     canvasWidth = nextWidth;
     canvasHeight = nextHeight;
@@ -1724,15 +1743,16 @@
 
   function drawParticles() {
     context.clearRect(0, 0, canvasWidth, canvasHeight);
-    context.fillStyle = 'rgba(13,13,13,.24)';
+    const particleMode = heroIsVisible ? particleStyles.hero : particleStyles.body;
+    context.fillStyle = 'rgba(13,13,13,' + particleMode.fill + ')';
     particles.forEach(function (particle) {
       const deltaX = pointer.x - particle.x;
       const deltaY = pointer.y - particle.y;
       const distance = Math.hypot(deltaX, deltaY);
       if (distance > 0 && distance < 145) {
         const force = (145 - distance) / 145;
-        particle.vx += (deltaX / distance) * force * .025;
-        particle.vy += (deltaY / distance) * force * .025;
+        particle.vx += (deltaX / distance) * force * particleMode.pull;
+        particle.vy += (deltaY / distance) * force * particleMode.pull;
       }
       particle.vx = particle.vx * .985 + (Math.random() - .5) * .006;
       particle.vy = particle.vy * .985 + (Math.random() - .5) * .006;
@@ -1757,7 +1777,7 @@
         const distanceSquared = deltaX * deltaX + deltaY * deltaY;
         if (distanceSquared < 10000) {
           const distance = Math.sqrt(distanceSquared);
-          context.strokeStyle = 'rgba(13,13,13,' + ((1 - distance / 100) * .11) + ')';
+          context.strokeStyle = 'rgba(13,13,13,' + ((1 - distance / 100) * particleMode.line) + ')';
           context.beginPath();
           context.moveTo(first.x, first.y);
           context.lineTo(second.x, second.y);
@@ -1768,7 +1788,7 @@
   }
 
   function animateParticles() {
-    if (!heroIsVisible || document.hidden || prefersReducedMotion.matches) {
+    if (document.hidden || prefersReducedMotion.matches) {
       animationFrame = 0;
       return;
     }
@@ -1777,7 +1797,7 @@
   }
 
   function startParticles() {
-    if (!animationFrame && heroIsVisible && !document.hidden && !prefersReducedMotion.matches) {
+    if (!animationFrame && !document.hidden && !prefersReducedMotion.matches) {
       animationFrame = window.requestAnimationFrame(animateParticles);
     }
   }
@@ -1787,45 +1807,38 @@
     animationFrame = 0;
   }
 
-  function updateHeroBounds() {
-    heroBounds = hero.getBoundingClientRect();
+  function updateParticlePointer(event) {
+    pointer.x = event.clientX;
+    pointer.y = event.clientY;
   }
 
-  hero.addEventListener('pointermove', function (event) {
-    pointer.x = event.clientX - heroBounds.left;
-    pointer.y = event.clientY - heroBounds.top;
-  });
-  hero.addEventListener('pointerleave', function () {
+  function resetParticlePointer() {
     pointer.x = -1000;
     pointer.y = -1000;
-  });
-
-  window.addEventListener('scroll', updateHeroBounds, { passive: true });
-
-  new IntersectionObserver(function (entries) {
-    statusBar.classList.toggle('is-hidden', !entries[0].isIntersecting);
-  }, { threshold: .15 }).observe(hero);
+  }
 
   function startParticleSystem() {
-    if (prefersReducedMotion.matches || particleResizeObserver) return;
+    if (prefersReducedMotion.matches || particleSystemActive) return;
+    particleSystemActive = true;
     resizeCanvas();
-    particleResizeObserver = new ResizeObserver(resizeCanvas);
-    particleResizeObserver.observe(hero);
-    particleVisibilityObserver = new IntersectionObserver(function (entries) {
+    heroVisibilityObserver = new IntersectionObserver(function (entries) {
       heroIsVisible = entries[0].isIntersecting;
-      if (heroIsVisible) startParticles();
-      else stopParticles();
-    }, { threshold: .02 });
-    particleVisibilityObserver.observe(hero);
+    }, { threshold: .18 });
+    heroVisibilityObserver.observe(hero);
+    window.addEventListener('resize', resizeCanvas);
+    document.addEventListener('pointermove', updateParticlePointer);
+    document.documentElement.addEventListener('pointerleave', resetParticlePointer);
     startParticles();
   }
 
   function stopParticleSystem() {
     stopParticles();
-    if (particleResizeObserver) particleResizeObserver.disconnect();
-    if (particleVisibilityObserver) particleVisibilityObserver.disconnect();
-    particleResizeObserver = null;
-    particleVisibilityObserver = null;
+    if (heroVisibilityObserver) heroVisibilityObserver.disconnect();
+    window.removeEventListener('resize', resizeCanvas);
+    document.removeEventListener('pointermove', updateParticlePointer);
+    document.documentElement.removeEventListener('pointerleave', resetParticlePointer);
+    particleSystemActive = false;
+    heroVisibilityObserver = null;
     particles = [];
     canvas.width = 0;
     canvas.height = 0;
