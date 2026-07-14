@@ -1,3 +1,34 @@
+# SITE-V2 POLISH IMPLEMENTATION (2026-07-14)
+
+Locked decisions: 7/5 evidence-rail hero; exact title "Assistant Manager, Cyber Strategy & Governance";
+anonymized outcome-led cases without recycled 15+/50+ counts; merged KPMG/Mitkat experience;
+CyberAssess flagship plus accessible demo modal; grouped capability taxonomy; one featured Field Note;
+retain cursor and particles with subtler, accessible behavior; target GRC/cyber-risk/security-assurance roles.
+
+- [x] Rebuild hero, navigation, status and spacing system
+- [x] Merge About + Engagements into experience timeline and four evidence-led cases
+- [x] Rebuild project hierarchy and accessible media dialog
+- [x] Replace practice chips with grouped capabilities and feature one Field Note
+- [x] Restore SEO/progressive-enhancement/reduced-motion/accessibility plumbing
+- [x] Verify assets, markup, responsive layout and interactions; review and simplify diff
+
+Verification: `npm test`, script syntax, `git diff --check`, and live browser checks at 1440px,
+1200px, and 390px. Confirmed hero balance, no horizontal overflow, mobile menu state, project
+dialog isolation/cleanup/focus return, equal adjacent-card heights, Field Note imagery, hero-only
+status visibility, and a clean browser console.
+
+---
+
+# SITE-V2 DESIGN/CONTENT AUDIT (2026-07-14)
+
+- [x] Read the v2 implementation notes, elevation plan, and vault operating rules
+- [x] Inspect the supplied desktop render and responsive/interaction code, including project demo expansion
+- [x] Audit current KPMG, practice-area, selected-work, and field-note content in source
+- [x] Review recent Job Search roles and map recurring recruiter expectations to portfolio evidence
+- [x] Deliver a prioritized design/content polish brief; no site edits in this pass
+
+---
+
 # SITE-V2 PIVOT (2026-07-14) — everything below is the superseded Astro plan
 
 The Claude-designed single-file site (`site-v2/index.html`, live at saqlainswebsite.vercel.app)
@@ -6,9 +37,9 @@ replaces the Astro scrollytelling build. Refined this session: name fixed (Momin
 risk & monitoring), no recycled 15+/50+ metrics, demos behind View-demo toggles, Writing section
 (6 field notes → LinkedIn), real contacts + CV.
 
-- [ ] Saqlain: confirm KPMG title wording ("Cyber Strategy & Governance" vs CV's "Assistant Manager, Cybersecurity")
-- [ ] Saqlain: eyeball demo toggles + videos in a real browser (embedded pane suspends video)
-- [ ] Commit site-v2/ and point the Vercel project's root directory at `site-v2`
+- [x] Saqlain confirmed exact public title: "Assistant Manager, Cyber Strategy & Governance"
+- [x] Demo dialog, media lifecycle, mobile navigation, and responsive layout verified in a real browser
+- [ ] Saqlain: commit and push; keep Vercel Root Directory at repository root so root `vercel.json` serves `site-v2`
 - [ ] Decide fate of the Astro build (src/) once v2 is confirmed live
 
 ---
