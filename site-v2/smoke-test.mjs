@@ -145,6 +145,14 @@ const featuredNote = nodesByTag('a').find(node => classIncludes(node, 'note-feat
 assert.equal(attributes(featuredNote).href, RECURSION_LINK, 'Featured Field Note should use the supplied LinkedIn URL');
 
 assert.match(html, /@media\(prefers-reduced-motion:reduce\)/, 'Reduced-motion styles are required');
+assert.match(html, /\.cursor\{[^}]*mix-blend-mode:difference/s, 'Custom cursor must preserve contrast across backdrop colors');
+assert.match(html, /\.contact-links a::before\{[^}]*transform:scaleX\(0\)/s, 'Contact links need a transform-based highlight layer');
+assert.match(html, /\.contact-links a::before\{[^}]*transition:transform/s, 'Contact highlight must use a smooth transform transition');
+assert.match(html, /\.contact-links a > span\{[^}]*transition:transform/s, 'Contact link content must move smoothly with the highlight');
+assert.match(html, /\.contact-links a:hover::before[^{}]*\{transform:scaleX\(1\)/, 'Contact link highlight must animate into view on hover');
+assert.match(html, /\.contact-links a:focus-visible::before[^{}]*\{transform:scaleX\(1\)/, 'Keyboard focus must receive the contact highlight');
+assert.match(html, /\.contact-links a:focus-visible \.clink-arrow\{[^}]*transform:translateX\(-14px\)/s, 'Keyboard focus must animate the contact arrow');
+assert.match(html, /\.contact-links a,\.contact-links a::before,\.contact-links a > span\{transition:none!important;\}/, 'Contact animations must respect reduced-motion preferences');
 const particleCanvas = nodeById('particleCanvas');
 assert.ok(particleCanvas, 'Site-wide particle canvas is required');
 assert.equal(particleCanvas.parentNode.tagName, 'body', 'Particle canvas should be site-wide, not nested in the hero');

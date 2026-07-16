@@ -1,3 +1,15 @@
+# SITE-V2 CURSOR + CONTACT INTERACTION FIX (2026-07-16)
+
+- [x] Restore cursor contrast across orange and light backdrops with difference blending
+- [x] Replace the contact-link background/padding transition with a transform-based highlight sweep
+- [x] Preserve keyboard-focus parity and reduced-motion behavior
+- [x] Add regression assertions and verify the interactions in a real browser
+
+Verification: `npm test`, HTML/CSS/JavaScript parsing, `git diff --check`, live cursor
+contrast over the orange contact highlight, completed focus-state transforms, and a clean console.
+
+---
+
 # SITE-V2 FINAL INTERACTION POLISH (2026-07-14)
 
 Assumptions: keep the desktop navigation available while scrolling, but give it an opaque
