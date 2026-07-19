@@ -240,6 +240,7 @@
     background:var(--accent);
     opacity:.82;
     pointer-events:none;
+    mix-blend-mode:difference;
     transition:width .25s var(--ease),height .25s var(--ease),background .25s,border .25s;
     will-change:transform;
   }
@@ -866,15 +867,40 @@
   .contact-intro{max-width:52ch;margin:-38px 0 54px;color:var(--muted);font-size:14px;line-height:1.65;}
   .contact-links{border-top:1px solid var(--ink);}
   .contact-links a{
+    position:relative;
+    isolation:isolate;
+    overflow:hidden;
     display:grid;
     grid-template-columns:60px 1fr auto auto;
     gap:30px;
     align-items:center;
     padding:26px 0;
     border-bottom:1px solid var(--line);
-    transition:padding .35s var(--ease),background .35s;
   }
-  .contact-links a:hover{padding-left:20px;padding-right:20px;background:var(--accent);}
+  .contact-links a::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:0;
+    background:var(--accent);
+    transform:scaleX(0);
+    transform-origin:left center;
+    transition:transform .42s cubic-bezier(.22,1,.36,1);
+    will-change:transform;
+  }
+  .contact-links a > span{
+    position:relative;
+    z-index:1;
+    transition:transform .42s var(--ease);
+  }
+  .contact-links a:hover::before,.contact-links a:focus-visible::before{transform:scaleX(1);}
+  .contact-links a:hover .clink-num,.contact-links a:hover .clink-name,.contact-links a:hover .clink-handle,
+  .contact-links a:focus-visible .clink-num,.contact-links a:focus-visible .clink-name,.contact-links a:focus-visible .clink-handle{
+    transform:translateX(14px);
+  }
+  .contact-links a:hover .clink-arrow,.contact-links a:focus-visible .clink-arrow{
+    transform:translateX(-14px);
+  }
   .clink-num,.clink-handle{color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.06em;}
   .clink-name{font-family:'Instrument Serif',serif;font-size:33px;}
   .clink-arrow{font-family:'JetBrains Mono',monospace;font-size:20px;}
@@ -989,6 +1015,7 @@
     .marquee-track,.status-bar .live::before{animation:none!important;}
     .status-bar{transition:none!important;}
     .cursor,#particleCanvas{display:none!important;}
+    .contact-links a,.contact-links a::before,.contact-links a > span{transition:none!important;}
     .project-poster img,.note-card img,.note-featured img{transition:none!important;transform:none!important;}
   }
 </style>
