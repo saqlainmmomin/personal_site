@@ -10,8 +10,8 @@ const { parse: parseCss } = require('css-tree');
 
 const root = dirname(fileURLToPath(import.meta.url));
 const PRODUCTION_ORIGIN = 'https://saqlainswebsite.vercel.app';
-const RECURSION_LINK = 'https://www.linkedin.com/posts/saqlain-musa_artificialabrintelligence-cybersecurity-activity-7422552460696698880-RLNL?utm_source=share&utm_medium=member_desktop&rcm=ACoAACD3yM8BSyqSc7F2ugwZkJdAE3Rl_HWABmA';
-const EXPECTED_FIELD_NOTE_IMAGES = 6;
+const FEATURED_NOTE_LINK = 'https://the-slow-escape.vercel.app';
+const EXPECTED_FIELD_NOTE_IMAGES = 7;
 const EXPECTED_PROJECTS = 4;
 const htmlPath = join(root, 'index.html');
 const html = readFileSync(htmlPath, 'utf8');
@@ -142,7 +142,7 @@ assert.equal(descendants(cyberAssess, node => classIncludes(node, 'project-demo'
 assert.equal(descendants(cyberAssess, node => node.tagName === 'img').length, 0, 'CyberAssess flagship card should be text-only');
 
 const featuredNote = nodesByTag('a').find(node => classIncludes(node, 'note-featured'));
-assert.equal(attributes(featuredNote).href, RECURSION_LINK, 'Featured Field Note should use the supplied LinkedIn URL');
+assert.equal(attributes(featuredNote).href, FEATURED_NOTE_LINK, 'Featured Field Note should use the supplied URL');
 
 assert.match(html, /@media\(prefers-reduced-motion:reduce\)/, 'Reduced-motion styles are required');
 assert.match(html, /\.cursor\{[^}]*mix-blend-mode:difference/s, 'Custom cursor must preserve contrast across backdrop colors');
@@ -203,7 +203,7 @@ assert.match(robots, new RegExp('Sitemap: ' + PRODUCTION_ORIGIN.replace(/[.*+?^$
 assert.ok(sitemap.includes('<loc>' + expectedPageUrl + '</loc>'), 'Sitemap URL should match the canonical URL');
 assert.ok(html.includes('Synthetic demo data'), 'CyberAssess media must disclose synthetic demo data');
 
-for (const date of ['2026-02-09', '2026-03-12', '2026-03-25', '2026-03-30', '2026-04-06', '2026-04-08']) {
+for (const date of ['2026-02-09', '2026-03-12', '2026-03-25', '2026-03-30', '2026-04-06', '2026-04-08', '2026-08-23']) {
   assert.ok(html.includes('datetime="' + date + '"'), 'Missing corrected Field Note date ' + date);
 }
 
