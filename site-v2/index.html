@@ -564,7 +564,7 @@
   .case-card{
     display:flex;
     flex-direction:column;
-    min-height:500px;
+    min-height:440px;
     padding:clamp(28px,3.2vw,44px);
     border:1px solid var(--line-2);
     background:rgba(242,239,232,.65);
@@ -574,7 +574,7 @@
   .case-card:nth-child(2) .case-top,.case-card:nth-child(3) .case-top{color:#A8A39A;}
   .case-card h3{
     max-width:14ch;
-    margin:clamp(40px,6vw,72px) 0 24px;
+    margin:clamp(28px,3vw,42px) 0 24px;
     font-family:'Instrument Serif',serif;
     font-size:clamp(34px,4.1vw,58px);
     font-weight:400;
@@ -1018,6 +1018,63 @@
     .contact-links a,.contact-links a::before,.contact-links a > span{transition:none!important;}
     .project-poster img,.note-card img,.note-featured img{transition:none!important;transform:none!important;}
   }
+
+  /* YOZORA PRODUCT STORY */
+  .project-topline{display:flex;flex-wrap:wrap;align-items:center;gap:14px;}
+  .product-status{border:1px solid #777168;padding:6px 9px;color:#D3CEC4;font-size:11px;}
+  .project-lead > .project-formerly{display:block;margin:-6px 0 16px;font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0;line-height:1.5;color:#A8A39A;}
+  .project-lead > .product-thesis{margin:8px 0 18px;font-family:'Instrument Serif',serif;font-size:clamp(28px,3vw,40px);line-height:1.1;color:var(--bg);}
+  .project-support .project-actions{gap:16px 22px;}
+  .project-support .button-secondary:hover{background:var(--bg);color:var(--ink);}
+  .project-support .text-link{background:transparent;color:inherit;text-align:left;}
+  .project-support button.text-link{border:0;border-bottom:1px solid currentColor;}
+  .prototype-note{margin-top:20px;max-width:54ch;color:#A8A39A;font-size:12px;line-height:1.6;}
+  .yozora-workflow{padding:0 clamp(32px,4.2vw,62px) 42px;}
+  .workflow-heading{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;padding:20px 0;border-top:1px solid #555047;}
+  .workflow-heading > span:last-child{font-size:12px;color:#A8A39A;}
+  .workflow-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));list-style:none;border:1px solid #555047;}
+  .workflow-steps li{padding:24px;border-right:1px solid #555047;}
+  .workflow-steps li:last-child{border-right:0;}
+  .workflow-mark{font-family:'JetBrains Mono',monospace;font-size:11px;color:#F58D70;}
+  .workflow-steps h4{margin:24px 0 12px;font-family:'Instrument Serif',serif;font-size:27px;font-weight:400;}
+  .workflow-steps p{font-size:12px;line-height:1.65;color:#D3CEC4;}
+  .yozora-case-study{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(32px,7vw,100px);padding:48px 0 64px;border-bottom:1px solid var(--line-2);margin-bottom:44px;scroll-margin-top:100px;}
+  #engagements,#yozora{scroll-margin-top:100px;}
+  .case-study-intro h3{margin:24px 0 18px;font-family:'Instrument Serif',serif;font-size:clamp(34px,4vw,56px);font-weight:400;line-height:1.02;}
+  .case-study-intro h3 em{color:var(--accent);}
+  .case-study-intro > p,.case-study-body p{font-size:14px;line-height:1.7;color:var(--ink-2);}
+  .case-study-problem{margin-bottom:24px;}
+  .design-approach{border-top:1px solid var(--ink);border-bottom:1px solid var(--line-2);}
+  .design-approach summary{display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:60px;list-style:none;font-size:14px;cursor:pointer;}
+  .design-approach summary::-webkit-details-marker{display:none;}
+  .design-approach summary > span{font-size:24px;}
+  .design-approach[open] summary > span{transform:rotate(45deg);}
+  .design-decisions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;padding:16px 0 28px;}
+  .design-decisions h4{margin-bottom:10px;font-size:14px;font-weight:500;}
+  .design-decisions p{font-size:12.5px;}
+  .case-study-status{padding-top:24px;}
+  .case-study-status p{margin-top:10px;font-size:12px;color:var(--muted);}
+  .writing-takeaway{display:grid;grid-template-columns:180px minmax(0,1fr);gap:24px;padding:24px 0;border-top:1px solid var(--line-2);margin-top:36px;}
+  .writing-takeaway p{max-width:70ch;font-size:15px;line-height:1.65;}
+  .capability-group .text-link{margin-top:14px;}
+  @media(max-width:1000px){
+    .workflow-steps{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .workflow-steps li:nth-child(2){border-right:0;}
+    .workflow-steps li:nth-child(-n+2){border-bottom:1px solid #555047;}
+    .yozora-case-study{grid-template-columns:1fr;}
+  }
+  @media(max-width:520px){
+    .workflow-steps,.design-decisions,.writing-takeaway{grid-template-columns:1fr;}
+    .workflow-steps li{border-right:0;border-bottom:1px solid #555047;}
+    .workflow-steps li:last-child{border-bottom:0;}
+    .workflow-steps h4{margin-top:12px;}
+    .writing-takeaway{gap:14px;}
+    .yozora-workflow{padding:0 24px 28px;}
+    .hero-grid{padding-top:96px;}
+    .hero-primary .eyebrow{font-size:9px;margin-bottom:24px;}
+    .hero h1{font-size:clamp(68px,19vw,98px);}
+    .hero-evidence{margin-top:28px;}
+  }
 </style>
 </head>
 <body>
@@ -1048,7 +1105,7 @@
   <section class="hero" id="top">
     <div class="hero-grid wrap">
       <div class="hero-primary">
-        <p class="eyebrow fade-up">GRC PROFESSIONAL · PORTFOLIO · 2026</p>
+        <p class="eyebrow fade-up">CYBER GOVERNANCE · ASSURANCE · BUILDER</p>
         <h1>
           <span class="mask-line"><span>Saqlain</span></span>
           <span class="mask-line"><span><em>Momin.</em></span></span>
@@ -1056,15 +1113,16 @@
       </div>
       <aside class="hero-evidence fade-up" aria-label="Professional summary">
         <p class="hero-role">Assistant Manager, Cyber Strategy &amp; Governance · KPMG Bangalore</p>
-        <p class="hero-proposition">I design governance programs and build the systems that make them <em>operable</em>.</p>
+        <p class="hero-proposition">I turn security evidence into <em>decisions.</em><br>And build the tools behind them.</p>
         <dl class="evidence-list">
           <div><dt>Assurance</dt><dd>ISO 27001 · 27701 · 22301 Lead Auditor</dd></div>
           <div><dt>Practice</dt><dd>GRC · TPRM · Cyber risk · Resilience</dd></div>
           <div><dt>Outcomes</dt><dd>Zero-defect ISO 27001 / 22301 audits and adopted remediation</dd></div>
-          <div><dt>Builder</dt><dd>AI-enabled compliance and vendor-risk tooling</dd></div>
+          <div><dt>Builder</dt><dd>Yozora · Assessment workflows for GRC consultants</dd></div>
         </dl>
         <div class="hero-actions">
-          <a class="button-primary" href="#experience">View selected engagements</a>
+          <a class="button-primary" href="#builds">Explore my tools ↓</a>
+          <a class="text-link" href="#engagements">Selected engagements ↓</a>
           <a class="text-link" href="cv.pdf" download>Download CV ↗</a>
         </div>
       </aside>
@@ -1095,20 +1153,19 @@
 
   <section id="experience">
     <span class="anchor-alias" id="about" aria-hidden="true"></span>
-    <span class="anchor-alias" id="engagements" aria-hidden="true"></span>
     <div class="wrap">
       <header class="sec-head">
         <div class="sec-num fade-up">01 / EXPERIENCE</div>
         <div>
           <h2 class="fade-up">Assurance depth,<br><em>operational instinct</em>.</h2>
-          <p class="sec-note fade-up">I work across the full assurance lifecycle, from scoping and control design to evidence review, executive reporting, and remediation validation. The builder practice turns recurring control problems into usable systems.</p>
+          <p class="sec-note fade-up">From control design and evidence review to executive reporting and remediation. My work spans Big Four advisory, risk intelligence, and assessment software.</p>
         </div>
       </header>
 
       <div class="career-intro">
         <div class="career-thesis fade-up">
           <p>Controls matter when they change a decision, a workflow, or a system.</p>
-          <p>That belief connects my work in Big Four advisory, risk intelligence, and compliance tooling. I understand why controls exist, how they fail, and what it takes to make them usable.</p>
+          <p>The engagements below show what I owned and what changed. The tools that follow address the recurring friction I see in that work.</p>
         </div>
         <ol class="career-timeline">
           <li class="career-entry fade-up">
@@ -1130,9 +1187,9 @@
         </ol>
       </div>
 
-      <div class="case-heading fade-up">
+      <div class="case-heading fade-up" id="engagements">
         <h3>Selected engagements</h3>
-        <p>Client names remain confidential. The mandates, ownership, and outcomes show how the work lands.</p>
+        <p>Anonymized mandates, my ownership, and the resulting change. Client names remain confidential.</p>
       </div>
       <div class="case-grid">
         <article class="case-card fade-up">
@@ -1160,7 +1217,7 @@
           <dl class="case-details">
             <div><dt>Mandate</dt><dd>Replace fragmented vendor reviews with a consistent, risk-based process for assessment, escalation, and monitoring.</dd></div>
             <div><dt>Owned</dt><dd>Vendor tiering, ISO and NIST-mapped questionnaires, due-diligence evidence review, risk treatment, and continuous-monitoring workflows.</dd></div>
-            <div><dt>Result</dt><dd>Standardized how third parties were assessed, documented, tracked, and escalated for acceptance or remediation decisions.</dd></div>
+            <div><dt>Result</dt><dd>A consistent path from vendor tiering and evidence review to documented risk acceptance, escalation, or remediation.</dd></div>
           </dl>
           <ul class="case-capabilities">
             <li>TPRM</li><li>Due Diligence</li><li>SOC Report Review</li><li>Monitoring</li>
@@ -1192,7 +1249,7 @@
           <dl class="case-details">
             <div><dt>Mandate</dt><dd>Keep security governance aligned with changing requirements while addressing recurring human and process risks.</dd></div>
             <div><dt>Owned</dt><dd>Policy and standards lifecycle, control mapping, review coordination, security-awareness content, phishing simulations, and program metrics.</dd></div>
-            <div><dt>Result</dt><dd>Kept evidence audit-ready, made recurring risk themes visible, and converted compliance requirements into guidance teams could act on.</dd></div>
+            <div><dt>Result</dt><dd>Audit-ready evidence, visible recurring risk themes, and practical security guidance for the teams responsible for controls.</dd></div>
           </dl>
           <ul class="case-capabilities">
             <li>Policy Lifecycle</li><li>Regulatory Mapping</li><li>Awareness</li><li>Governance Metrics</li>
@@ -1207,32 +1264,62 @@
       <header class="sec-head">
         <div class="sec-num fade-up">02 / BUILDS</div>
         <div>
-          <h2 class="fade-up">Products that make<br>controls <em>operable</em>.</h2>
-          <p class="sec-note fade-up">The same patterns I see in assurance work become software: evidence before questions, deterministic decisions before AI interpretation, and workflows that reduce audit friction.</p>
+          <h2 class="fade-up">Built from the work.<br>Designed for <em>the workflow.</em></h2>
+          <p class="sec-note fade-up">I build around the parts of assurance that consume attention: tracing evidence, reviewing judgments, and turning findings into action.</p>
         </div>
       </header>
 
-      <article class="project-featured fade-up" data-project="cyberassess" data-media-type="video" data-media="img/projects/cyberassess-demo.mp4" data-poster="img/projects/cyberassess-demo-poster.webp" data-media-label="CyberAssess product walkthrough using synthetic demo data" data-dialog-description="Synthetic demo data. A walkthrough of a completed multi-framework gap report, from overall scoring to high-risk gaps and requirement-level findings.">
+      <article class="project-featured fade-up" id="yozora" data-project="yozora" data-media-type="video" data-media="img/projects/cyberassess-demo.mp4" data-poster="img/projects/cyberassess-demo-poster.webp" data-media-label="Earlier CyberAssess prototype walkthrough using synthetic demo data" data-dialog-description="Synthetic demo data. This earlier CyberAssess prototype shows the previous report experience. Yozora's current workflow and interface are in development.">
         <div class="project-copy">
           <div class="project-lead">
-            <div class="mono-label">B-01 / FLAGSHIP · AI-ENABLED GRC</div>
-            <h3>CyberAssess</h3>
-            <p>A compliance assessment platform that reads evidence before it asks a question. Six frameworks are assessed in one pass, with adaptive questioning and deterministic scoring: the model writes, code decides. Product media uses synthetic demo data.</p>
+            <div class="project-topline"><span class="mono-label">B-01 / ASSESSMENT WORKSPACE</span><span class="product-status">In development</span></div>
+            <h3>Yozora</h3>
+            <p class="project-formerly">Previously CyberAssess</p>
+            <p class="product-thesis">From client evidence to defensible assessment conclusions.</p>
+            <p>An assessment workspace for GRC consultants. Scope the engagement, collect evidence, review proposed conclusions, and carry approved findings through reporting and remediation.</p>
           </div>
           <div class="project-support">
             <dl class="project-facts">
-              <div><dt>Problem</dt><dd>Repetitive evidence collection</dd></div>
-              <div><dt>User</dt><dd>Audit and compliance teams</dd></div>
-              <div><dt>Coverage</dt><dd>Six security and privacy frameworks</dd></div>
-              <div><dt>Principle</dt><dd>Deterministic decisions</dd></div>
+              <div><dt>Built for</dt><dd>Boutique GRC consulting firms</dd></div>
+              <div><dt>Working structure</dt><dd>Client → Engagement → Assessment</dd></div>
+              <div><dt>AI's role</dt><dd>Extract evidence and propose assessments</dd></div>
+              <div><dt>Consultant's role</dt><dd>Review the basis and approve conclusions</dd></div>
             </dl>
             <div class="project-actions">
-              <button class="button-secondary project-demo" type="button">View demo</button>
+              <a class="button-secondary" href="#yozora-case-study">Read the design approach ↓</a>
+              <button class="text-link project-demo" type="button">Watch earlier prototype ↗</button>
               <a class="text-link" href="https://github.com/saqlainmmomin/Cyber" target="_blank" rel="noopener">GitHub ↗</a>
             </div>
+            <p class="prototype-note">The video shows the earlier CyberAssess prototype with synthetic data. Yozora's current workflow and interface are in development.</p>
           </div>
         </div>
+        <div class="yozora-workflow" aria-label="Yozora assessment workflow">
+          <div class="workflow-heading"><span class="mono-label">A connected assessment workflow</span><span>Evidence stays attached to the judgment.</span></div>
+          <ol class="workflow-steps">
+            <li><span class="workflow-mark" aria-hidden="true">01</span><h4>Scope &amp; collect</h4><p>Define the assessment boundary. Request and version the evidence.</p></li>
+            <li><span class="workflow-mark" aria-hidden="true">02</span><h4>Assess &amp; review</h4><p>Work through requirements with cited AI proposals and reviewer workpapers.</p></li>
+            <li><span class="workflow-mark" aria-hidden="true">03</span><h4>Approve &amp; report</h4><p>Record the consultant's conclusion. Calculate scores within each framework.</p></li>
+            <li><span class="workflow-mark" aria-hidden="true">04</span><h4>Act &amp; reassess</h4><p>Track findings and actions. Revisit the assessment as evidence changes.</p></li>
+          </ol>
+        </div>
       </article>
+
+      <div class="yozora-case-study fade-up" id="yozora-case-study">
+        <div class="case-study-intro"><span class="mono-label">Inside the build / Yozora</span><h3>The judgment is human.<br>The trail is <em>traceable.</em></h3><p>Evidence analysis is an input. A reviewed, defensible assessment is the outcome.</p></div>
+        <div class="case-study-body">
+          <p class="case-study-problem">When evidence, questionnaires, and reports live in separate files, the basis for a conclusion is hard to follow. Yozora connects that work without handing the consultant's judgment to a model.</p>
+          <details class="design-approach">
+            <summary>Read the design decisions <span aria-hidden="true">+</span></summary>
+            <div class="design-decisions">
+              <section><h4>AI proposes. Consultants approve.</h4><p>A machine proposal and an approved conclusion are different records. The consultant can inspect the evidence, edit the reasoning, and record the decision.</p></section>
+              <section><h4>A source behind every judgment.</h4><p>Evidence versions, precise citations, and reviewer workpapers preserve the path from source material to conclusion. Reuse between assessments is explicit.</p></section>
+              <section><h4>Each framework keeps its meaning.</h4><p>Scoring follows deterministic methodology rules. Reports preserve framework and scope boundaries instead of blending unlike assessments into one score.</p></section>
+              <section><h4>The report is part of the workflow.</h4><p>Approved findings connect to reports and tracked actions. Reassessment revisits the evidence and conclusions rather than copying a previous result.</p></section>
+            </div>
+          </details>
+          <div class="case-study-status"><span class="mono-label">Current direction</span><p>Built around DPDPA, ISO 27001, and NIST CSF assessment workflows. The core assessment and evidence workflows are implemented; the Yozora interface is being developed. Customer adoption and production validation are still ahead.</p></div>
+        </div>
+      </div>
 
       <div class="project-grid">
         <article class="project-card fade-up" data-project="recon" data-media-type="video" data-media="img/projects/recon-demo.mp4" data-poster="img/projects/recon-demo-poster.webp" data-media-label="Recon vendor risk walkthrough" data-dialog-description="A live vendor-domain scan showing six completed security checks, deterministic rules, and a summarized risk tier.">
@@ -1292,7 +1379,7 @@
         <div class="sec-num fade-up">03 / CREDENTIALS</div>
         <div>
           <h2 class="fade-up">Credentials and<br><em>capability depth</em>.</h2>
-          <p class="sec-note fade-up">A grouped view of the work, the standards behind it, and the emerging systems I continue to explore.</p>
+          <p class="sec-note fade-up">Formal credentials, followed by the three areas where I apply them.</p>
         </div>
       </header>
       <div class="credentials-grid">
@@ -1307,64 +1394,19 @@
           <div class="capability-title">Practice and focus areas</div>
           <div class="capability-groups">
             <section class="capability-group">
-              <h3>Audit &amp; assurance</h3>
-              <ul>
-                <li>IT audit and control testing</li>
-                <li>Control design and operating effectiveness</li>
-                <li>Evidence and remediation validation</li>
-                <li>ISMS and BCMS assurance</li>
-                <li>SOC report review</li>
-              </ul>
+              <h3>Assurance &amp; resilience</h3>
+              <ul><li>Control design and effectiveness testing</li><li>Evidence review and remediation validation</li><li>ISO 27001, 27701 and 22301</li><li>ISMS and business continuity programs</li></ul>
+              <a class="text-link" href="#engagements">See the engagements ↑</a>
             </section>
             <section class="capability-group">
-              <h3>Risk &amp; governance</h3>
-              <ul>
-                <li>Cyber risk assessments</li>
-                <li>Risk registers and treatment</li>
-                <li>Executive risk reporting</li>
-                <li>Policy and standards lifecycle</li>
-                <li>Regulatory and control mapping</li>
-              </ul>
+              <h3>Cyber &amp; third-party risk</h3>
+              <ul><li>Vendor tiering and due diligence</li><li>SOC report and technical-evidence review</li><li>Risk treatment and executive reporting</li><li>NIST CSF, PCI DSS and OWASP guidance</li></ul>
+              <a class="text-link" href="#builds">See the tools ↑</a>
             </section>
             <section class="capability-group">
-              <h3>Third-party risk</h3>
-              <ul>
-                <li>Vendor tiering and due diligence</li>
-                <li>Security-document review</li>
-                <li>Continuous monitoring</li>
-                <li>Risk acceptance and remediation</li>
-                <li>Customer due-diligence support</li>
-              </ul>
-            </section>
-            <section class="capability-group">
-              <h3>Frameworks</h3>
-              <ul>
-                <li>ISO 27001, 27701 and 22301</li>
-                <li>NIST Cybersecurity Framework</li>
-                <li>PCI DSS and OWASP guidance</li>
-                <li>Privacy and data protection</li>
-                <li>BFSI regulatory compliance</li>
-              </ul>
-            </section>
-            <section class="capability-group">
-              <h3>Emerging practice</h3>
-              <ul>
-                <li>AI governance and assurance</li>
-                <li>Compliance automation</li>
-                <li>AI-enabled evidence workflows</li>
-                <li>Cloud-control review</li>
-                <li>Secure AI agent systems</li>
-              </ul>
-            </section>
-            <section class="capability-group">
-              <h3>Resilience</h3>
-              <ul>
-                <li>Business continuity management</li>
-                <li>Operational resilience</li>
-                <li>Security awareness</li>
-                <li>Phishing simulations</li>
-                <li>Geopolitical risk intelligence</li>
-              </ul>
+              <h3>Assessment systems &amp; AI</h3>
+              <ul><li>Evidence-informed assessment workflows</li><li>Human review of AI-proposed conclusions</li><li>Traceable scoring and reporting</li><li>Research into agent access and governance</li></ul>
+              <a class="text-link" href="#writing">Read the field notes ↓</a>
             </section>
           </div>
         </div>
@@ -1378,7 +1420,7 @@
         <div class="sec-num fade-up">04 / WRITING</div>
         <div>
           <h2 class="fade-up">Field notes,<br>with the <em>data attached</em>.</h2>
-          <p class="sec-note fade-up">Research notes for security and GRC practitioners. The recurring theme: securing AI means governing systems that can now act, remember, and operate at machine speed.</p>
+          <p class="sec-note fade-up">Research on AI systems that can act, remember, and access production environments. I examine what their behavior means for security controls and assurance.</p>
         </div>
       </header>
 
@@ -1438,6 +1480,7 @@
           <span class="note-go">Read on LinkedIn →</span>
         </a>
       </div>
+      <aside class="writing-takeaway fade-up"><span class="mono-label">From research to practice</span><p>My focus: make agent identities, permissions, evidence trails, and human approval part of the governance design.</p></aside>
       <div class="notes-all fade-up">
         <a class="text-link" href="https://www.linkedin.com/in/saqlain-musa/" target="_blank" rel="noopener">All field notes on LinkedIn ↗</a>
       </div>
