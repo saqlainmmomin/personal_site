@@ -1,3 +1,32 @@
+# LOCAL PORTFOLIO / YOZORA PREVIEW (2026-10-09)
+
+Scope: local preview only; retain the current visual identity, existing demo video,
+and published August writing. Native implementation on codex/yozora-portfolio-preview.
+No invented engagement metrics, customer adoption, or product readiness claims.
+
+- [x] Reconcile published site with origin/main and read current Yozora direction
+- [x] Sharpen hero and shorten experience introductions
+- [x] Present Yozora workflow and an expandable case study with current product direction
+- [x] Condense capabilities and connect writing to governance practice
+- [x] Run smoke checks, review diff, and verify desktop/mobile preview and demo
+- [x] Open the local preview for Saqlain
+
+Verification: existing structural/asset/interaction smoke suite plus browser checks.
+Content and styling changes use visual verification; no new runtime behavior planned.
+Yozora sources: dpdpa-gap-tool/docs/product/2026-09-21-cyberassess-product-requirements.md,
+yozora-design-system.md (approved 2026-10-03), and current tasks/todo.md.
+
+Verified: npm test (HTML/CSS/JS parsing, 18 assets, 10 images, seven demo triggers),
+git diff --check, responsive layout at 1440px and 390px with no horizontal overflow,
+all internal anchors resolve, keyboard disclosure, mobile navigation, old video playback,
+Yozora dialog title, media cleanup and focus return. Browser console: no warnings/errors.
+Simplification: three independent passes; fixed heading contamination of the dialog title.
+Code review: complete (lite), no remaining actionable findings; receipt at
+/tmp/personal-site-yozora-review/review.json. No lint/typecheck command configured.
+Local preview: http://localhost:4173/. Saqlain approved committing and pushing this preview on 2026-10-09.
+
+---
+
 # SITE-V2 CURSOR + CONTACT INTERACTION FIX (2026-07-16)
 
 - [x] Restore cursor contrast across orange and light backdrops with difference blending

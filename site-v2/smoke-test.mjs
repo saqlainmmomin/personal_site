@@ -134,12 +134,12 @@ assert.equal(attributes(dialog)['aria-describedby'], 'dialogDescription');
 const projectElements = nodesByTag('article').filter(node => attributes(node)['data-project']);
 const projectTriggers = nodesByTag('button').filter(node => classIncludes(node, 'project-demo'));
 assert.equal(projectElements.length, EXPECTED_PROJECTS, 'Expected one flagship and three supporting projects');
-assert.equal(projectTriggers.length, EXPECTED_PROJECTS * 2 - 1, 'CyberAssess needs one demo trigger; supporting projects need two');
+assert.equal(projectTriggers.length, EXPECTED_PROJECTS * 2 - 1, 'Yozora needs one demo trigger; supporting projects need two');
 
-const cyberAssess = projectElements.find(node => attributes(node)['data-project'] === 'cyberassess');
-assert.ok(cyberAssess, 'CyberAssess project is required');
-assert.equal(descendants(cyberAssess, node => classIncludes(node, 'project-demo')).length, 1, 'CyberAssess should open its demo from one button');
-assert.equal(descendants(cyberAssess, node => node.tagName === 'img').length, 0, 'CyberAssess flagship card should be text-only');
+const yozora = projectElements.find(node => attributes(node)['data-project'] === 'yozora');
+assert.ok(yozora, 'Yozora project is required');
+assert.equal(descendants(yozora, node => classIncludes(node, 'project-demo')).length, 1, 'Yozora should open its demo from one button');
+assert.equal(descendants(yozora, node => node.tagName === 'img').length, 0, 'Yozora flagship card should be text-only');
 
 const featuredNote = nodesByTag('a').find(node => classIncludes(node, 'note-featured'));
 assert.equal(attributes(featuredNote).href, FEATURED_NOTE_LINK, 'Featured Field Note should use the supplied URL');
@@ -201,7 +201,7 @@ const robots = readFileSync(join(root, 'robots.txt'), 'utf8');
 const sitemap = readFileSync(join(root, 'sitemap.xml'), 'utf8');
 assert.match(robots, new RegExp('Sitemap: ' + PRODUCTION_ORIGIN.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '/sitemap\\.xml'));
 assert.ok(sitemap.includes('<loc>' + expectedPageUrl + '</loc>'), 'Sitemap URL should match the canonical URL');
-assert.ok(html.includes('Synthetic demo data'), 'CyberAssess media must disclose synthetic demo data');
+assert.ok(html.includes('Synthetic demo data'), 'Yozora media must disclose synthetic demo data');
 
 for (const date of ['2026-02-09', '2026-03-12', '2026-03-25', '2026-03-30', '2026-04-06', '2026-04-08', '2026-08-23']) {
   assert.ok(html.includes('datetime="' + date + '"'), 'Missing corrected Field Note date ' + date);
