@@ -1,0 +1,312 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Instrument Serif';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/instrument-serif-regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Instrument Serif';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/instrument-serif-italic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300 600;
+  font-display: swap;
+  src: url('/fonts/inter-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-latin.woff2') format('woff2');
+}
+
+/* Audit-file palette: paper and ink from site-v2, plus manila folders and stamp red. */
+@theme {
+  --color-paper: #F2EFE8;
+  --color-paper-2: #E8E4D9;
+  --color-manila: #E3D3AE;
+  --color-manila-2: #D2BE90;
+  --color-ink: #0D0D0D;
+  --color-ink-2: #24221F;
+  --color-muted: #68645E;
+  --color-accent: #F14920;
+  --color-accent-dark: #B72C0D; /* small orange text: ≥4.9:1 on paper and paper-2 (AA) */
+  --color-stamp: #C2321B;
+  /* Darker inks for small text on manila: both clear WCAG AA (≥4.5:1) on every folder shade. */
+  --color-folder-muted: #4F4B45;
+  --color-stamp-ink: #8F2010;
+  --color-warm: #E9E3D2;
+  --color-on-accent: #0D0D0D;
+  --color-line: rgb(13 13 13 / 0.13);
+  --color-line-2: rgb(13 13 13 / 0.28);
+
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --ease-out-expo: cubic-bezier(.19, 1, .22, 1);
+  --spacing-page: clamp(20px, 3vw, 40px);
+  --spacing-section: clamp(88px, 8vw, 128px);
+}
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+  ::selection { @apply bg-accent text-white; }
+  section[id] { scroll-margin-top: 80px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Section surfaces: sections alternate between paper and a deeper warm cream, and each opens with a
+   thick ink rule and an index tab, so a new section reads as structure, not just colour. */
+.surface-warm {
+  background-color: var(--color-warm);
+  --color-muted: #5F5B55;
+}
+
+/* The still badge sways from its strap like it was just hung up. */
+.badge-still {
+  transform-origin: 50% 0;
+  animation: badge-sway 6s ease-in-out infinite;
+}
+@keyframes badge-sway {
+  0%, 100% { transform: rotate(-2.2deg); }
+  50% { transform: rotate(2.2deg); }
+}
+
+/* Case files: manila folders with a tab, and an NDA stamp that thumps on once in view. */
+.folder,
+.folder-tab {
+  background: var(--shade);
+}
+.folder {
+  box-shadow: 0 -14px 32px -22px rgb(13 13 13 / 0.45), 0 1px 0 rgb(13 13 13 / 0.08);
+  background-image: repeating-linear-gradient(0deg, transparent 0 31px, rgb(13 13 13 / 0.035) 31px 32px);
+}
+.folder-body { transition: opacity 300ms var(--ease-out-expo); }
+@media (min-width: 768px) {
+  [data-covered] .folder-body { opacity: 0; }
+}
+/* Phones: the stamp sits in the flow above the file label; md+: pinned beside the title. */
+.stamp {
+  position: relative;
+  width: max-content;
+  margin: 0 0 20px 6px;
+  display: grid;
+  justify-items: center;
+  padding: 6px 14px 5px;
+  border: 3px double var(--color-stamp-ink);
+  border-radius: 6px;
+  color: var(--color-stamp-ink);
+  font: 500 26px/1 var(--font-mono);
+  letter-spacing: 0.2em;
+  mix-blend-mode: multiply;
+  opacity: 0;
+  transform: rotate(-11deg) scale(1.7);
+}
+.stamp small {
+  margin-top: 3px;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.stamp[data-stamped] {
+  animation: stamp-thump 420ms cubic-bezier(.2, 1.6, .4, 1) forwards;
+}
+@keyframes stamp-thump {
+  0% { opacity: 0; transform: rotate(-11deg) scale(1.7); }
+  60% { opacity: 0.9; transform: rotate(-11deg) scale(0.94); }
+  100% { opacity: 1; transform: rotate(-11deg) scale(1); }
+}
+@media (min-width: 768px) {
+  .stamp { position: absolute; top: 0; right: 0; margin: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stamp { opacity: 1; transform: rotate(-11deg); }
+}
+
+/* KPMG block: the current-role dot pulses, the rule under the name grows in, tiles stagger up. */
+.pulse-dot { animation: pulse-dot 2.2s ease-out infinite; }
+@keyframes pulse-dot {
+  0% { box-shadow: 0 0 0 0 rgb(241 73 32 / 0.55); }
+  100% { box-shadow: 0 0 0 10px rgb(241 73 32 / 0); }
+}
+.grow-rule {
+  width: 0;
+  transition: width 900ms var(--ease-out-expo) 200ms;
+}
+[data-in] .grow-rule { width: 5rem; }
+.stagger-in {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 600ms var(--ease-out-expo), transform 600ms var(--ease-out-expo), border-color 300ms, background-color 300ms;
+  transition-delay: calc(var(--i, 0) * 90ms), calc(var(--i, 0) * 90ms), 0ms, 0ms;
+}
+[data-in] .stagger-in { opacity: 1; transform: none; }
+.work-tile {
+  transition: transform 300ms var(--ease-out-expo), border-color 300ms, background-color 300ms;
+}
+.work-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--color-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 400ms var(--ease-out-expo);
+}
+.work-tile:hover {
+  transform: translateY(-3px);
+  border-color: var(--color-ink);
+  background-color: var(--color-paper);
+}
+.work-tile:hover::before { transform: scaleX(1); }
+@media (prefers-reduced-motion: reduce) {
+  .grow-rule { width: 5rem; }
+  .stagger-in { opacity: 1; transform: none; }
+  .work-tile:hover { transform: none; }
+}
+
+/* Evidence trail: --p (0–1) draws the line; data-step lights each node's dot as the line reaches it.
+   The rail <span> is the list's first child, so node n is :nth-child(n + 1). */
+.trail-ink {
+  /* Gap longer than the path, so rounding never wraps a sliver of dash onto the far end. */
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: calc(1 - var(--p, 0));
+}
+.trail-rail::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-accent);
+  transform: scaleY(var(--p, 0));
+  transform-origin: top;
+}
+.trail-dot {
+  border-color: var(--color-line-2);
+  background: var(--color-paper);
+  color: var(--color-muted);
+  transition: background-color 300ms, border-color 300ms, color 300ms, transform 400ms var(--ease-out-expo);
+}
+.trail[data-step='1'] .trail-node:nth-child(-n + 2) .trail-dot,
+.trail[data-step='2'] .trail-node:nth-child(-n + 3) .trail-dot,
+.trail[data-step='3'] .trail-node:nth-child(-n + 4) .trail-dot,
+.trail[data-step='4'] .trail-node:nth-child(-n + 5) .trail-dot,
+.trail[data-step='5'] .trail-node .trail-dot {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  transform: scale(1.15);
+}
+
+/* Credentials: embossed seals that tilt toward the pointer and catch a foil sheen. */
+.seal { perspective: 800px; }
+.seal-face {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(100%, 150px);
+  aspect-ratio: 1;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 50%;
+  color: var(--color-ink-2);
+  background: radial-gradient(circle at 35% 28%, #FBF8F0, var(--color-paper-2) 58%, #D6CFBC);
+  box-shadow:
+    inset 0 2px 3px rgb(255 255 255 / 0.85),
+    inset 0 -4px 8px rgb(13 13 13 / 0.16),
+    0 14px 26px -14px rgb(13 13 13 / 0.55);
+  transition: transform 250ms var(--ease-out-expo);
+}
+.seal-ring { font: 500 11px var(--font-mono); }
+.seal-foil {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  opacity: 0;
+  mix-blend-mode: soft-light;
+  background:
+    radial-gradient(circle at var(--mx, 30%) var(--my, 25%), rgb(255 255 255 / 0.95), transparent 42%),
+    conic-gradient(from 20deg at var(--mx, 50%) var(--my, 50%), #ff9aa2, #ffe29a, #9affc0, #9ad0ff, #d49aff, #ff9aa2);
+  transition: opacity 250ms;
+  pointer-events: none;
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .seal:hover .seal-foil { opacity: 0.9; }
+  .seal:hover .seal-face {
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) scale(1.04);
+    transition-duration: 80ms;
+  }
+}
+
+/* Field notes: black bars cover each thesis line until hover or focus. Touch devices and reduced
+   motion never get the bars, so every note stays readable. */
+.redact-hint { display: none; }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .redact-hint { display: block; }
+  .redact {
+    padding: 0 0.15em;
+    color: transparent;
+    background: linear-gradient(var(--color-ink), var(--color-ink)) 0 0 / 100% 100% no-repeat;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    transition: background-size 450ms var(--ease-out-expo), color 250ms 120ms;
+  }
+  .note-row:hover .redact,
+  .note-row:focus-visible .redact {
+    color: var(--color-ink-2);
+    background-size: 100% 0;
+  }
+}
+
+@media print {
+  .redact { color: inherit; background: none; }
+}
+
+/* Contact: the underline draws itself once in view; the email is a stamp-style button. */
+.scribble-ink {
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 2.6s cubic-bezier(.45, 0, .2, 1);
+}
+.scribble[data-drawn] .scribble-ink { stroke-dashoffset: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .scribble-ink { stroke-dashoffset: 0; }
+}
+.contact-stamp {
+  display: grid;
+  gap: 6px;
+  padding: 14px 26px 12px;
+  border: 3px double var(--color-stamp-ink);
+  color: var(--color-stamp-ink);
+  transform: rotate(-2deg);
+  transition: background-color 200ms, color 200ms, transform 300ms var(--ease-out-expo);
+}
+.contact-stamp:hover,
+.contact-stamp:focus-visible {
+  background: var(--color-stamp-ink);
+  color: var(--color-paper);
+  transform: rotate(0deg) scale(1.02);
+}

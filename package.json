@@ -3,11 +3,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "python3 -m http.server 4173 --directory site-v2",
-    "test": "node site-v2/smoke-test.mjs"
+    "dev": "npm --prefix web run dev",
+    "build": "npm --prefix web run build",
+    "preview": "npm --prefix web run preview",
+    "dev:legacy": "python3 -m http.server 4173 --directory site-v2",
+    "test": "node site-v2/smoke-test.mjs && node web/smoke-test.mjs"
   },
   "devDependencies": {
     "css-tree": "3.2.1",
-    "parse5": "7.3.0"
+    "parse5": "7.3.0",
+    "playwright-core": "1.61.0"
   }
 }
