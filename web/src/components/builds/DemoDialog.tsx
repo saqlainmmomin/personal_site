@@ -25,7 +25,7 @@ export function DemoDialog({ demo, onClose }: { demo: Demo | null; onClose: () =
         <div className="max-h-[calc(100svh-34px)] overflow-auto p-5 md:p-9">
           <header className="flex items-start justify-between gap-6">
             <div>
-              <p className="font-mono text-[11px] tracking-[0.2em] text-paper/60 uppercase">Exhibit · {demo.label}</p>
+              <p className="font-mono text-xs tracking-[0.2em] text-paper/60 uppercase">Exhibit · {demo.label}</p>
               <h2 id="demo-title" className="mt-2 font-serif text-5xl leading-none md:text-6xl">
                 {demo.title}
               </h2>
@@ -33,7 +33,7 @@ export function DemoDialog({ demo, onClose }: { demo: Demo | null; onClose: () =
             <button
               type="button"
               onClick={() => ref.current?.close()}
-              className="border border-paper/30 px-3 py-2 font-mono text-[11px] tracking-[0.2em] uppercase hover:border-paper"
+              className="border border-paper/30 px-3 py-2 font-mono text-xs tracking-[0.2em] uppercase hover:border-paper"
             >
               Close ✕
             </button>
@@ -60,7 +60,7 @@ export function DemoDialog({ demo, onClose }: { demo: Demo | null; onClose: () =
               {demo.description}
             </p>
             {demo.github && (
-              <a href={demo.github} target="_blank" rel="noreferrer" className="font-mono text-[11px] tracking-[0.15em] text-accent uppercase">
+              <a href={demo.github} target="_blank" rel="noreferrer" className="font-mono text-xs tracking-[0.15em] text-accent uppercase">
                 GitHub ↗
               </a>
             )}

@@ -27,7 +27,7 @@ export function Builds() {
               <h3 id="yozora-name" className="font-serif text-7xl leading-none md:text-8xl">
                 {yozora.name}
               </h3>
-              <span className="mb-2 inline-flex items-center gap-2 border border-ink/40 px-2.5 py-1 font-mono text-[11px] tracking-[0.15em] uppercase">
+              <span className="mb-2 inline-flex items-center gap-2 border border-ink/40 px-2.5 py-1 font-mono text-xs tracking-[0.15em] uppercase">
                 <span className="size-1.5 rounded-full bg-accent" aria-hidden="true" />
                 {yozora.status}
               </span>
@@ -50,8 +50,8 @@ export function Builds() {
           <dl className="grid content-start gap-x-8 sm:grid-cols-2 lg:pt-3">
             {yozora.facts.map(([k, v]) => (
               <div key={k} className="border-t border-line-2 py-4">
-                <dt className="font-mono text-[10px] tracking-[0.2em] text-muted uppercase">{k}</dt>
-                <dd className="mt-1.5 text-[15px] leading-snug">{v}</dd>
+                <dt className="font-mono text-xs tracking-[0.2em] text-muted uppercase">{k}</dt>
+                <dd className="mt-1.5 text-[15px] leading-[1.45]">{v}</dd>
               </div>
             ))}
           </dl>
@@ -59,8 +59,8 @@ export function Builds() {
 
         <EvidenceTrail />
 
-        <p className="mt-14 max-w-3xl border-l-2 border-accent pl-4 text-sm leading-relaxed text-ink-2">
-          <span className="font-mono text-[11px] tracking-[0.2em] text-ink uppercase">Current direction · </span>
+        <p className="mt-14 max-w-[68ch] border-l-2 border-accent pl-4 text-sm leading-relaxed text-ink-2">
+          <span className="font-mono text-xs tracking-[0.2em] text-ink uppercase">Current direction · </span>
           {yozora.direction}
         </p>
 

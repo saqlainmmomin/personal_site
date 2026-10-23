@@ -59,14 +59,15 @@
 }
 
 @layer base {
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+  h1, h2, h3, h4 { text-wrap: balance; }
+  p, li, dd { text-wrap: pretty; }
   body {
     @apply bg-paper text-ink font-sans antialiased;
     line-height: 1.5;
     overflow-x: hidden;
   }
   ::selection { @apply bg-accent text-white; }
-  section[id] { scroll-margin-top: 80px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -84,6 +85,8 @@
   background-color: var(--color-warm);
   --color-muted: #5F5B55;
 }
+/* Bright orange fails 3:1 even as large text on the warm cream; use a deeper orange there. */
+.surface-warm .text-accent { color: #C93410; }
 
 /* The still badge sways from its strap like it was just hung up. */
 .badge-still {
@@ -127,8 +130,8 @@
 }
 .stamp small {
   margin-top: 3px;
-  font-size: 9px;
-  letter-spacing: 0.2em;
+  font-size: 11px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 .stamp[data-stamped] {
@@ -146,7 +149,7 @@
   .stamp { opacity: 1; transform: rotate(-11deg); }
 }
 
-/* KPMG block: the current-role dot pulses, the rule under the name grows in, tiles stagger up. */
+/* KPMG block: the current-role dot pulses, the rule under the name grows in, stages stagger up. */
 .pulse-dot { animation: pulse-dot 2.2s ease-out infinite; }
 @keyframes pulse-dot {
   0% { box-shadow: 0 0 0 0 rgb(241 73 32 / 0.55); }
@@ -164,29 +167,68 @@
   transition-delay: calc(var(--i, 0) * 90ms), calc(var(--i, 0) * 90ms), 0ms, 0ms;
 }
 [data-in] .stagger-in { opacity: 1; transform: none; }
-.work-tile {
-  transition: transform 300ms var(--ease-out-expo), border-color 300ms, background-color 300ms;
+.work-card {
+  position: relative;
+  transition: transform 300ms var(--ease-out-expo), border-color 300ms, background-color 300ms, box-shadow 300ms;
 }
-.work-tile::before {
+@media (hover: hover) {
+  .work-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--color-ink);
+    border-top-color: var(--color-accent);
+    background-color: var(--color-paper);
+    box-shadow: 6px 6px 0 0 var(--color-ink);
+  }
+}
+/* Highlighter swipe under the key phrase of each area. */
+.mark {
+  background: linear-gradient(transparent 60%, rgb(241 73 32 / 0.3) 60%) 0 0 / 0 100% no-repeat;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition: background-size 700ms var(--ease-out-expo) 500ms;
+}
+[data-in] .mark { background-size: 100% 100%; }
+
+/* Lifecycle rail: a line from each stage node to the next, drawn in as the block scrolls into view.
+   Phones: runs down the left edge; lg+: runs along the top of the columns. */
+.flow-link {
+  position: absolute;
+  left: 17px;
+  top: 40px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--color-line-2);
+}
+.flow-link::after {
   content: '';
   position: absolute;
-  inset: 0 0 auto;
-  height: 3px;
+  inset: 0;
   background: var(--color-accent);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 400ms var(--ease-out-expo);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 700ms var(--ease-out-expo) calc(var(--i, 0) * 350ms + 300ms);
 }
-.work-tile:hover {
-  transform: translateY(-3px);
-  border-color: var(--color-ink);
-  background-color: var(--color-paper);
+[data-in] .flow-link::after { transform: scaleY(1); }
+.bracket { transform: scaleX(0); transform-origin: left; transition: transform 900ms var(--ease-out-expo) 1200ms; }
+[data-in] .bracket { transform: none; }
+@media (min-width: 1024px) {
+  .flow-link {
+    left: 44px;
+    top: 17px;
+    bottom: auto;
+    width: calc(100% - 28px);
+    height: 2px;
+  }
+  .flow-link::after { transform: scaleX(0); transform-origin: left; }
+  [data-in] .flow-link::after { transform: scaleX(1); }
 }
-.work-tile:hover::before { transform: scaleX(1); }
 @media (prefers-reduced-motion: reduce) {
   .grow-rule { width: 5rem; }
   .stagger-in { opacity: 1; transform: none; }
-  .work-tile:hover { transform: none; }
+  .work-card:hover { transform: none; }
+  .mark { background-size: 100% 100%; }
+  .flow-link::after { transform: none; }
+  .bracket { transform: none; }
 }
 
 /* Evidence trail: --p (0–1) draws the line; data-step lights each node's dot as the line reaches it.
@@ -304,9 +346,72 @@
   transform: rotate(-2deg);
   transition: background-color 200ms, color 200ms, transform 300ms var(--ease-out-expo);
 }
-.contact-stamp:hover,
 .contact-stamp:focus-visible {
   background: var(--color-stamp-ink);
   color: var(--color-paper);
   transform: rotate(0deg) scale(1.02);
+}
+@media (hover: hover) {
+  .contact-stamp:hover {
+    background: var(--color-stamp-ink);
+    color: var(--color-paper);
+    transform: rotate(0deg) scale(1.02);
+  }
+}
+
+/* Practice pass: an access-pass card with the badge's pastel finish; tabs mark the active area. */
+.pass-tab {
+  border-color: var(--color-line-2);
+  color: var(--color-ink-2);
+}
+@media (hover: hover) {
+  .pass-tab:hover { background: var(--color-paper-2); color: var(--color-ink); }
+}
+.pass-tab[aria-selected='true'] {
+  border-color: var(--color-accent);
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+}
+.pass { perspective: 1200px; }
+.pass-face {
+  background:
+    linear-gradient(180deg, transparent calc(100% - 6px), var(--color-accent) calc(100% - 6px)),
+    linear-gradient(135deg, #f6e9e4 0%, #ece9f4 45%, #e4f0e3 100%);
+  box-shadow: 0 24px 40px -28px rgb(13 13 13 / 0.55), inset 0 1px 0 rgb(255 255 255 / 0.8);
+  transition: transform 250ms var(--ease-out-expo);
+}
+.pass-foil {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  mix-blend-mode: soft-light;
+  background:
+    radial-gradient(circle at var(--mx, 30%) var(--my, 25%), rgb(255 255 255 / 0.95), transparent 45%),
+    conic-gradient(from 20deg at var(--mx, 50%) var(--my, 50%), #ff9aa2, #ffe29a, #9affc0, #9ad0ff, #d49aff, #ff9aa2);
+  transition: opacity 250ms;
+  pointer-events: none;
+}
+.pass-panel:not([hidden]) { animation: pass-in 420ms var(--ease-out-expo); }
+@keyframes pass-in {
+  from { opacity: 0; transform: translateY(10px) rotateX(-6deg); }
+  to { opacity: 1; transform: none; }
+}
+.pass-step {
+  font: 500 12px var(--font-mono);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 10px 4px;
+  color: var(--color-ink);
+  border-bottom: 2px solid transparent;
+  transition: border-color 200ms, padding 200ms;
+}
+@media (hover: hover) {
+  .pass-step:hover { border-bottom-color: var(--color-accent); }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .pass:hover .pass-foil { opacity: 0.7; }
+  .pass:hover .pass-face {
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transition-duration: 80ms;
+  }
 }

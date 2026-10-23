@@ -179,11 +179,27 @@ async function commonChecks(label, { page, problems }) {
   assert.ok(cells >= 350, `[${label}] GitHub activity graph should draw a year of days, found ${cells}`)
   ok(`${label}: GitHub activity graph renders ${cells} days`)
 
-  const groups = await page.locator('#credentials h4').allInnerTexts()
+  // Practice pass: all six panels live in the DOM (hidden ones included), one tab is selected, keyboard flips them.
+  const groups = await page.locator('#credentials [role="tabpanel"] h4').evaluateAll((els) => els.map((e) => e.textContent))
   assert.equal(groups.length, 6, `[${label}] six practice groups`)
-  const credText = await page.locator('#credentials').innerText()
-  for (const term of ['PCI DSS', 'GDPR', 'IRDAI', 'Prompt engineering', 'Reinforcement learning from human feedback']) assert.ok(credText.includes(term), `[${label}] credentials should mention ${term}`)
-  ok(`${label}: six practice groups with the expected terms`)
+  const credText = await page.locator('#credentials').evaluate((el) => el.textContent)
+  for (const term of ['PCI DSS', 'GDPR', 'IRDAI', 'Prompt engineering', 'Reinforcement learning from human feedback', 'ServiceNow GRC', 'Claude Code']) assert.ok(credText.includes(term), `[${label}] credentials should mention ${term}`)
+  const tabs = page.locator('#credentials [role="tab"]')
+  assert.equal(await tabs.count(), 6, `[${label}] six practice tabs`)
+  assert.equal(await page.locator('#credentials [role="tabpanel"]:not([hidden])').count(), 1, `[${label}] exactly one practice panel visible`)
+  await tabs.first().focus()
+  await page.keyboard.press('ArrowDown')
+  assert.equal(await tabs.nth(1).getAttribute('aria-selected'), 'true', `[${label}] ArrowDown should select the next practice tab`)
+  assert.match(await page.locator('#credentials [role="tabpanel"]:not([hidden]) h4').innerText(), /Audit/, `[${label}] panel should follow the tab`)
+  await page.getByRole('button', { name: /Next area/ }).click()
+  assert.equal(await tabs.nth(2).getAttribute('aria-selected'), 'true', `[${label}] Next should advance the pass`)
+  await tabs.first().click()
+  ok(`${label}: six practice panels with the expected terms; tabs, arrow keys and Next flip the pass`)
+
+  // Field-note index: two columns on desktop, one on phones.
+  const noteCols = await page.locator('#writing ol li').evaluateAll((els) => new Set(els.map((e) => Math.round(e.getBoundingClientRect().left))).size)
+  assert.equal(noteCols, label === '390' ? 1 : 2, `[${label}] field-note index columns`)
+  ok(`${label}: field-note index lays out in ${noteCols} column(s)`)
 
   // Demo dialogs: Yozora's walkthrough and one exhibit.
   for (const [name, trigger] of [
@@ -283,16 +299,30 @@ console.log('Browser checks')
       scribble: getComputedStyle(q('.scribble-ink')).strokeDashoffset,
       tile: getComputedStyle(q('.stagger-in')).opacity,
       rule: q('.grow-rule').getBoundingClientRect().width,
+      mark: getComputedStyle(q('.mark')).backgroundSize,
+      flow: getComputedStyle(q('.flow-link'), '::after').transform,
     }
   })
   assert.equal(state.scrollBehavior, 'auto', 'smooth scroll should be off')
   assert.doesNotMatch(state.redact, /rgba\(0, 0, 0, 0\)/, 'notes must stay readable under reduced motion')
   assert.equal(state.stampOpacity, '1', 'stamps should be visible without animating in')
   assert.ok(parseFloat(state.scribble) === 0, 'underline should be fully drawn')
-  assert.equal(state.tile, '1', 'work tiles should be visible without animating in')
+  assert.equal(state.tile, '1', 'KPMG stages should be visible without animating in')
   assert.ok(state.rule > 0, 'KPMG rule should be full width')
+  assert.match(state.mark, /100%/, 'key-phrase highlight should be drawn without animating')
+  assert.ok(state.flow === 'none' || /matrix\(1, 0, 0, 1/.test(state.flow), 'lifecycle line should be fully drawn')
   assert.deepEqual(s.problems, [], 'reduced-motion: console errors or failed requests')
-  ok('reduced motion: scroll, redaction, stamps, underline and KPMG tiles resolve to their final state')
+  ok('reduced motion: scroll, redaction, stamps, underline and KPMG stages resolve to their final state')
+  await s.context.close()
+}
+
+// 320px (WCAG 1.4.10 reflow): no horizontal scroll.
+{
+  const s = await open('320', { viewport: { width: 320, height: 700 }, isMobile: true, hasTouch: true })
+  await scrollThrough(s.page)
+  const o = await s.page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, inner: innerWidth }))
+  assert.ok(o.scroll <= o.inner, `[320] horizontal overflow: scrollWidth ${o.scroll} > ${o.inner}`)
+  ok('320: no horizontal overflow')
   await s.context.close()
 }
 

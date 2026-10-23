@@ -1,6 +1,15 @@
 // Experience copy. Source of truth: ~/.claude/skills/cv-tailor/reference/content-evidence-map.md.
 // Client names stay confidential; no figures that the evidence map does not support.
 
+export interface Area {
+  area: string
+  /** The scannable phrase: what the area is, in the fewest words. `detail` adds the rest. */
+  key: string
+  detail: string
+  /** Lifecycle stage 1-4 (design, implement, assure, run). Omitted for work that runs through all of them. */
+  stage?: 1 | 2 | 3 | 4
+}
+
 export interface Role {
   /** "YYYY-MM"; `end` is omitted for the current role. */
   start: string
@@ -11,7 +20,7 @@ export interface Role {
   title: string
   summary: string
   /** Areas of work, elaborated for the current role only. */
-  areas?: { area: string; detail: string }[]
+  areas?: Area[]
 }
 
 export const roles: Role[] = [
@@ -25,28 +34,39 @@ export const roles: Role[] = [
       'Risk-based cyber and IT-audit engagements for regulated enterprises, from first gap assessment to running the program.',
     areas: [
       {
-        area: 'Regulatory audits',
-        detail: 'Cyber-compliance reviews against RBI and IRDAI requirements for banks and insurers; ITGC design and testing.',
-      },
-      {
-        area: 'Certification audits',
-        detail: 'ISO 27001 and ISO 22301 programs taken through certification, and ISO 27001 surveillance audits after it.',
-      },
-      {
         area: 'Program design',
-        detail: 'Gap and maturity assessments, and unified control frameworks across ISO 27001, NIST CSF, and DPDPA.',
+        key: 'One control set, many standards',
+        detail: 'Gap and maturity assessments, then unified control frameworks across ISO 27001, NIST CSF, and DPDPA.',
+        stage: 1,
       },
       {
         area: 'Program implementation',
-        detail: 'Phased cyber transformation plans carried through policy, technology, and operations.',
+        key: 'Policy, technology, operations',
+        detail: 'Phased cyber transformation plans, carried through all three.',
+        stage: 2,
+      },
+      {
+        area: 'Regulatory audits',
+        key: 'RBI and IRDAI',
+        detail: 'Cyber-compliance reviews for banks and insurers, plus ITGC design and testing.',
+        stage: 3,
+      },
+      {
+        area: 'Certification audits',
+        key: 'ISO\u00a027001 and ISO\u00a022301',
+        detail: 'Programs taken through certification, and ISO 27001 surveillance audits after it.',
+        stage: 3,
       },
       {
         area: 'Managed services',
-        detail: 'Cyber transformation and TPRM run as managed services: KPIs for cyber and IT operations, vendor SLAs, steering reviews.',
+        key: 'KPIs and vendor SLAs',
+        detail: 'Cyber transformation and TPRM run as managed services, with steering reviews.',
+        stage: 4,
       },
       {
         area: 'Client leadership',
-        detail: 'Primary client contact across concurrent engagements: kickoffs, status, escalations, and CISO-level reporting.',
+        key: 'CISO-level reporting',
+        detail: 'Primary client contact across concurrent engagements: kickoffs, status, and escalations.',
       },
     ],
   },

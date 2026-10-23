@@ -1,10 +1,9 @@
-import { degrees, practice, seals } from '@/content/credentials'
+import { degrees, seals } from '@/content/credentials'
 import { Section } from '@/components/ui/Section'
 import { SectionHead } from '@/components/ui/SectionHead'
 import { GithubActivity } from './GithubActivity'
+import { PracticePass } from './PracticePass'
 import { Seal } from './Seal'
-
-const slug = (area: string) => `practice-${area.toLowerCase().replace(/\W+/g, '-')}`
 
 export function Credentials() {
   return (
@@ -40,20 +39,7 @@ export function Credentials() {
 
       <div className="mt-20 border-t border-ink pt-10">
         <h3 className="font-serif text-3xl">Practice and focus areas</h3>
-        <div className="mt-8 grid gap-x-12 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-          {practice.map((g) => (
-            <section key={g.area} aria-labelledby={slug(g.area)}>
-              <h4 id={slug(g.area)} className="border-t border-line-2 pt-4 font-serif text-2xl leading-tight">
-                {g.area}
-              </h4>
-              <ul className="mt-3 space-y-1.5 text-[15px] leading-snug text-ink-2">
-                {g.items.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </section>
-          ))}
-        </div>
+        <PracticePass />
       </div>
 
       <div className="mt-20 border-t border-ink pt-10">

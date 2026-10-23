@@ -43,7 +43,7 @@ export function HeroBadge() {
   }, [])
 
   const still = art && (
-    <div className="badge-still mx-auto flex w-[min(72vw,300px)] flex-col items-center" aria-hidden="true">
+    <div className="badge-still mx-auto flex w-[min(80vw,340px)] flex-col items-center" aria-hidden="true">
       <div className="h-24 w-6 bg-accent" />
       <img src={art.front} alt="" className="-mt-1 w-full rounded-[18px] shadow-[0_24px_60px_-20px_rgb(13_13_13/0.45)]" />
     </div>
@@ -64,7 +64,7 @@ export function HeroBadge() {
             cardColor="#F2EFE8"
             finish="metallic"
             anchor="right"
-            size={0.6}
+            size={0.7}
             strapLength={0.3}
             strapWidth={0.6}
             metal="silver"

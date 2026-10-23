@@ -29,8 +29,8 @@ export function Contact() {
 
       <div className="mt-14 flex flex-wrap items-center gap-x-10 gap-y-8">
         <a href={`mailto:${contact.email}`} aria-label={`Interested in working with me? Email ${contact.email}`} className="contact-stamp">
-          <span className="font-mono text-[11px] tracking-[0.2em] uppercase">Interested in working with me?</span>
-          <span className="font-mono text-lg tracking-[0.06em] sm:text-2xl">{contact.email}</span>
+          <span className="font-mono text-xs tracking-[0.2em] uppercase">Interested in working with me?</span>
+          <span className="font-mono text-base tracking-[0.04em] [overflow-wrap:anywhere] sm:text-2xl sm:tracking-[0.06em]">{contact.email}</span>
         </a>
         <ul className="flex flex-wrap gap-x-8 gap-y-3">
           {contact.links.map((l) => (
@@ -41,7 +41,7 @@ export function Contact() {
                 className="group inline-flex items-baseline gap-2 border-b border-line-2 pb-1 transition-colors hover:border-ink"
               >
                 <span className="font-mono text-xs tracking-[0.18em] uppercase">{l.name}</span>
-                <span className="font-mono text-[11px] text-ink-2">{l.handle}</span>
+                <span className="font-mono text-xs text-ink-2">{l.handle}</span>
                 <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">↗</span>
               </a>
             </li>

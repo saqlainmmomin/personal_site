@@ -42,7 +42,7 @@ function ExhibitMedia({ exhibit, onOpen }: { exhibit: Exhibit; onOpen: () => voi
           className="size-full object-cover object-top opacity-90 transition-[opacity,transform] duration-500 group-hover:scale-[1.03] group-hover:opacity-100"
         />
       )}
-      <span className="absolute bottom-3 left-3 bg-paper px-2.5 py-1 font-mono text-[10px] tracking-[0.18em] text-ink uppercase">
+      <span className="absolute bottom-3 left-3 bg-paper px-2.5 py-1 font-mono text-xs tracking-[0.18em] text-ink uppercase">
         {exhibit.action} ↗
       </span>
     </button>
@@ -60,14 +60,14 @@ export function Exhibits({ onOpen }: { onOpen: (demo: Demo) => void }) {
           <li key={ex.id}>
             <article aria-labelledby={`${ex.id}-name`}>
               <ExhibitMedia exhibit={ex} onOpen={() => onOpen(ex)} />
-              <p className="mt-4 font-mono text-[11px] tracking-[0.2em] text-accent-dark uppercase">
+              <p className="mt-4 font-mono text-xs tracking-[0.2em] text-accent-dark uppercase">
                 {ex.kind}
               </p>
               <h4 id={`${ex.id}-name`} className="mt-2 font-serif text-4xl leading-none">
                 {ex.name}
               </h4>
-              <p className="mt-3 text-[15px] leading-snug text-ink-2">{ex.pitch}</p>
-              <a href={ex.github} target="_blank" rel="noreferrer" className="mt-4 inline-block font-mono text-[11px] tracking-[0.18em] uppercase underline decoration-line-2 underline-offset-4 hover:decoration-ink">
+              <p className="mt-3 text-[15px] leading-[1.45] text-ink-2">{ex.pitch}</p>
+              <a href={ex.github} target="_blank" rel="noreferrer" className="mt-2 inline-block py-2 font-mono text-xs tracking-[0.18em] uppercase underline decoration-line-2 underline-offset-4 hover:decoration-ink">
                 GitHub ↗
               </a>
             </article>

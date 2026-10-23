@@ -69,7 +69,7 @@ export function Nav({ sections }: { sections: NavSection[] }) {
   return (
     <nav aria-label="Primary" className="sticky top-0 z-40 border-b border-line bg-paper/97 backdrop-blur">
       <div className="flex items-center justify-between px-page py-4">
-        <a href="#top" className="font-mono text-xs tracking-widest uppercase">S. Momin / Audit file</a>
+        <a href="#top" className="py-2 font-mono text-xs tracking-widest uppercase">S. Momin / Audit file</a>
 
         <ul ref={list} className="relative hidden gap-6 md:flex">
           {sections.map((s) => (

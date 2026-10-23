@@ -28,7 +28,7 @@ function Folder({ file, index }: { file: CaseFile; index: number }) {
       style={{ '--shade': SHADES[index % SHADES.length], '--i': index } as CSSProperties}
       aria-labelledby={`${file.id}-title`}
     >
-      <div className="folder-tab absolute -top-9 left-0 flex h-9 max-w-[calc(100%-2rem)] items-center rounded-t-lg px-5 font-mono text-[11px] tracking-[0.2em] text-ink-2 uppercase md:left-[calc(var(--i)*25%)] md:max-w-[calc(25%-8px)]">
+      <div className="folder-tab absolute -top-9 left-0 flex h-9 max-w-[calc(100%-2rem)] items-center rounded-t-lg px-5 font-mono text-xs tracking-[0.2em] text-ink-2 uppercase md:left-[calc(var(--i)*25%)] md:max-w-[calc(25%-8px)]">
         <span className="truncate">
           {file.practice}
         </span>
@@ -41,7 +41,7 @@ function Folder({ file, index }: { file: CaseFile; index: number }) {
           </h3>
           <ul className="mt-6 flex flex-wrap gap-2" aria-label="Focus areas">
             {file.tags.map((tag) => (
-              <li key={tag} className="border border-ink/25 px-2.5 py-1 font-mono text-[10px] tracking-[0.15em] text-ink-2 uppercase">
+              <li key={tag} className="border border-ink/25 px-2.5 py-1 font-mono text-xs tracking-[0.15em] text-ink-2 uppercase">
                 {tag}
               </li>
             ))}
@@ -50,10 +50,10 @@ function Folder({ file, index }: { file: CaseFile; index: number }) {
         <dl className="border-t border-ink/20">
           {rows.map(([label, text]) => (
             <div key={label} className="grid gap-1 border-b border-ink/20 py-4 sm:grid-cols-[110px_minmax(0,1fr)] sm:gap-6">
-              <dt className={`font-mono text-[11px] tracking-[0.2em] uppercase ${label === 'Result' ? 'text-stamp-ink' : 'text-folder-muted'}`}>
+              <dt className={`font-mono text-xs tracking-[0.2em] uppercase ${label === 'Result' ? 'text-stamp-ink' : 'text-folder-muted'}`}>
                 {label}
               </dt>
-              <dd className={`leading-snug ${label === 'Result' ? 'text-ink' : 'text-ink-2'}`}>{text}</dd>
+              <dd className={`leading-[1.45] ${label === 'Result' ? 'text-ink' : 'text-ink-2'}`}>{text}</dd>
             </div>
           ))}
         </dl>
@@ -94,7 +94,7 @@ export function CaseFiles() {
     <div className="mt-20">
       <div className="flex flex-wrap items-baseline justify-between gap-4 border-b border-line pb-4">
         <h3 className="font-serif text-3xl">Selected engagements</h3>
-        <p className="font-mono text-[11px] tracking-[0.2em] text-muted uppercase">Anonymized · client names withheld</p>
+        <p className="font-mono text-xs tracking-[0.2em] text-muted uppercase">Anonymized · client names withheld</p>
       </div>
       <ol ref={listRef} className="mt-16 space-y-16 md:space-y-[14vh]">
         {caseFiles.map((file, i) => (

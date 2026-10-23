@@ -37,7 +37,7 @@ export function GithubActivity() {
 
   const profile = `https://github.com/${githubUser}`
   const link = (
-    <a href={profile} target="_blank" rel="noopener" className="font-mono text-xs tracking-[0.18em] text-accent-dark uppercase underline-offset-4 hover:underline">
+    <a href={profile} target="_blank" rel="noopener" className="inline-block py-2 font-mono text-xs tracking-[0.18em] text-accent-dark uppercase underline-offset-4 hover:underline">
       @{githubUser} on GitHub ↗
     </a>
   )
@@ -53,7 +53,7 @@ export function GithubActivity() {
   return (
     <div>
       <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-        <p className="font-serif text-2xl leading-tight">
+        <p className="font-serif text-2xl leading-tight tabular-nums">
           {data ? (
             <>
               {data.total.toLocaleString('en')} contributions <span className="text-muted">in the last year</span>
@@ -93,7 +93,7 @@ export function GithubActivity() {
             ))}
         </svg>
       </div>
-      <div className="mt-2 flex items-center justify-end gap-1.5 font-mono text-[10px] tracking-[0.15em] text-muted uppercase" aria-hidden="true">
+      <div className="mt-2 flex items-center justify-end gap-1.5 font-mono text-xs tracking-[0.15em] text-muted uppercase" aria-hidden="true">
         Less
         {SHADES.map((c) => (
           <span key={c} className="size-3 rounded-[2px]" style={{ background: c }} />

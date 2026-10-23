@@ -43,7 +43,7 @@ export function EvidenceTrail() {
         <span className="trail-rail absolute top-2 bottom-2 left-[11px] w-0.5 bg-line lg:hidden" aria-hidden="true" />
         {trail.map((node, i) => (
           <li key={node.step} className="trail-node relative pb-12 pl-10 lg:px-3 lg:pb-0 lg:pl-4 lg:text-center" style={{ '--i': i } as CSSProperties}>
-            <span className="trail-dot absolute top-1 left-0 grid size-6 place-items-center rounded-full border-2 font-mono text-[10px] lg:relative lg:top-0 lg:mx-auto">
+            <span className="trail-dot absolute top-1 left-0 grid size-6 place-items-center rounded-full border-2 font-mono text-xs lg:relative lg:top-0 lg:mx-auto">
               {i + 1}
             </span>
             <h4 className="mt-0 font-serif text-2xl leading-tight lg:mt-6 lg:whitespace-nowrap">{node.step}</h4>

@@ -8,7 +8,7 @@ import { FieldNotes } from '@/components/writing/FieldNotes'
 
 // Section anchors match site-v2 so existing links keep resolving.
 const sections: NavSection[] = [
-  { id: 'experience', index: '01', label: 'Engagements' },
+  { id: 'experience', index: '01', label: 'Experience' },
   { id: 'builds', index: '02', label: 'Builds' },
   { id: 'credentials', index: '03', label: 'Credentials' },
   { id: 'writing', index: '04', label: 'Field notes' },
@@ -30,7 +30,7 @@ export default function App() {
         <FieldNotes />
         <Contact />
       </main>
-      <footer className="flex flex-wrap justify-between gap-2 border-t border-line px-page py-6 font-mono text-[11px] tracking-[0.15em] text-ink-2 uppercase">
+      <footer className="flex flex-wrap justify-between gap-2 border-t border-line px-page py-6 font-mono text-xs tracking-[0.15em] text-ink-2 uppercase">
         <p>© 2026 Saqlain Momin</p>
         <p>Designed and built in Bangalore</p>
       </footer>

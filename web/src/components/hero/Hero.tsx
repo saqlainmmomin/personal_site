@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import LogoLoop from '@/components/LogoLoop'
 import { roles } from '@/content/experience'
 import { fullYearsSince, yearsInWords } from '@/lib/dates'
@@ -10,6 +11,7 @@ const frameworks = ['ISO 27001', 'ISO 27701', 'ISO 22301', 'NIST CSF', 'DPDPA', 
 }))
 
 export function Hero() {
+  const [paused, setPaused] = useState(false)
   return (
     <section id="top" className="relative overflow-hidden">
       <div className="relative mx-auto grid max-w-[1440px] gap-10 px-page pt-10 lg:min-h-[calc(100svh-120px)] lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-6 lg:pt-14">
@@ -26,7 +28,10 @@ export function Hero() {
           </p>
 
           <div className="mt-7 flex flex-wrap gap-3">
-            <a href="#experience" className="bg-ink px-5 py-3 font-mono text-xs tracking-[0.18em] text-paper uppercase transition-colors hover:bg-accent">
+            <a href="#contact" className="bg-ink px-5 py-3 font-mono text-xs tracking-[0.18em] text-paper uppercase transition-colors hover:bg-accent">
+              Contact me ↓
+            </a>
+            <a href="#experience" className="border border-line-2 px-5 py-3 font-mono text-xs tracking-[0.18em] uppercase transition-colors hover:border-ink">
               Open the case files ↓
             </a>
             <a href="/cv.pdf" className="border border-line-2 px-5 py-3 font-mono text-xs tracking-[0.18em] uppercase transition-colors hover:border-ink">
@@ -43,10 +48,10 @@ export function Hero() {
         </div>
       </div>
 
-      <div className="mt-10 border-y border-line py-5">
+      <div className="relative mt-10 border-y border-line py-5">
         <LogoLoop
           logos={frameworks}
-          speed={50}
+          speed={paused ? 0 : 50}
           gap={56}
           logoHeight={20}
           pauseOnHover
@@ -54,6 +59,14 @@ export function Hero() {
           fadeOutColor="#F2EFE8"
           ariaLabel="Frameworks and standards I work with"
         />
+        <button
+          type="button"
+          aria-pressed={paused}
+          onClick={() => setPaused((v) => !v)}
+          className="absolute top-1/2 right-[var(--spacing-page)] z-10 -translate-y-1/2 border border-line-2 bg-paper px-3 py-2 font-mono text-xs tracking-[0.15em] uppercase hover:border-ink"
+        >
+          {paused ? 'Play' : 'Pause'} scroll
+        </button>
       </div>
     </section>
   )

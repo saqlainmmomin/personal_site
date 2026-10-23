@@ -51,7 +51,7 @@ export function Seal({ seal }: { seal: SealData }) {
         <p className="font-serif text-xl leading-tight">
           {seal.standard}:{seal.edition}
         </p>
-        <p className="mt-1 text-[13px] leading-snug text-ink-2">Lead Auditor · {seal.topic}</p>
+        <p className="mt-1 text-[13px] leading-[1.45] text-ink-2">Lead Auditor · {seal.topic}</p>
       </figcaption>
     </figure>
   )
