@@ -28,5 +28,9 @@ export default class LeonSans {
   position(x: number, y: number): void
   draw(ctx: CanvasRenderingContext2D): void
   wave(ctx: CanvasRenderingContext2D, time?: number): void
+  /** Construction guides: glyph boxes, baselines and curve circles. */
+  grid(ctx: CanvasRenderingContext2D): void
+  /** Anchor points and bezier handles. */
+  point(ctx: CanvasRenderingContext2D): void
   pattern(ctx: CanvasRenderingContext2D, w: number, h: number): void
 }

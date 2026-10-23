@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react'
 import LeonSans from '@/vendor/leon.js'
 
-const DRAW_SECONDS = 1.6
-const STAGGER = 0.06
-const easeOutQuart = (k: number) => 1 - Math.pow(1 - k, 4)
+const DRAW_SECONDS = 2.4
+const STAGGER = 0.16
+const GUIDE_IN = 0.5 // seconds for the construction lines to appear
+const easeInOut = (k: number) => 0.5 - 0.5 * Math.cos(Math.PI * k) // even pace, so each stroke is seen forming
 
 /**
  * The name, hand-drawn stroke by stroke with Leon Sans, then left to breathe in wave mode.
@@ -23,7 +24,7 @@ export function HeroName({ text = 'Saqlain\nMomin' }: { text?: string }) {
     const leon = new LeonSans({
       text,
       size: 100,
-      weight: 220,
+      weight: 280,
       color: [ink],
       align: 'left',
       leading: -1,
@@ -69,8 +70,19 @@ export function HeroName({ text = 'Saqlain\nMomin' }: { text?: string }) {
       if (t < introEnd) {
         leon.drawing.forEach((d, i) => {
           const k = Math.min(Math.max((t - i * STAGGER) / DRAW_SECONDS, 0), 1)
-          d.value = easeOutQuart(k)
+          d.value = easeInOut(k)
         })
+        // Construction first: Leon's guide circles, lines and anchor points fade in, hold while the strokes
+        // are drawn along them, then fade out as the last letter finishes.
+        const guide = Math.min(t / GUIDE_IN, 1) * (1 - Math.min(Math.max((t - (introEnd - 1.4)) / 1.4, 0), 1))
+        if (guide > 0.01) {
+          ctx.save()
+          ctx.globalAlpha = guide * 0.55
+          leon.grid(ctx)
+          ctx.globalAlpha = guide
+          leon.point(ctx)
+          ctx.restore()
+        }
         leon.draw(ctx)
       } else {
         // draw() animates strokes with line dashes and never clears them; wave() needs solid lines.
