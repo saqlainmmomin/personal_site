@@ -1,7 +1,5 @@
 import { useState } from 'react'
 import LogoLoop from '@/components/LogoLoop'
-import { roles } from '@/content/experience'
-import { fullYearsSince, yearsInWords } from '@/lib/dates'
 import { HeroBadge } from './HeroBadge'
 import { HeroName } from './HeroName'
 
@@ -22,12 +20,7 @@ export function Hero() {
           <p className="mt-6 max-w-xl font-serif text-4xl leading-[1.05] md:text-5xl">
             I design security programs, and audit whether they <em className="text-accent">hold</em>.
           </p>
-          <p className="mt-3 max-w-xl text-lg text-ink-2">
-            {yearsInWords(fullYearsSince(roles[0].start))} years at KPMG Bangalore across banks, insurers, and regulated enterprises. I also build software for the
-            parts of GRC that still run on spreadsheets.
-          </p>
-
-          <div className="mt-7 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-wrap gap-3">
             <a href="#contact" className="bg-ink px-5 py-3 font-mono text-xs tracking-[0.18em] text-paper uppercase transition-colors hover:bg-accent">
               Contact me ↓
             </a>
