@@ -1,3 +1,74 @@
+# PORTFOLIO REDESIGN: "THE AUDIT FILE" (2026-10-23) — APPROVED 2026-10-23, IN PROGRESS
+
+Decisions (Saqlain, 2026-10-23): Vite + React + TS + Tailwind; audit-file metaphor;
+moderate cut (~40% less copy, every section kept); lanyard badge with his photo.
+Research: Sonnet teardown of yashb.xyz / itspsneha.com / aarya.wtf / stanleyojima;
+Sonnet stack research (Leon Sans, react-bits Lanyard + LogoLoop, Vite/shadcn/Vercel).
+
+Constraints carried over: no invented metrics, client names, adoption or readiness claims
+(Stanley-style stat rows only with real numbers: ISO ×3, since 2021, 4 builds, 7 notes).
+Max ~60 words per screen. One signature interaction per section. Every piece of content
+readable without interaction, without JS-driven reveals firing, and under reduced motion.
+
+## Architecture
+- New `web/` Vite 8 + React 19 + TS + Tailwind 4 app; `site-v2/` stays until cutover.
+- Keep the current type system (Instrument Serif + Inter + JetBrains Mono, self-hosted) and
+  the ink/paper/orange palette, reworked as audit-file tokens (manila, ink, stamp red/orange).
+- Leon Sans vendored at `src/vendor/leon.js` (MIT header kept, `export default` appended).
+- Lanyard + LogoLoop via shadcn `@react-bits` registry (plain three.js, no GLB assets).
+  three.js lazy-loaded after first paint, desktop only; mobile/no-WebGL = static badge PNG.
+- One scroll utility (IntersectionObserver + rAF), no GSAP/Lenis unless a section needs it.
+- vercel.json: output `web/dist`, hashed `/assets/*` immutable cache, headers kept.
+
+## Sections
+0. Chrome — file-index tab nav ("01 · ENGAGEMENTS" mono tabs), active tab slides.
+1. Hero / cover sheet — Leon Sans "Saqlain Momin" draws in, then idles in wave mode; real
+   sr-only <h1>. One-line claim ("I turn security evidence into decisions.") + 3 proof
+   lines. Physics lanyard badge: photo, Assistant Manager · Cyber Strategy & Governance,
+   KPMG, 5+ yrs (since 2021), ISO Lead Auditor ×3, "Open to GRC roles" status; back = CV QR.
+   LogoLoop of frameworks (ISO 27001/27701/22301, NIST CSF, DPDPA, PCI DSS, OWASP, SOC 2).
+2. Statement — "Controls matter when they change a decision…" grey→ink word reveal on scroll.
+3. Engagements / case files — 4 manila folders in a CSS sticky stack; each: doc ID, NDA
+   stamp that thumps in, Mandate / Owned / Result in ≤45 words, tag chips. KPMG + Mitkat as
+   a 2-row personnel record above.
+4. Yozora / evidence trail — one SVG path drawn on scroll through Scope → Assess → Approve →
+   Act nodes; each node pins a one-line claim. "AI proposes · consultant approves" shown as
+   two record cards (draft vs. signed). Demo video + GitHub kept; skip link past the trail.
+5. Other builds — Recon / Velocity / RL Playground as evidence exhibits (tag "EXHIBIT B-02"),
+   poster → video on hover/tap, existing demo dialogs reused.
+6. Credentials — 3 embossed ISO seals (tilt + foil sheen on hover) + 2 degrees as a ledger;
+   capability groups compressed to one line each under the seals.
+7. Field notes — featured note as a declassified report; 6 others as a redacted index where
+   black bars lift on hover/focus (always readable on touch and reduced motion).
+8. Contact / sign-off — "Let us make risk operable." signature line that draws itself;
+   email as the primary stamp button, LinkedIn/GitHub/CV secondary; footer.
+
+## Phases (each ends with a smoke check run by a Sonnet subagent)
+- [x] P1 Scaffold `web/`, port assets, tokens, fonts, vercel.json; build passes
+      (verified 2026-10-23: npm ci + build, dist assets 14/14 img, 4 fonts, headers, no
+      overflow 390/1440, fonts load, legacy npm test passes with new deploy target)
+- [x] P2 Hero: Leon Sans name, Lanyard badge (+ static fallback), LogoLoop
+      (Sonnet smoke 8/8 pass; then: weight 220, full-hero badge canvas, tuned metallic finish)
+- [x] P3 Statement + engagements case files
+      (Sonnet smoke: fixed AA contrast on manila, mobile stamp overlap, tab overlap, SR spacing;
+      copy rewritten from the evidence map, scope section folded into a tenure-ruler personnel record)
+- [x] P4 Yozora evidence trail + other builds (port demo dialogs)
+      (Sonnet smoke: all pass after small orange labels moved to accent-dark for AA)
+- [x] P5 Credentials seals + field notes redaction index + contact
+      (2026-10-23: trail copy decluttered; seals, ledger, declassified featured note, redaction index,
+      signature + stamp contact, footer; verified at 1280 and 375 in the pane; Sonnet smoke below)
+- [~] P6 (nav menu + active indicator and `web/smoke-test.mjs` done, wired into `npm test` beside
+      the legacy test; cutover awaiting Saqlain's approval) Port smoke test to the new build (assets, anchors, dialogs, no overflow 390/1440,
+      reduced motion, console clean, Lighthouse perf on mobile); cutover; remove site-v2
+
+## Open items
+- Portrait for the badge (≥800px short side, plain background).
+- Repo is PUBLIC: react-bits is MIT + Commons Clause; shipping it on the site is fine, the
+  source sitting in a public repo is a grey area. Options: make repo private, or accept.
+- Branch: build on a new branch off codex/yozora-portfolio-preview (keeps Yozora copy).
+
+---
+
 # LOCAL PORTFOLIO / YOZORA PREVIEW (2026-10-09)
 
 Scope: local preview only; retain the current visual identity, existing demo video,

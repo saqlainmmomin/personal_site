@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://saqlainswebsite.vercel.app/sitemap.xml

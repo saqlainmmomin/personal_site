@@ -210,7 +210,8 @@ for (const date of ['2026-02-09', '2026-03-12', '2026-03-25', '2026-03-30', '202
 const vercelConfigPath = join(root, '..', 'vercel.json');
 assertNonemptyFile(vercelConfigPath, 'root vercel.json');
 const vercelConfig = JSON.parse(readFileSync(vercelConfigPath, 'utf8'));
-assert.equal(vercelConfig.outputDirectory, 'site-v2');
+// Deploy target moved to the Vite rebuild; site-v2 stays as the legacy reference until cutover.
+assert.equal(vercelConfig.outputDirectory, 'web/dist');
 
 console.log('site-v2 smoke test passed');
 console.log('  HTML parse errors: 0');
