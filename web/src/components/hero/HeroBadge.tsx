@@ -4,8 +4,6 @@ import { BADGE, renderBadge, yearsOfExperience, type BadgeArt } from '@/lib/badg
 // three.js only loads for the physics badge, never in the critical path.
 const Lanyard = lazy(() => import('@/components/Lanyard'))
 
-const DESKTOP = '(min-width: 1024px) and (pointer: fine)'
-
 const hasWebGL = () => {
   try {
     return !!document.createElement('canvas').getContext('webgl2')
@@ -14,25 +12,26 @@ const hasWebGL = () => {
   }
 }
 
-function useMedia(query: string) {
-  const [matches, setMatches] = useState(() => matchMedia(query).matches)
+/** True at lg and up, where the badge canvas spans the whole hero and the card hangs on the right. */
+function useWide() {
+  const [wide, setWide] = useState(() => matchMedia('(min-width: 1024px)').matches)
   useEffect(() => {
-    const mq = matchMedia(query)
-    const onChange = () => setMatches(mq.matches)
+    const mq = matchMedia('(min-width: 1024px)')
+    const onChange = () => setWide(mq.matches)
     mq.addEventListener('change', onChange)
     return () => mq.removeEventListener('change', onChange)
-  }, [query])
-  return matches
+  }, [])
+  return wide
 }
 
 /**
- * The access badge: a physics lanyard on desktop, a still card hanging from a strap on
- * touch screens, small viewports, or browsers without WebGL.
+ * The access badge: a physics lanyard (drag it, tap to flip) wherever WebGL is available, and a still
+ * card hanging from a strap where it is not.
  */
 export function HeroBadge() {
   const [art, setArt] = useState<BadgeArt | null>(null)
-  const desktop = useMedia(DESKTOP)
-  const physics = desktop && hasWebGL()
+  const [physics] = useState(hasWebGL)
+  const wide = useWide()
 
   useEffect(() => {
     let live = true
@@ -50,7 +49,7 @@ export function HeroBadge() {
   )
 
   return (
-    <figure className="relative h-full w-full">
+    <figure className={`relative w-full lg:h-full ${physics ? 'h-[520px]' : ''}`}>
       <figcaption className="sr-only">
         Access badge: {BADGE.name}, {BADGE.role}, {BADGE.practice}, {BADGE.employer}. {yearsOfExperience()}+ years
         of experience since {BADGE.since}. ISO 27001, 27701 and 22301 Lead Auditor. {BADGE.status}.
@@ -63,7 +62,7 @@ export function HeroBadge() {
             strapImage={art.strap}
             cardColor="#F2EFE8"
             finish="metallic"
-            anchor="right"
+            anchor={wide ? 'right' : 'center'}
             size={0.7}
             strapLength={0.3}
             strapWidth={0.6}
@@ -72,7 +71,7 @@ export function HeroBadge() {
           />
         </Suspense>
       ) : (
-        <div className="flex h-full items-start justify-center pt-0 lg:pt-0">{still}</div>
+        <div className="flex items-start justify-center lg:h-full">{still}</div>
       )}
     </figure>
   )

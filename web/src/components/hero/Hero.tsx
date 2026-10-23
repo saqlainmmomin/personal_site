@@ -36,7 +36,7 @@ export function Hero() {
         </div>
 
         {/* On desktop the badge canvas spans the whole hero, so the card can swing over the name without clipping. */}
-        <div className="relative h-[440px] sm:h-[520px] lg:absolute lg:inset-0 lg:h-auto">
+        <div className="relative pb-6 lg:absolute lg:inset-0 lg:pb-0">
           <HeroBadge />
         </div>
       </div>
