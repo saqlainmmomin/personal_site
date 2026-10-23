@@ -109,15 +109,20 @@ function paintFront(photo: HTMLImageElement | null) {
   ctx.fillText(status, px + 24, py + ph - 22)
   ctx.letterSpacing = '0px'
 
-  // Name and role.
+  // Role as the headline (the name already leads the page), fitted to the card width.
   ctx.fillStyle = C.ink
-  ctx.font = `400 128px ${SERIF}`
-  ctx.fillText(BADGE.name, PAD - 4, 1040)
+  let headline = 128
+  ctx.font = `400 ${headline}px ${SERIF}`
+  while (ctx.measureText(BADGE.role).width > W - PAD * 2 && headline > 60) {
+    headline -= 4
+    ctx.font = `400 ${headline}px ${SERIF}`
+  }
+  ctx.fillText(BADGE.role, PAD - 4, 1040)
   ctx.font = `500 38px ${SANS}`
-  ctx.fillText(BADGE.role, PAD, 1104)
+  ctx.fillText(BADGE.practice, PAD, 1104)
   ctx.fillStyle = C.muted
   ctx.font = `400 34px ${SANS}`
-  ctx.fillText(`${BADGE.practice} · ${BADGE.employer.split(' · ')[0]}`, PAD, 1152)
+  ctx.fillText(BADGE.employer, PAD, 1152)
 
   // Ledger of three facts.
   const top = 1206
