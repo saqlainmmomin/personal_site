@@ -55,7 +55,7 @@ const coverDraw = (ctx: CanvasRenderingContext2D, img: HTMLImageElement, x: numb
   const sw = w / scale
   const sh = h / scale
   // Bias the crop upward so the face stays in frame.
-  ctx.drawImage(img, (img.width - sw) / 2, (img.height - sh) * 0.42, sw, sh, x, y, w, h)
+  ctx.drawImage(img, (img.width - sw) / 2, (img.height - sh) * 0.3, sw, sh, x, y, w, h)
 }
 
 const tracked = (ctx: CanvasRenderingContext2D, text: string, x: number, y: number, spacing: number) => {
