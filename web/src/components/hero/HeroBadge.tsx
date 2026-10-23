@@ -50,7 +50,7 @@ export function HeroBadge() {
   )
 
   return (
-    <figure className="relative h-full w-full">
+    <figure className="relative w-full lg:h-full">
       <figcaption className="sr-only">
         Access badge: {BADGE.name}, {BADGE.role}, {BADGE.practice}, {BADGE.employer}. {yearsOfExperience()}+ years
         of experience since {BADGE.since}. ISO 27001, 27701 and 22301 Lead Auditor. {BADGE.status}.
@@ -72,7 +72,7 @@ export function HeroBadge() {
           />
         </Suspense>
       ) : (
-        <div className="flex h-full items-start justify-center pt-0 lg:pt-0">{still}</div>
+        <div className="flex items-start justify-center lg:h-full">{still}</div>
       )}
     </figure>
   )
