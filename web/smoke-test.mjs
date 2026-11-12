@@ -179,27 +179,34 @@ async function commonChecks(label, { page, problems }) {
   assert.ok(cells >= 350, `[${label}] GitHub activity graph should draw a year of days, found ${cells}`)
   ok(`${label}: GitHub activity graph renders ${cells} days`)
 
-  // Practice pass: all six panels live in the DOM (hidden ones included), one tab is selected, keyboard flips them.
-  const groups = await page.locator('#credentials [role="tabpanel"] h4').evaluateAll((els) => els.map((e) => e.textContent))
-  assert.equal(groups.length, 6, `[${label}] six practice groups`)
-  const credText = await page.locator('#credentials').evaluate((el) => el.textContent)
-  for (const term of ['PCI DSS', 'GDPR', 'IRDAI', 'Prompt engineering', 'Reinforcement learning from human feedback', 'ServiceNow GRC', 'Claude Code']) assert.ok(credText.includes(term), `[${label}] credentials should mention ${term}`)
-  const tabs = page.locator('#credentials [role="tab"]')
-  assert.equal(await tabs.count(), 6, `[${label}] six practice tabs`)
-  assert.equal(await page.locator('#credentials [role="tabpanel"]:not([hidden])').count(), 1, `[${label}] exactly one practice panel visible`)
-  await tabs.first().focus()
-  await page.keyboard.press('ArrowDown')
-  assert.equal(await tabs.nth(1).getAttribute('aria-selected'), 'true', `[${label}] ArrowDown should select the next practice tab`)
-  assert.match(await page.locator('#credentials [role="tabpanel"]:not([hidden]) h4').innerText(), /Audit/, `[${label}] panel should follow the tab`)
-  await page.getByRole('button', { name: /Next area/ }).click()
-  assert.equal(await tabs.nth(2).getAttribute('aria-selected'), 'true', `[${label}] Next should advance the pass`)
-  await tabs.first().click()
-  ok(`${label}: six practice panels with the expected terms; tabs, arrow keys and Next flip the pass`)
+  // Engagement map: five engagements; picking one lights its terms and swaps the detail panel.
+  const engagements = page.locator('#experience [data-eng]')
+  assert.equal(await engagements.count(), 5, `[${label}] five engagements`)
+  await engagements.nth(1).scrollIntoViewIfNeeded()
+  await engagements.nth(1).click()
+  await page.waitForTimeout(500)
+  assert.equal(await engagements.nth(1).getAttribute('aria-pressed'), 'true', `[${label}] picked engagement should be pressed`)
+  const lit = await page.locator('#experience [data-term][data-lit]').evaluateAll((els) => els.map((e) => e.textContent))
+  assert.deepEqual(lit, ['RBI', 'IRDAI', 'ITGC testing', 'Banking and insurance'], `[${label}] regulatory audit should light its four terms`)
+  assert.match(await page.locator('#engagement-detail').innerText(), /RBI and IRDAI/, `[${label}] detail panel should follow the pick`)
+  const wires = await page.locator('#experience .wire-lit').count()
+  assert.equal(wires, label === '390' ? 0 : 4, `[${label}] lit wires`)
+  ok(`${label}: engagement map lights the picked engagement's terms${wires ? ' and wires' : ''} and updates the detail`)
 
   // Field-note index: two columns on desktop, one on phones.
   const noteCols = await page.locator('#writing ol li').evaluateAll((els) => new Set(els.map((e) => Math.round(e.getBoundingClientRect().left))).size)
   assert.equal(noteCols, label === '390' ? 1 : 2, `[${label}] field-note index columns`)
   ok(`${label}: field-note index lays out in ${noteCols} column(s)`)
+
+  // Yozora walkthrough: five steps; picking one shows its scene and line.
+  const steps = page.locator('#builds .trail-step')
+  assert.equal(await steps.count(), 5, `[${label}] five walkthrough steps`)
+  await steps.nth(3).scrollIntoViewIfNeeded()
+  await steps.nth(3).click()
+  await page.waitForTimeout(400)
+  assert.equal(await steps.nth(3).getAttribute('aria-pressed'), 'true', `[${label}] picked step should be pressed`)
+  assert.match(await page.locator('#yozora-window').innerText(), /Scoring follows fixed rules/, `[${label}] window should show the picked step`)
+  ok(`${label}: Yozora walkthrough shows the picked step`)
 
   // Demo dialogs: Yozora's walkthrough and one exhibit.
   for (const [name, trigger] of [
@@ -231,6 +238,44 @@ console.log('Browser checks')
   const s = await open('1440', { viewport: { width: 1440, height: 900 } })
   await commonChecks('1440', s)
 
+  // Credentials: the seals have stamped on and the graph has filled in and counted up to the stubbed total.
+  await s.page.locator('#credentials svg[role="img"]').scrollIntoViewIfNeeded()
+  await s.page.waitForTimeout(2000)
+  const creds = await s.page.evaluate(() => ({
+    seals: [...document.querySelectorAll('#credentials .seal-press, #credentials .seal-caption')].map((el) => getComputedStyle(el).opacity),
+    total: document.querySelector('#credentials [data-gh-total]')?.textContent,
+    cells: [...document.querySelectorAll('#credentials .gh-cell')].map((el) => getComputedStyle(el).opacity),
+  }))
+  assert.equal(creds.seals.length, 6, 'three seals with captions')
+  assert.ok(creds.seals.every((o) => o === '1'), `seals should end fully visible, got ${creds.seals}`)
+  assert.equal(creds.total, sampleActivity().total.lastYear.toLocaleString('en'), 'GitHub count should land on the stubbed total')
+  assert.ok(creds.cells.length >= 350 && creds.cells.every((o) => o === '1'), 'every graph cell should end fully visible')
+  ok('1440: seals stamp on, graph cells fill in, contribution count lands on the total')
+
+  // Field notes: the Declassified tag has stamped on; hovering an earlier note shows the floating preview.
+  await s.page.locator('#writing ol li').first().scrollIntoViewIfNeeded()
+  await s.page.waitForTimeout(800)
+  assert.equal(await s.page.locator('#writing .declass').evaluate((el) => getComputedStyle(el).opacity), '1', 'Declassified tag should end fully visible')
+  const box = await s.page.locator('#writing ol li').nth(1).boundingBox()
+  await s.page.mouse.move(box.x + box.width - 20, box.y + box.height / 2)
+  await s.page.mouse.move(box.x + box.width - 10, box.y + box.height / 2, { steps: 4 })
+  await s.page.waitForTimeout(600)
+  const preview = await s.page.evaluate(() => {
+    const el = document.querySelector('.note-preview')
+    const r = el?.getBoundingClientRect()
+    return el && { on: el.hasAttribute('data-on'), hidden: el.getAttribute('aria-hidden'), events: getComputedStyle(el).pointerEvents, opacity: getComputedStyle(el).opacity, right: r.right, inner: innerWidth, imgs: el.querySelectorAll('img').length, scroll: document.documentElement.scrollWidth, img: getComputedStyle(el.querySelector('.note-preview-img[data-on]')).backgroundImage }
+  })
+  assert.ok(preview?.on && preview.opacity === '1', 'hovering a note row should show the floating preview')
+  assert.equal(preview.hidden, 'true', 'floating preview should be aria-hidden')
+  assert.equal(preview.events, 'none', 'floating preview should not take pointer events')
+  assert.equal(preview.imgs, 0, 'floating preview should use a background image, not an <img>')
+  assert.match(preview.img, /notes\//, 'floating preview should show the hovered note cover')
+  assert.ok(preview.right <= preview.inner && preview.scroll <= preview.inner, 'floating preview should stay inside the viewport')
+  await s.page.mouse.move(5, 5)
+  await s.page.waitForTimeout(600)
+  assert.equal(await s.page.locator('.note-preview[data-on]').count(), 0, 'preview should hide when the pointer leaves the list')
+  ok('1440: Declassified stamps on; note preview follows the hover, stays decorative and hides on leave')
+
   // Active-section indicator follows the scroll.
   await s.page.evaluate(() => {
     document.documentElement.style.scrollBehavior = 'auto'
@@ -240,22 +285,17 @@ console.log('Browser checks')
   assert.match(await s.page.locator('nav ul.md\\:flex a[aria-current="true"]').innerText(), /CREDENTIALS/i, 'nav should mark the section in view')
   ok('1440: nav marks the active section')
 
-  // Redaction bars cover the thesis until hover or focus.
-  const redact = s.page.locator('.redact').first()
-  const color = () => redact.evaluate((el) => getComputedStyle(el).color)
-  await redact.scrollIntoViewIfNeeded()
-  assert.match(await color(), /rgba\(0, 0, 0, 0\)|transparent/, 'redacted text should be covered by default on fine pointers')
-  await redact.hover()
-  await s.page.waitForTimeout(700)
-  assert.doesNotMatch(await color(), /rgba\(0, 0, 0, 0\)/, 'hover should lift the redaction')
-  await s.page.mouse.move(2, 2)
-  await s.page.waitForTimeout(600)
-  await s.page.locator('.note-row').first().focus()
-  await s.page.keyboard.press('Shift+Tab')
-  await s.page.keyboard.press('Tab')
-  await s.page.waitForTimeout(700)
-  assert.doesNotMatch(await color(), /rgba\(0, 0, 0, 0\)/, 'keyboard focus should lift the redaction')
-  ok('1440: redaction bars lift on hover and on keyboard focus')
+  // Page thread: nothing drawn past the hero at the top, fully drawn at the bottom, one node per section.
+  const threadLeft = () => s.page.evaluate(() => parseFloat(document.querySelector('.thread-ink').style.strokeDashoffset))
+  await s.page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }))
+  await s.page.waitForTimeout(1500)
+  assert.ok((await threadLeft()) > 1000, 'thread should be mostly undrawn at the top of the page')
+  await s.page.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }))
+  await s.page.waitForTimeout(1800)
+  assert.ok((await threadLeft()) < 1, 'thread should be fully drawn at the bottom of the page')
+  assert.equal(await s.page.locator('.thread-node[data-lit]').count(), 5, 'every section node should be lit at the bottom')
+  ok('1440: page thread draws with the scroll and lights all five section nodes')
+
   await s.context.close()
 }
 
@@ -279,10 +319,6 @@ console.log('Browser checks')
   assert.equal(await menu.isVisible(), false, 'Escape should close the menu')
   ok('390: mobile menu opens, navigates and closes (link, Escape)')
 
-  // Touch devices never get the black bars.
-  const color = await s.page.locator('.redact').first().evaluate((el) => getComputedStyle(el).color)
-  assert.doesNotMatch(color, /rgba\(0, 0, 0, 0\)/, 'notes must be readable on touch screens')
-  ok('390: field note text is readable on touch')
   await s.context.close()
 }
 
@@ -294,25 +330,27 @@ console.log('Browser checks')
     const q = (sel) => document.querySelector(sel)
     return {
       scrollBehavior: getComputedStyle(document.documentElement).scrollBehavior,
-      redact: getComputedStyle(q('.redact')).color,
       stampOpacity: getComputedStyle(q('.stamp')).opacity,
       scribble: getComputedStyle(q('.scribble-ink')).strokeDashoffset,
-      tile: getComputedStyle(q('.stagger-in')).opacity,
+      reveal: [...document.querySelectorAll('[data-reveal]')].map((el) => getComputedStyle(el).opacity),
       rule: q('.grow-rule').getBoundingClientRect().width,
-      mark: getComputedStyle(q('.mark')).backgroundSize,
-      flow: getComputedStyle(q('.flow-link'), '::after').transform,
+      seals: [...document.querySelectorAll('.seal-press, .seal-caption')].map((el) => getComputedStyle(el).opacity),
+      declass: getComputedStyle(q('.declass')).opacity,
+      total: q('[data-gh-total]')?.textContent,
+      preview: document.querySelectorAll('.note-preview').length,
     }
   })
   assert.equal(state.scrollBehavior, 'auto', 'smooth scroll should be off')
-  assert.doesNotMatch(state.redact, /rgba\(0, 0, 0, 0\)/, 'notes must stay readable under reduced motion')
   assert.equal(state.stampOpacity, '1', 'stamps should be visible without animating in')
   assert.ok(parseFloat(state.scribble) === 0, 'underline should be fully drawn')
-  assert.equal(state.tile, '1', 'KPMG stages should be visible without animating in')
+  assert.ok(state.reveal.length > 10 && state.reveal.every((o) => o === '1'), 'reveal targets should be visible without animating in')
   assert.ok(state.rule > 0, 'KPMG rule should be full width')
-  assert.match(state.mark, /100%/, 'key-phrase highlight should be drawn without animating')
-  assert.ok(state.flow === 'none' || /matrix\(1, 0, 0, 1/.test(state.flow), 'lifecycle line should be fully drawn')
+  assert.ok(state.seals.length === 6 && state.seals.every((o) => o === '1'), 'seals should be visible without stamping in')
+  assert.equal(state.declass, '1', 'Declassified tag should be visible without stamping in')
+  assert.equal(state.total, sampleActivity().total.lastYear.toLocaleString('en'), 'GitHub count should show the total without counting')
+  assert.equal(state.preview, 0, 'no cursor-follow preview under reduced motion')
   assert.deepEqual(s.problems, [], 'reduced-motion: console errors or failed requests')
-  ok('reduced motion: scroll, redaction, stamps, underline and KPMG stages resolve to their final state')
+  ok('reduced motion: scroll, stamps, seals, Declassified tag, GitHub count, underline, KPMG rule and reveals resolve to their final state')
   await s.context.close()
 }
 

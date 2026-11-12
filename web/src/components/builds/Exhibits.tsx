@@ -1,24 +1,28 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { exhibits, type Demo } from '@/content/builds'
 
 type Exhibit = (typeof exhibits)[number]
 
-/** Poster that previews its video on hover (fine pointers only); a click always opens the full demo. */
+/** Demo that plays, muted, while it is mostly in view (unless reduced motion is on); a click opens the full demo. */
 function ExhibitMedia({ exhibit, onOpen }: { exhibit: Exhibit; onOpen: () => void }) {
   const video = useRef<HTMLVideoElement>(null)
-  const canHover = () => matchMedia('(hover: hover) and (pointer: fine)').matches
+  useEffect(() => {
+    const v = video.current
+    if (!v || matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) v.play().catch(() => {})
+        else v.pause()
+      },
+      { threshold: 0.6 },
+    )
+    io.observe(v)
+    return () => io.disconnect()
+  }, [])
   return (
     <button
       type="button"
       onClick={onOpen}
-      onMouseEnter={() => canHover() && video.current?.play().catch(() => {})}
-      onMouseLeave={() => {
-        const v = video.current
-        if (v) {
-          v.pause()
-          v.currentTime = 0
-        }
-      }}
       aria-label={`${exhibit.action}: ${exhibit.name}`}
       className="group relative block aspect-[16/10] w-full overflow-hidden border border-line bg-[#0B0B0B]"
     >

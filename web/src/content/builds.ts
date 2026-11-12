@@ -16,7 +16,7 @@ export const yozora = {
   name: 'Yozora',
   pitch: 'From client evidence to defensible assessment conclusions.',
   summary:
-    'An assessment workspace for GRC consultants. Scope the engagement, collect evidence, review proposed conclusions, and carry approved findings into reporting and remediation.',
+    'An assessment workspace for boutique GRC consulting firms. The AI extracts evidence and proposes assessments; the consultant approves every conclusion.',
   facts: [
     ['Built for', 'Boutique GRC consulting firms'],
     ['Structure', 'Client → Engagement → Assessment'],
@@ -46,15 +46,15 @@ export const yozora = {
 export const trail = [
   {
     step: 'Map once',
-    line: 'A unified control framework maps one answer to every relevant framework, so no work is repeated.',
+    line: 'One unified control set maps each answer to every relevant standard, so no work is repeated.',
   },
   {
-    step: 'Pre-fill the questionnaire',
+    step: 'Pre-fill answers',
     line: 'Evidence pre-fills the answers. The consultant confirms each one.',
   },
   {
     step: 'Review the evidence',
-    line: 'Test criteria are defined for all required evidence. The AI reviews it for design and operating effectiveness and cites the source of every response.',
+    line: 'Each control has test criteria. The AI checks the evidence for design and operating effectiveness and cites its source.',
   },
   {
     step: 'Score by rule',
@@ -71,8 +71,8 @@ export const exhibits: (Demo & { id: string; kind: string; name: string; pitch: 
     id: 'B-02',
     kind: 'Vendor risk',
     name: 'Recon',
-    pitch: 'A vendor security screen that checks public signals before a detailed assessment. Six scanners run concurrently, with a hard-rules verdict before any AI interpretation.',
-    action: 'Play walkthrough',
+    pitch: 'A vendor security screen that checks public signals before a detailed assessment. Six scanners run in parallel. Fixed rules set the risk tier before any AI interpretation.',
+    action: 'Watch walkthrough',
     title: 'Recon',
     type: 'video',
     src: '/img/projects/recon-demo.mp4',
@@ -99,7 +99,7 @@ export const exhibits: (Demo & { id: string; kind: string; name: string; pitch: 
     kind: 'Experiment',
     name: 'RL Playground',
     pitch: "How systems learn from rules alone: a prisoner's dilemma tournament, autonomous game agents, and strategies evolving over generations.",
-    action: 'Play experiment',
+    action: 'Watch experiment',
     title: 'RL Playground',
     type: 'video',
     src: '/img/projects/pd-evolution.mp4',

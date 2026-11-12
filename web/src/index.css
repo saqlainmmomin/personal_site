@@ -58,12 +58,23 @@
   --spacing-section: clamp(88px, 8vw, 128px);
 }
 
+/* Motion: three durations, one easing. Hover and focus use fast; reveals and toggles use base; drawn lines use slow. */
+:root {
+  --dur-fast: 150ms;
+  --dur-base: 400ms;
+  --dur-slow: 800ms;
+  --paper-dots: radial-gradient(rgb(13 13 13 / 0.11) 1px, transparent 1.5px);
+}
+
 @layer base {
   html { scroll-behavior: smooth; scroll-padding-top: 72px; }
   h1, h2, h3, h4 { text-wrap: balance; }
   p, li, dd { text-wrap: pretty; }
   body {
     @apply bg-paper text-ink font-sans antialiased;
+    /* Ledger paper: a faint dot grid instead of flat colour. */
+    background-image: var(--paper-dots);
+    background-size: 22px 22px;
     line-height: 1.5;
     overflow-x: hidden;
   }
@@ -79,14 +90,52 @@
   }
 }
 
+/* The one reveal: a short rise and fade, played once when the element scrolls into view (see useReveal).
+   --i staggers siblings. Reduced motion and print never hide anything. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity var(--dur-slow) var(--ease-out-expo), transform var(--dur-slow) var(--ease-out-expo);
+    transition-delay: calc(var(--i, 0) * 60ms);
+  }
+  [data-reveal][data-shown] { opacity: 1; transform: none; }
+}
+@media print {
+  [data-reveal] { opacity: 1; transform: none; }
+}
+
 /* Section surfaces: sections alternate between paper and a deeper warm cream, and each opens with a
    thick ink rule and an index tab, so a new section reads as structure, not just colour. */
 .surface-warm {
   background-color: var(--color-warm);
+  background-image: var(--paper-dots);
+  background-size: 22px 22px;
   --color-muted: #5F5B55;
 }
 /* Bright orange fails 3:1 even as large text on the warm cream; use a deeper orange there. */
 .surface-warm .text-accent { color: #C93410; }
+
+/* Page thread: one orange line drawn down the whole page as it scrolls (see Thread.tsx). It sits above
+   section backgrounds and below section content. */
+.thread {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.thread path { fill: none; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.thread-guide { stroke: var(--color-line-2); stroke-width: 1.5; stroke-dasharray: 3 7; }
+.thread-ink { stroke: var(--color-accent); stroke-width: 2.5; }
+.thread-node {
+  fill: var(--color-paper);
+  stroke: var(--color-line-2);
+  stroke-width: 1.5;
+  transition: fill var(--dur-base), stroke var(--dur-base);
+}
+.thread-node[data-lit] { fill: var(--color-accent); stroke: var(--color-accent); }
 
 /* The still badge sways from its strap like it was just hung up. */
 .badge-still {
@@ -98,20 +147,47 @@
   50% { transform: rotate(2.2deg); }
 }
 
-/* Case files: manila folders with a tab, and an NDA stamp that thumps on once in view. */
-.folder,
-.folder-tab {
-  background: var(--shade);
+/* Engagement map: wires from each engagement to the terms it touched. A lit wire draws itself in. */
+.wire { fill: none; stroke: var(--color-line-2); stroke-width: 1; }
+.wire-lit {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  animation: wire-draw var(--dur-slow) var(--ease-out-expo);
 }
-.folder {
-  box-shadow: 0 -14px 32px -22px rgb(13 13 13 / 0.45), 0 1px 0 rgb(13 13 13 / 0.08);
-  background-image: repeating-linear-gradient(0deg, transparent 0 31px, rgb(13 13 13 / 0.035) 31px 32px);
+@keyframes wire-draw {
+  from { stroke-dashoffset: 1; }
 }
-.folder-body { transition: opacity 300ms var(--ease-out-expo); }
-@media (min-width: 768px) {
-  [data-covered] .folder-body { opacity: 0; }
+.map-eng {
+  position: relative;
+  background: var(--color-paper);
+  transition: border-color var(--dur-fast), box-shadow var(--dur-base) var(--ease-out-expo), transform var(--dur-base) var(--ease-out-expo);
 }
-/* Phones: the stamp sits in the flow above the file label; md+: pinned beside the title. */
+.map-eng[aria-pressed='true'] {
+  border-color: var(--color-ink);
+  box-shadow: 6px 6px 0 0 var(--color-ink);
+  transform: translate(-3px, -3px);
+}
+.map-eng[data-linked] { border-color: var(--color-accent); }
+.map-term {
+  background: var(--color-paper);
+  color: var(--color-muted);
+  transition: background-color var(--dur-base), border-color var(--dur-base), color var(--dur-base);
+}
+.map-dot { background: var(--color-line-2); transition: background-color var(--dur-base); }
+.map-term[data-lit] {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+.map-term[data-lit] .map-dot { background: var(--color-accent); }
+.detail-in { animation: detail-in var(--dur-base) var(--ease-out-expo); }
+@keyframes detail-in {
+  from { opacity: 0; transform: translateY(8px); }
+}
+/* NDA stamp: thumps on once in view. Phones: in the flow under the heading; md+: pinned to the right of it. */
 .stamp {
   position: relative;
   width: max-content;
@@ -135,7 +211,7 @@
   text-transform: uppercase;
 }
 .stamp[data-stamped] {
-  animation: stamp-thump 420ms cubic-bezier(.2, 1.6, .4, 1) forwards;
+  animation: stamp-thump var(--dur-base) var(--ease-out-expo) forwards;
 }
 @keyframes stamp-thump {
   0% { opacity: 0; transform: rotate(-11deg) scale(1.7); }
@@ -149,94 +225,23 @@
   .stamp { opacity: 1; transform: rotate(-11deg); }
 }
 
-/* KPMG block: the current-role dot pulses, the rule under the name grows in, stages stagger up. */
-.pulse-dot { animation: pulse-dot 2.2s ease-out infinite; }
-@keyframes pulse-dot {
-  0% { box-shadow: 0 0 0 0 rgb(241 73 32 / 0.55); }
-  100% { box-shadow: 0 0 0 10px rgb(241 73 32 / 0); }
-}
+/* KPMG block: the rule under the name grows in once the block is in view. */
 .grow-rule {
   width: 0;
-  transition: width 900ms var(--ease-out-expo) 200ms;
+  transition: width var(--dur-slow) var(--ease-out-expo) 200ms;
 }
 [data-in] .grow-rule { width: 5rem; }
-.stagger-in {
-  opacity: 0;
-  transform: translateY(18px);
-  transition: opacity 600ms var(--ease-out-expo), transform 600ms var(--ease-out-expo), border-color 300ms, background-color 300ms;
-  transition-delay: calc(var(--i, 0) * 90ms), calc(var(--i, 0) * 90ms), 0ms, 0ms;
-}
-[data-in] .stagger-in { opacity: 1; transform: none; }
-.work-card {
-  position: relative;
-  transition: transform 300ms var(--ease-out-expo), border-color 300ms, background-color 300ms, box-shadow 300ms;
-}
-@media (hover: hover) {
-  .work-card:hover {
-    transform: translateY(-3px);
-    border-color: var(--color-ink);
-    border-top-color: var(--color-accent);
-    background-color: var(--color-paper);
-    box-shadow: 6px 6px 0 0 var(--color-ink);
-  }
-}
-/* Highlighter swipe under the key phrase of each area. */
-.mark {
-  background: linear-gradient(transparent 60%, rgb(241 73 32 / 0.3) 60%) 0 0 / 0 100% no-repeat;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
-  transition: background-size 700ms var(--ease-out-expo) 500ms;
-}
-[data-in] .mark { background-size: 100% 100%; }
-
-/* Lifecycle rail: a line from each stage node to the next, drawn in as the block scrolls into view.
-   Phones: runs down the left edge; lg+: runs along the top of the columns. */
-.flow-link {
-  position: absolute;
-  left: 17px;
-  top: 40px;
-  bottom: 4px;
-  width: 2px;
-  background: var(--color-line-2);
-}
-.flow-link::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--color-accent);
-  transform: scaleY(0);
-  transform-origin: top;
-  transition: transform 700ms var(--ease-out-expo) calc(var(--i, 0) * 350ms + 300ms);
-}
-[data-in] .flow-link::after { transform: scaleY(1); }
-.bracket { transform: scaleX(0); transform-origin: left; transition: transform 900ms var(--ease-out-expo) 1200ms; }
-[data-in] .bracket { transform: none; }
-@media (min-width: 1024px) {
-  .flow-link {
-    left: 44px;
-    top: 17px;
-    bottom: auto;
-    width: calc(100% - 28px);
-    height: 2px;
-  }
-  .flow-link::after { transform: scaleX(0); transform-origin: left; }
-  [data-in] .flow-link::after { transform: scaleX(1); }
-}
 @media (prefers-reduced-motion: reduce) {
   .grow-rule { width: 5rem; }
-  .stagger-in { opacity: 1; transform: none; }
-  .work-card:hover { transform: none; }
-  .mark { background-size: 100% 100%; }
-  .flow-link::after { transform: none; }
-  .bracket { transform: none; }
 }
 
-/* Evidence trail: --p (0–1) draws the line; data-step lights each node's dot as the line reaches it.
+/* Evidence trail: --p (0–1) draws the line to the current step; data-step lights each dot up to it.
    The rail <span> is the list's first child, so node n is :nth-child(n + 1). */
 .trail-ink {
   /* Gap longer than the path, so rounding never wraps a sliver of dash onto the far end. */
   stroke-dasharray: 1 2;
   stroke-dashoffset: calc(1 - var(--p, 0));
+  transition: stroke-dashoffset var(--dur-slow) var(--ease-out-expo);
 }
 .trail-rail::after {
   content: '';
@@ -245,12 +250,13 @@
   background: var(--color-accent);
   transform: scaleY(var(--p, 0));
   transform-origin: top;
+  transition: transform var(--dur-slow) var(--ease-out-expo);
 }
 .trail-dot {
   border-color: var(--color-line-2);
   background: var(--color-paper);
   color: var(--color-muted);
-  transition: background-color 300ms, border-color 300ms, color 300ms, transform 400ms var(--ease-out-expo);
+  transition: background-color var(--dur-base), border-color var(--dur-base), color var(--dur-base), transform var(--dur-base) var(--ease-out-expo);
 }
 .trail[data-step='1'] .trail-node:nth-child(-n + 2) .trail-dot,
 .trail[data-step='2'] .trail-node:nth-child(-n + 3) .trail-dot,
@@ -263,8 +269,20 @@
   transform: scale(1.15);
 }
 
-/* Credentials: embossed seals that tilt toward the pointer and catch a foil sheen. */
-.seal { perspective: 800px; }
+.trail-step { color: var(--color-muted); transition: color var(--dur-base); }
+.trail-step[aria-pressed='true'], .trail-step:hover { color: var(--color-ink); }
+
+/* Walkthrough scenes: pieces pop or grow in, in order, each time a step is shown. --d is the delay in ms. */
+.pop { animation: pop var(--dur-base) var(--ease-out-expo) both; animation-delay: calc(var(--d, 0) * 1ms); }
+@keyframes pop {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+}
+.grow-x { transform-origin: left; animation: grow-x var(--dur-slow) var(--ease-out-expo) both; animation-delay: calc(var(--d, 0) * 1ms); }
+@keyframes grow-x {
+  from { transform: scaleX(0); }
+}
+
+/* Credentials: embossed seals. */
 .seal-face {
   position: relative;
   display: grid;
@@ -280,58 +298,13 @@
     inset 0 2px 3px rgb(255 255 255 / 0.85),
     inset 0 -4px 8px rgb(13 13 13 / 0.16),
     0 14px 26px -14px rgb(13 13 13 / 0.55);
-  transition: transform 250ms var(--ease-out-expo);
 }
 .seal-ring { font: 500 11px var(--font-mono); }
-.seal-foil {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  opacity: 0;
-  mix-blend-mode: soft-light;
-  background:
-    radial-gradient(circle at var(--mx, 30%) var(--my, 25%), rgb(255 255 255 / 0.95), transparent 42%),
-    conic-gradient(from 20deg at var(--mx, 50%) var(--my, 50%), #ff9aa2, #ffe29a, #9affc0, #9ad0ff, #d49aff, #ff9aa2);
-  transition: opacity 250ms;
-  pointer-events: none;
-}
-@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .seal:hover .seal-foil { opacity: 0.9; }
-  .seal:hover .seal-face {
-    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) scale(1.04);
-    transition-duration: 80ms;
-  }
-}
-
-/* Field notes: black bars cover each thesis line until hover or focus. Touch devices and reduced
-   motion never get the bars, so every note stays readable. */
-.redact-hint { display: none; }
-@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .redact-hint { display: block; }
-  .redact {
-    padding: 0 0.15em;
-    color: transparent;
-    background: linear-gradient(var(--color-ink), var(--color-ink)) 0 0 / 100% 100% no-repeat;
-    -webkit-box-decoration-break: clone;
-    box-decoration-break: clone;
-    transition: background-size 450ms var(--ease-out-expo), color 250ms 120ms;
-  }
-  .note-row:hover .redact,
-  .note-row:focus-visible .redact {
-    color: var(--color-ink-2);
-    background-size: 100% 0;
-  }
-}
-
-@media print {
-  .redact { color: inherit; background: none; }
-}
-
 /* Contact: the underline draws itself once in view; the email is a stamp-style button. */
 .scribble-ink {
   stroke-dasharray: 1 2;
   stroke-dashoffset: 1;
-  transition: stroke-dashoffset 2.6s cubic-bezier(.45, 0, .2, 1);
+  transition: stroke-dashoffset var(--dur-slow) var(--ease-out-expo);
 }
 .scribble[data-drawn] .scribble-ink { stroke-dashoffset: 0; }
 @media (prefers-reduced-motion: reduce) {
@@ -344,7 +317,7 @@
   border: 3px double var(--color-stamp-ink);
   color: var(--color-stamp-ink);
   transform: rotate(-2deg);
-  transition: background-color 200ms, color 200ms, transform 300ms var(--ease-out-expo);
+  transition: background-color var(--dur-fast), color var(--dur-fast), transform var(--dur-fast) var(--ease-out-expo);
 }
 .contact-stamp:focus-visible {
   background: var(--color-stamp-ink);
@@ -359,59 +332,131 @@
   }
 }
 
-/* Practice pass: an access-pass card with the badge's pastel finish; tabs mark the active area. */
-.pass-tab {
-  border-color: var(--color-line-2);
-  color: var(--color-ink-2);
+/* Seals stamp themselves on, one after another, the first time the row is in view (data-stamped on the row):
+   down from larger and turned, a small overshoot, then rest at each seal's own --rest angle so they look
+   hand-stamped. An ink ring spreads at the moment of impact. Reduced motion: no hidden state, just the rest angle. */
+.seal-press {
+  position: relative;
+  width: min(100%, 150px);
+  margin: 0 auto;
+  transform: rotate(var(--rest, 0deg));
 }
-@media (hover: hover) {
-  .pass-tab:hover { background: var(--color-paper-2); color: var(--color-ink); }
-}
-.pass-tab[aria-selected='true'] {
-  border-color: var(--color-accent);
-  background: var(--color-paper-2);
-  color: var(--color-ink);
-}
-.pass { perspective: 1200px; }
-.pass-face {
-  background:
-    linear-gradient(180deg, transparent calc(100% - 6px), var(--color-accent) calc(100% - 6px)),
-    linear-gradient(135deg, #f6e9e4 0%, #ece9f4 45%, #e4f0e3 100%);
-  box-shadow: 0 24px 40px -28px rgb(13 13 13 / 0.55), inset 0 1px 0 rgb(255 255 255 / 0.8);
-  transition: transform 250ms var(--ease-out-expo);
-}
-.pass-foil {
+.seal-press::after {
+  content: '';
   position: absolute;
-  inset: 0;
+  inset: -5%;
+  border: 2px solid var(--color-stamp-ink);
+  border-radius: 50%;
   opacity: 0;
-  mix-blend-mode: soft-light;
-  background:
-    radial-gradient(circle at var(--mx, 30%) var(--my, 25%), rgb(255 255 255 / 0.95), transparent 45%),
-    conic-gradient(from 20deg at var(--mx, 50%) var(--my, 50%), #ff9aa2, #ffe29a, #9affc0, #9ad0ff, #d49aff, #ff9aa2);
-  transition: opacity 250ms;
   pointer-events: none;
 }
-.pass-panel:not([hidden]) { animation: pass-in 420ms var(--ease-out-expo); }
-@keyframes pass-in {
-  from { opacity: 0; transform: translateY(10px) rotateX(-6deg); }
-  to { opacity: 1; transform: none; }
-}
-.pass-step {
-  font: 500 12px var(--font-mono);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  padding: 10px 4px;
-  color: var(--color-ink);
-  border-bottom: 2px solid transparent;
-  transition: border-color 200ms, padding 200ms;
-}
-@media (hover: hover) {
-  .pass-step:hover { border-bottom-color: var(--color-accent); }
-}
-@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .pass:hover .pass-foil { opacity: 0.7; }
-  .pass:hover .pass-face {
-    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-    transition-duration: 80ms;
+@media (prefers-reduced-motion: no-preference) {
+  .seal-press { opacity: 0; transform: rotate(calc(var(--rest, 0deg) - 16deg)) scale(1.6); }
+  .seal-caption { opacity: 0; }
+  [data-stamped] .seal-press {
+    animation: seal-stamp var(--dur-slow) linear forwards;
+    animation-delay: calc(var(--i, 0) * 260ms);
+  }
+  [data-stamped] .seal-press::after {
+    animation: seal-ink var(--dur-slow) var(--ease-out-expo) forwards;
+    animation-delay: calc(var(--i, 0) * 260ms + 300ms);
+  }
+  [data-stamped] .seal-caption {
+    animation: seal-caption var(--dur-base) var(--ease-out-expo) forwards;
+    animation-delay: calc(var(--i, 0) * 260ms + 300ms);
   }
 }
+/* The descent accelerates (a hand bringing the stamp down); the landing squashes, then eases back out. */
+@keyframes seal-stamp {
+  0% { opacity: 0; transform: rotate(calc(var(--rest, 0deg) - 16deg)) scale(1.6); animation-timing-function: cubic-bezier(.55, 0, .85, .4); }
+  38% { opacity: 1; transform: rotate(calc(var(--rest, 0deg) + 1.5deg)) scale(0.92); animation-timing-function: cubic-bezier(.19, 1, .22, 1); }
+  100% { opacity: 1; transform: rotate(var(--rest, 0deg)) scale(1); }
+}
+@keyframes seal-ink {
+  0% { opacity: 0.5; transform: scale(0.94); }
+  100% { opacity: 0; transform: scale(1.3); }
+}
+@keyframes seal-caption {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+/* Hover on a fine pointer: the seal presses into the paper a little, its drop shadow tightening. */
+@media (hover: hover) and (pointer: fine) {
+  .seal-face {
+    transition: transform var(--dur-fast) var(--ease-out-expo), box-shadow var(--dur-fast) var(--ease-out-expo);
+  }
+  .seal-press:hover .seal-face {
+    transform: translateY(2px) scale(0.965);
+    box-shadow:
+      inset 0 2px 3px rgb(255 255 255 / 0.85),
+      inset 0 -3px 6px rgb(13 13 13 / 0.2),
+      0 6px 12px -8px rgb(13 13 13 / 0.6);
+  }
+}
+
+/* GitHub graph: once in view and loaded (data-wave), cells pop in as a wave from left to right, delayed by week
+   column (--w) times --step, which GithubActivity caps so the wave ends in about a second. */
+@media (prefers-reduced-motion: no-preference) {
+  .gh-cell { opacity: 0; transform-box: fill-box; transform-origin: center; transform: scale(0.3); }
+  .gh-graph[data-wave] .gh-cell {
+    animation: gh-cell var(--dur-base) var(--ease-out-expo) forwards;
+    animation-delay: calc(var(--w, 0) * var(--step, 10ms));
+  }
+}
+@keyframes gh-cell {
+  to { opacity: 1; transform: none; }
+}
+
+/* Featured note: the Declassified tag thumps on like a stamp once the card is in view (data-stamped). */
+.declass { transform: rotate(5deg); }
+@media (prefers-reduced-motion: no-preference) {
+  .declass { opacity: 0; transform: rotate(-3deg) scale(1.8); }
+  [data-stamped] .declass { animation: declass-thump var(--dur-base) var(--ease-out-expo) 300ms forwards; }
+}
+@keyframes declass-thump {
+  0% { opacity: 0; transform: rotate(-3deg) scale(1.8); }
+  60% { opacity: 0.9; transform: rotate(5deg) scale(0.94); }
+  100% { opacity: 1; transform: rotate(5deg) scale(1); }
+}
+/* Cover image: usePointerTilt writes --tx/--ty (-0.5 to 0.5). The frame tilts a few degrees and the image drifts
+   the other way inside it, zoomed just enough that its edges never show. The transition smooths the pointer. */
+.cover-frame {
+  overflow: hidden;
+  transform: perspective(1000px) rotateX(calc(var(--ty, 0) * -6deg)) rotateY(calc(var(--tx, 0) * 6deg));
+  transition: transform var(--dur-base) var(--ease-out-expo);
+}
+.cover-frame img {
+  transform: translate(calc(var(--tx, 0) * -16px), calc(var(--ty, 0) * -16px)) scale(var(--zoom, 1));
+  transition: transform var(--dur-base) var(--ease-out-expo);
+}
+.cover-frame[data-tilting] { --zoom: 1.07; }
+
+/* Earlier notes: a larger floating copy of the hovered note's cover follows the cursor (NotePreview.tsx moves it).
+   Fixed, decorative and clamped inside the viewport, so it never takes pointer events or causes overflow. */
+.note-preview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 40;
+  width: 260px;
+  aspect-ratio: 4 / 3;
+  box-sizing: content-box;
+  padding: 7px;
+  background: var(--color-paper);
+  border: 1px solid var(--color-line-2);
+  box-shadow: 0 18px 30px -18px rgb(13 13 13 / 0.55);
+  pointer-events: none;
+  opacity: 0;
+  scale: 0.9;
+  will-change: transform;
+  transition: opacity var(--dur-base) var(--ease-out-expo), scale var(--dur-base) var(--ease-out-expo);
+}
+.note-preview[data-on] { opacity: 1; scale: 1; }
+.note-preview-img {
+  position: absolute;
+  inset: 7px;
+  background: var(--color-ink) center top / cover no-repeat;
+  opacity: 0;
+  transition: opacity var(--dur-fast);
+}
+.note-preview-img[data-on] { opacity: 1; }
