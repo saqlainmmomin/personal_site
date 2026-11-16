@@ -1,6 +1,6 @@
 import { Section } from '@/components/ui/Section'
-import { CaseFiles } from './CaseFiles'
-import { PersonnelRecord } from './PersonnelRecord'
+import { EngagementMap } from './EngagementMap'
+import { EarlierRoles, PersonnelRecord } from './PersonnelRecord'
 
 export function Experience() {
   return (
@@ -9,7 +9,9 @@ export function Experience() {
 
       <PersonnelRecord />
 
-      <CaseFiles />
+      <EngagementMap />
+
+      <EarlierRoles />
     </Section>
   )
 }

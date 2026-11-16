@@ -1,20 +1,34 @@
-import { allNotesHref, featured, intro, notes, takeaway } from '@/content/notes'
+import { useRef, type CSSProperties } from 'react'
+import { allNotesHref, featured, intro, notes } from '@/content/notes'
+import { useInViewOnce, usePointerTilt } from '@/lib/motion'
 import { Section } from '@/components/ui/Section'
 import { SectionHead } from '@/components/ui/SectionHead'
+import { NotePreview } from './NotePreview'
 
+/** The cover story: the image tilts toward a fine pointer and the Declassified tag stamps on once in view. */
 function Featured() {
+  const box = useRef<HTMLDivElement>(null)
+  const card = useRef<HTMLAnchorElement>(null)
+  const frame = useRef<HTMLDivElement>(null)
+  const stamped = useInViewOnce(box)
+  usePointerTilt(card, frame)
+
   return (
+    <div ref={box} data-reveal data-stamped={stamped ? '' : undefined}>
     <a
+      ref={card}
       href={featured.href}
       target="_blank"
       rel="noopener"
       className="group relative mt-16 grid gap-8 border border-ink bg-paper p-5 transition-shadow hover:shadow-[8px_8px_0_0_var(--color-ink)] focus-visible:shadow-[8px_8px_0_0_var(--color-ink)] md:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] md:gap-12 md:p-8"
     >
-      <span className="absolute -top-4 right-6 rotate-[5deg] border-[3px] border-double border-stamp-ink bg-paper px-3 py-1 font-mono text-sm tracking-[0.2em] text-stamp-ink uppercase">
+      <span className="declass absolute -top-4 right-6 z-[1] border-[3px] border-double border-stamp-ink bg-paper px-3 py-1 font-mono text-sm tracking-[0.2em] text-stamp-ink uppercase">
         Declassified
       </span>
       <div className="self-start">
-        <img src={featured.image} width={featured.width} height={featured.height} alt={featured.alt} className="w-full border border-line-2" />
+        <div ref={frame} className="cover-frame border border-line-2">
+          <img src={featured.image} width={featured.width} height={featured.height} alt={featured.alt} className="block w-full" />
+        </div>
       </div>
       <div className="flex flex-col">
         <p className="font-mono text-xs tracking-[0.2em] text-muted uppercase">
@@ -27,41 +41,43 @@ function Featured() {
         </span>
       </div>
     </a>
+    </div>
   )
 }
 
-/** A black bar covers each note's thesis until hover or focus; coarse pointers and reduced motion always see it. */
-function Row({ note }: { note: (typeof notes)[number] }) {
+/** One earlier note: thumbnail, date and title. The whole row links out; data-note feeds the hover preview. */
+function Row({ note, index }: { note: (typeof notes)[number]; index: number }) {
   return (
-    <li className="border-b border-line-2">
+    <li data-reveal data-note={index} className="border-b border-line-2" style={{ '--i': index } as CSSProperties}>
       <a
         href={note.href}
         target="_blank"
         rel="noopener"
-        className="note-row block h-full py-6 transition-colors hover:bg-paper/60 focus-visible:bg-paper/60 md:px-3"
+        className="group flex items-center gap-5 py-4 transition-colors hover:bg-paper/60 focus-visible:bg-paper/60 md:px-3"
       >
-        <time dateTime={note.date} className="block font-mono text-xs tracking-[0.2em] text-ink-2 uppercase">
-          {note.label}
-        </time>
-        <img
-          src={note.image}
-          alt={note.alt}
-          loading="lazy"
-          width={240}
-          height={180}
-          className="mt-3 aspect-[16/9] w-full border border-line-2 bg-ink object-cover object-top"
-        />
-        <h3 className="mt-4 font-serif text-[1.75rem] leading-tight">{note.title}</h3>
-        <p className="mt-3 max-w-[65ch] text-[15px] leading-relaxed text-ink-2">
-          <span className="redact">{note.thesis}</span>
-        </p>
-        <span className="mt-3 block font-mono text-xs tracking-[0.18em] text-accent-dark uppercase">Read on LinkedIn →</span>
+        <img src={note.image} alt={note.alt} loading="lazy" width={240} height={180} className="aspect-[4/3] w-24 shrink-0 border border-line-2 bg-ink object-cover object-top" />
+        <span className="min-w-0 flex-1">
+          <time dateTime={note.date} className="block font-mono text-xs tracking-[0.2em] text-ink-2 uppercase">
+            {note.label}
+          </time>
+          <h3 className="mt-1.5 font-serif text-2xl leading-tight transition-transform duration-(--dur-fast) ease-out-expo group-hover:translate-x-1.5 group-focus-visible:translate-x-1.5">
+            {note.title}
+          </h3>
+        </span>
+        <span
+          className="font-mono text-sm text-accent-dark transition-transform duration-(--dur-fast) ease-out-expo group-hover:translate-x-1 group-hover:-translate-y-1 group-focus-visible:translate-x-1 group-focus-visible:-translate-y-1"
+          aria-hidden="true"
+        >
+          ↗
+        </span>
       </a>
     </li>
   )
 }
 
 export function FieldNotes() {
+  const list = useRef<HTMLOListElement>(null)
+
   return (
     <Section id="writing" index="04" label="Field notes" warm>
         <SectionHead
@@ -75,20 +91,14 @@ export function FieldNotes() {
 
         <Featured />
 
-        <div className="mt-20 flex items-baseline justify-between gap-4">
-          <h3 className="font-serif text-3xl">Index of earlier notes</h3>
-          <p className="redact-hint font-mono text-xs tracking-[0.2em] text-muted uppercase">Hover or focus to declassify</p>
-        </div>
-        <ol className="mt-4 grid border-t border-ink md:grid-cols-2 md:gap-x-10">
-          {notes.map((n) => (
-            <Row key={n.href} note={n} />
+        <h3 className="mt-20 font-serif text-3xl">Earlier notes</h3>
+        <ol ref={list} className="mt-4 grid border-t border-ink md:grid-cols-2 md:gap-x-10">
+          {notes.map((n, i) => (
+            <Row key={n.href} note={n} index={i} />
           ))}
         </ol>
+        <NotePreview list={list} items={notes} />
 
-        <aside className="mt-14 grid gap-4 border-l-2 border-accent pl-5 md:grid-cols-[12rem_minmax(0,1fr)] md:items-baseline">
-          <p className="font-mono text-xs tracking-[0.2em] uppercase">From research to practice</p>
-          <p className="max-w-2xl font-serif text-2xl leading-snug">{takeaway}</p>
-        </aside>
         <p className="mt-8">
           <a href={allNotesHref} target="_blank" rel="noopener" className="inline-block py-2 font-mono text-xs tracking-[0.18em] text-accent-dark uppercase underline-offset-4 hover:underline">
             All field notes on LinkedIn ↗

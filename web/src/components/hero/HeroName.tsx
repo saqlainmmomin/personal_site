@@ -7,7 +7,7 @@ const GUIDE_IN = 0.5 // seconds for the construction lines to appear
 const easeInOut = (k: number) => 0.5 - 0.5 * Math.cos(Math.PI * k) // even pace, so each stroke is seen forming
 
 /**
- * The name, hand-drawn stroke by stroke with Leon Sans, then left to breathe in wave mode.
+ * The name, hand-drawn stroke by stroke with Leon Sans. Once drawn it stays still and the loop stops.
  * The real <h1> stays in the DOM for screen readers and search; the canvas is decorative.
  */
 export function HeroName({ text = 'Saqlain\nMomin' }: { text?: string }) {
@@ -28,10 +28,6 @@ export function HeroName({ text = 'Saqlain\nMomin' }: { text?: string }) {
       color: [ink],
       align: 'left',
       leading: -1,
-      isWave: !reduce,
-      pathGap: 0.3,
-      amplitude: 0.04, // a faint ink tremor; higher values read as a scribble at hero size
-      fps: 12,
     })
 
     let W = 0
@@ -57,44 +53,40 @@ export function HeroName({ text = 'Saqlain\nMomin' }: { text?: string }) {
     let start = 0
     let raf = 0
     let visible = true
+    let done = false
     const introEnd = DRAW_SECONDS + STAGGER * leon.drawing.length
 
     const paint = (now: number) => {
       ctx.clearRect(0, 0, W, H)
-      if (reduce) {
+      const t = start ? (now - start) / 1000 : 0
+      if (reduce || t >= introEnd) {
         leon.drawing.forEach((d) => (d.value = 1))
         leon.draw(ctx)
         return
       }
-      const t = start ? (now - start) / 1000 : 0
-      if (t < introEnd) {
-        leon.drawing.forEach((d, i) => {
-          const k = Math.min(Math.max((t - i * STAGGER) / DRAW_SECONDS, 0), 1)
-          d.value = easeInOut(k)
-        })
-        // Construction first: Leon's guide circles, lines and anchor points fade in, hold while the strokes
-        // are drawn along them, then fade out as the last letter finishes.
-        const guide = Math.min(t / GUIDE_IN, 1) * (1 - Math.min(Math.max((t - (introEnd - 1.4)) / 1.4, 0), 1))
-        if (guide > 0.01) {
-          ctx.save()
-          ctx.globalAlpha = guide * 0.55
-          leon.grid(ctx)
-          ctx.globalAlpha = guide
-          leon.point(ctx)
-          ctx.restore()
-        }
-        leon.draw(ctx)
-      } else {
-        // draw() animates strokes with line dashes and never clears them; wave() needs solid lines.
-        ctx.setLineDash([])
-        leon.wave(ctx, now)
+      leon.drawing.forEach((d, i) => {
+        const k = Math.min(Math.max((t - i * STAGGER) / DRAW_SECONDS, 0), 1)
+        d.value = easeInOut(k)
+      })
+      // Construction first: Leon's guide circles, lines and anchor points fade in, hold while the strokes
+      // are drawn along them, then fade out as the last letter finishes.
+      const guide = Math.min(t / GUIDE_IN, 1) * (1 - Math.min(Math.max((t - (introEnd - 1.4)) / 1.4, 0), 1))
+      if (guide > 0.01) {
+        ctx.save()
+        ctx.globalAlpha = guide * 0.55
+        leon.grid(ctx)
+        ctx.globalAlpha = guide
+        leon.point(ctx)
+        ctx.restore()
       }
+      leon.draw(ctx)
     }
 
     const tick = (now: number) => {
       start ||= now
       paint(now)
-      raf = visible ? requestAnimationFrame(tick) : 0
+      done = (now - start) / 1000 >= introEnd
+      raf = visible && !done ? requestAnimationFrame(tick) : 0
     }
 
     const ro = new ResizeObserver(fit)
@@ -104,7 +96,7 @@ export function HeroName({ text = 'Saqlain\nMomin' }: { text?: string }) {
     // Stop the loop when the hero is off-screen; resume when it returns.
     const io = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting
-      if (visible && !raf && !reduce) raf = requestAnimationFrame(tick)
+      if (visible && !raf && !reduce && !done) raf = requestAnimationFrame(tick)
     })
     io.observe(wrap)
     if (!reduce) raf = requestAnimationFrame(tick)

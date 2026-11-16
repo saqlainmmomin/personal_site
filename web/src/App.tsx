@@ -4,7 +4,9 @@ import { Credentials } from '@/components/credentials/Credentials'
 import { Experience } from '@/components/experience/Experience'
 import { Hero } from '@/components/hero/Hero'
 import { Nav, type NavSection } from '@/components/Nav'
+import { Thread } from '@/components/Thread'
 import { FieldNotes } from '@/components/writing/FieldNotes'
+import { useReveal } from '@/lib/motion'
 
 // Section anchors match site-v2 so existing links keep resolving.
 const sections: NavSection[] = [
@@ -16,13 +18,15 @@ const sections: NavSection[] = [
 ]
 
 export default function App() {
+  useReveal()
   return (
     <>
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:bg-ink focus:px-4 focus:py-2 focus:text-paper">
         Skip to content
       </a>
       <Nav sections={sections} />
-      <main id="main">
+      <main id="main" className="relative">
+        <Thread />
         <Hero />
         <Experience />
         <Builds />

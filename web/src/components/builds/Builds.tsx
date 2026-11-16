@@ -21,7 +21,7 @@ export function Builds() {
           intro="I build around the parts of assurance that eat attention: tracing evidence, reviewing judgments, and turning findings into action."
         />
 
-        <article id="yozora" aria-labelledby="yozora-name" className="mt-16 grid gap-10 border-t border-ink pt-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-16">
+        <article id="yozora" aria-labelledby="yozora-name" data-reveal className="mt-16 grid gap-10 border-t border-ink pt-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-end lg:gap-16">
           <div>
             <div className="flex flex-wrap items-end gap-x-5 gap-y-2">
               <h3 id="yozora-name" className="font-serif text-7xl leading-none md:text-8xl">
@@ -33,7 +33,9 @@ export function Builds() {
               </span>
             </div>
             <p className="mt-8 max-w-lg font-serif text-3xl leading-tight">{yozora.pitch}</p>
-            <p className="mt-4 max-w-lg leading-relaxed text-ink-2">{yozora.summary}</p>
+          </div>
+          <div>
+            <p className="max-w-lg text-[17px] leading-relaxed text-ink-2">{yozora.summary}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <button
                 type="button"
@@ -47,24 +49,13 @@ export function Builds() {
               </a>
             </div>
           </div>
-          <dl className="grid content-start gap-x-8 sm:grid-cols-2 lg:pt-3">
-            {yozora.facts.map(([k, v]) => (
-              <div key={k} className="border-t border-line-2 py-4">
-                <dt className="font-mono text-xs tracking-[0.2em] text-muted uppercase">{k}</dt>
-                <dd className="mt-1.5 text-[15px] leading-[1.45]">{v}</dd>
-              </div>
-            ))}
-          </dl>
         </article>
 
         <EvidenceTrail />
 
-        <p className="mt-14 max-w-[68ch] border-l-2 border-accent pl-4 text-sm leading-relaxed text-ink-2">
-          <span className="font-mono text-xs tracking-[0.2em] text-ink uppercase">Current direction · </span>
-          {yozora.direction}
-        </p>
-
-        <Exhibits onOpen={setDemo} />
+        <div data-reveal>
+          <Exhibits onOpen={setDemo} />
+        </div>
       </Section>
       <DemoDialog demo={demo} onClose={() => setDemo(null)} />
     </>
