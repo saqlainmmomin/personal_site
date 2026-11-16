@@ -1,0 +1,58 @@
+/* The /yozora story page shows each screen at its full content height inside a plain frame,
+   so nothing here may depend on the viewport height. Small layout helpers for the story screens. */
+[hidden]{display:none!important}
+html{min-height:0}
+body{min-height:0}
+.app{min-height:0}
+.side{display:flex;flex-direction:column}
+.side-in{position:static;height:auto;flex:1}
+.page{padding-top:var(--s-3);padding-bottom:var(--s-5)}
+.top{height:44px}
+.page-head{margin-bottom:var(--s-3)}
+.card{padding:var(--s-5)}
+.qgroup{padding:var(--s-3) 0}
+.qgroup:first-of-type{padding-top:var(--s-2)}
+.side-in{padding-bottom:var(--s-2)}
+@media (max-width:640px){.yz-xs-hide{display:none!important}}
+.rq{height:auto;min-height:0}
+.rq-body{overflow:visible}
+
+/* Static frames: nothing looks clickable except the one reveal button. */
+html.yz-static *{cursor:default!important}
+html.yz-static [data-reveal]{cursor:pointer!important}
+/* No hover states either: rows lighting up under a resting cursor repainted the frames on every scroll. */
+html.yz-static body{pointer-events:none}
+html.yz-static [data-reveal]{pointer-events:auto}
+[data-reveal-focus]:focus{outline:none}
+
+/* Two cards side by side when there is room. */
+.yz-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:var(--s-4);align-items:start}
+.yz-opt{padding:var(--s-3) 0;border-top:1px solid var(--line)}
+.yz-opt:first-of-type{border-top:0}
+
+/* RFI rows: item, what it feeds and why, then its tags. */
+.yz-rfi .grow{min-width:0}
+.yz-rfi-tags{display:flex;flex-direction:column;align-items:flex-end;gap:var(--s-2);flex:none}
+.yz-q{flex-wrap:wrap}
+.yz-q h3{flex:1;min-width:min(100%,260px)}
+.yz-concl > *{align-items:flex-start}
+.yz-concl .sub{display:block;margin-top:2px}
+.yz-sections > *{padding-top:var(--s-3);padding-bottom:var(--s-3)}
+.yz-obs .block:first-child{margin-top:var(--s-6)}
+@media (max-width:860px){
+  .yz-rfi-tags{flex-direction:row;align-items:center;width:100%}
+  .yz-concl > *{flex-direction:column;gap:var(--s-2)}
+  .yz-concl .txt{width:100%}
+  .rq-list{padding-bottom:var(--s-2)}
+}
+
+@media (prefers-reduced-motion:no-preference){
+  .yz-fade:not([hidden]){animation:yz-fade .4s cubic-bezier(.22,.61,.36,1) both}
+}
+@keyframes yz-fade{from{opacity:0;transform:translateY(6px)}}
+
+/* Scope questions: keep each legend inside its group, above its options. */
+.qgroup > legend{float:left;width:100%;margin-bottom:0}
+.qgroup > legend + *{clear:both}
+.d-title{flex-wrap:wrap;gap:var(--s-2) var(--s-4)}
+html.yz-static [data-reveal]:focus-visible{box-shadow:0 0 0 2px #FFFFFF,0 0 0 4px #141A26}

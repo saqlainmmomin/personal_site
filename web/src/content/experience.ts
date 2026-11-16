@@ -1,152 +1,69 @@
 // Experience copy. Source of truth: ~/.claude/skills/cv-tailor/reference/content-evidence-map.md.
 // Client names stay confidential; no figures that the evidence map does not support.
 
-export interface Area {
-  area: string
-  /** The scannable phrase: what the area is, in the fewest words. `detail` adds the rest. */
-  key: string
-  detail: string
-  /** Lifecycle stage 1-4 (design, implement, assure, run). Omitted for work that runs through all of them. */
-  stage?: 1 | 2 | 3 | 4
+/** Tenure at KPMG as of Nov 2026 ("four and a half years"). The role itself is in the intro. */
+export const kpmgTenure = '4.5 years'
+
+export interface CycleStep {
+  /** Tab label. */
+  name: string
+  /** One line under the tab: what this stage is for. */
+  purpose: string
+  points: { title: string; text: string }[]
 }
 
-export interface Role {
-  /** "YYYY-MM"; `end` is omitted for the current role. */
-  start: string
-  end?: string
-  period: string
-  org: string
-  place: string
-  title: string
-  summary: string
-  /** Areas of work, elaborated for the current role only. */
-  areas?: Area[]
-}
-
-export const roles: Role[] = [
+// Plan, Do, Check, Act: the cycle most control standards use. Each point is one area of work.
+export const cycle: CycleStep[] = [
   {
-    start: '2022-07',
-    period: 'Jul 2022 – Present',
-    org: 'KPMG',
-    place: 'Bangalore',
-    title: 'Assistant Manager, Cyber Strategy & Governance',
-    summary:
-      'Cyber risk, ITGC and ISO audits for regulated enterprises, from first gap assessment to ongoing delivery.',
-    areas: [
-      {
-        area: 'Program design',
-        key: 'One control set, many standards',
-        detail: 'Gap and maturity assessments, then unified control frameworks across ISO 27001, NIST CSF, and DPDPA.',
-        stage: 1,
-      },
-      {
-        area: 'Program implementation',
-        key: 'Policy, technology, operations',
-        detail: 'Phased cyber transformation plans, carried through all three.',
-        stage: 2,
-      },
-      {
-        area: 'Regulatory audits',
-        key: 'RBI and IRDAI',
-        detail: 'Cyber-compliance reviews for banks and insurers, plus ITGC design and testing.',
-        stage: 3,
-      },
-      {
-        area: 'Certification audits',
-        key: 'ISO\u00a027001 and ISO\u00a022301',
-        detail: 'Programs taken through certification, and ISO 27001 surveillance audits after it.',
-        stage: 3,
-      },
-      {
-        area: 'Managed services',
-        key: 'KPIs and vendor SLAs',
-        detail: 'Cyber transformation and TPRM run as managed services, with steering reviews.',
-        stage: 4,
-      },
-      {
-        area: 'Client leadership',
-        key: 'CISO-level reporting',
-        detail: 'Primary client contact across concurrent engagements: kickoffs, status, and escalations.',
-      },
+    name: 'Plan',
+    purpose: 'Set the target, the rules, and how risk and progress are measured.',
+    points: [
+      { title: 'Cyber strategy and roadmaps', text: 'Maturity assessments for organizations across sectors, and the roadmap from where security stands to where it should be.' },
+      { title: 'Policies, procedures and standards', text: 'Cyber policies, procedures and standards built on industry frameworks, including a suite for 300+ R&D labs in 6+ regions.' },
+      { title: 'Risk assessment methodology', text: 'Scoring scales, risk tiers and risk appetite, agreed with each client, for process and application risk assessments.' },
+      { title: 'Unified control frameworks', text: 'Designed one control set that overlaps ISO 27001, NIST CSF, PCI DSS, DPDPA and GDPR, so each control is tested once.' },
+      { title: 'KPIs and service targets', text: 'Defined KPIs for cyber and IT operations run as a managed service, and for policy programs such as the R&D labs.' },
     ],
   },
   {
-    start: '2021-05',
-    end: '2021-09',
-    period: 'May – Sep 2021',
-    org: 'Mitkat Advisory',
-    place: 'Mumbai',
-    title: 'Risk Intelligence Analyst',
-    summary:
-      'Geopolitical, operational, and supply-chain risk analysis across South Asia, turned into weekly leadership briefings.',
+    name: 'Do',
+    purpose: 'Turn the plan into owned controls, tracked risks and trained people.',
+    points: [
+      { title: 'Control implementation', text: 'Working groups with security, business and Legal to assign control owners, define evidence, and track gaps to closure.' },
+      { title: 'Risk registers', text: 'Owned multiple risk registers, taking each risk from documentation through assignment and treatment to closure.' },
+      { title: 'Third-party risk program', text: 'Vendor tiering that sets assessment depth, ISO- and NIST-mapped questionnaires, and security terms negotiated with Legal.' },
+      { title: 'Privacy and continuity', text: 'Privacy impact assessments, data flow diagrams and RACI matrices, plus business impact analysis for ISO 22301.' },
+      { title: 'Awareness and training', text: 'Role-based training plans and calendars, phishing simulation, and tabletop exercises for top management.' },
+    ],
+  },
+  {
+    name: 'Check',
+    purpose: 'Test whether controls are designed well and work in practice.',
+    points: [
+      { title: 'ISO certification audits', text: 'Led 15+ ISO 27001 and 22301 engagements: internal, pre-certification and surveillance audits, zero-defect external audits.' },
+      { title: 'Banks and insurers', text: 'Cyber compliance reviews against RBI and IRDAI requirements, for multiple banks and insurers.' },
+      { title: 'IT general controls', text: 'Designed and tested these controls for privileged access, segregation of duties, change management, and backup and recovery.' },
+      { title: 'Vendor audits and SOC 2 reviews', text: 'Audited vendors, reviewed their SOC 2 Type II reports, and followed up with vendors directly for missing evidence.' },
+      { title: 'Technical assurance', text: 'Tested systems against CIS Benchmarks and reviewed code, vulnerability, cloud and SIEM evidence.' },
+    ],
+  },
+  {
+    name: 'Act',
+    purpose: 'Fix what the checks find, report it, and keep controls current.',
+    points: [
+      { title: 'Remediation', text: 'Documented findings, validated the fixes, and reported results to CISOs and leadership.' },
+      { title: 'Recurring control testing', text: 'Recurring control testing and monitoring between audits, to confirm controls keep working.' },
+      { title: 'Regulatory change', text: 'Documented regulatory changes and updated client control sets to reflect them.' },
+      { title: 'Governance cadence', text: 'Service review and steering decks, minutes and action logs, with vendor SLAs and KPI adherence tracked for managed services.' },
+      { title: 'Training and mentoring', text: 'Trained the third-party risk team on the programs and frameworks built, and mentored 8–10+ junior analysts.' },
+    ],
   },
 ]
 
-export interface CaseFile {
-  id: string
-  practice: string
-  title: string
-  mandate: string
-  owned: string
-  result: string
-  /** Terms from `mapGroups` this engagement touched; each must be supported by the evidence map or by Saqlain. */
-  touches: string[]
+export const internship = {
+  org: 'Mitkat Advisory',
+  place: 'Mumbai',
+  period: 'May – Sep 2021',
+  title: 'Risk Intelligence Analyst',
+  summary: 'Geopolitical, operational, and supply-chain risk analysis across South Asia, turned into weekly leadership briefings.',
 }
-
-// Five engagement types chosen for range, with scopes that do not overlap. SOC 2 is report review only;
-// Procurement work is assessing their vendor shortlist, not intake.
-export const caseFiles: CaseFile[] = [
-  {
-    id: 'E-01',
-    practice: 'Audit & certification',
-    title: 'Internal and external audits for ISO certification',
-    mandate: 'Take organizations from gap analysis to ISO 27001 ISMS and ISO 22301 BCMS certification, and keep them certified.',
-    owned: 'Gap assessment, control design, evidence and remediation tracking; internal and pre-certification audits; surveillance audits after certification.',
-    result: 'Zero-defect external audits on ISO 27001 and ISO 22301 programs.',
-    touches: ['ISO 27001', 'ISO 22301', 'ISO 27701', 'NIST CSF', 'Internal audits', 'External audits', 'Banking and insurance', 'E-commerce', 'Real estate'],
-  },
-  {
-    id: 'E-02',
-    practice: 'Regulatory audit',
-    title: 'Cyber audits for banks and insurers',
-    mandate: 'Test cyber and IT controls against RBI and IRDAI requirements across multiple financial institutions.',
-    owned: 'IT general controls (ITGC) design and testing across privileged access, segregation of duties, change, and backup and recovery.',
-    result: 'Remediation validated; findings reported to CISOs and leadership.',
-    touches: ['RBI', 'IRDAI', 'ITGC testing', 'Banking and insurance'],
-  },
-  {
-    id: 'E-03',
-    practice: 'Third-party risk',
-    title: 'Third-party risk management (TPRM) program',
-    mandate: 'Standardize fragmented vendor reviews into one risk-based program.',
-    owned: 'Designed the vendor tiering and pre-onboarding assessments and the ISO- and NIST-mapped questionnaires; ran vendor audits and SOC 2 report reviews; agreed security terms with Legal and assessed shortlisted vendors for Procurement.',
-    result: 'A repeatable path from pre-onboarding assessment to recurring review, with vendor SLAs tracked as a managed service.',
-    touches: ['ISO 27001', 'NIST CSF', 'SOC 2', 'Vendor audits'],
-  },
-  {
-    id: 'E-04',
-    practice: 'Unified compliance',
-    title: 'One control set for many standards',
-    mandate: 'Build one control set that satisfies several standards and a regulation at once.',
-    owned: 'Broke each requirement into common controls, added privacy controls where DPDPA asks for more, and updated the set as regulations changed.',
-    result: 'Each control is tested once and counts for every framework it maps to.',
-    touches: ['ISO 27001', 'NIST CSF', 'PCI DSS', 'OWASP Top 10', 'DPDPA', 'GDPR', 'Control mapping'],
-  },
-  {
-    id: 'E-05',
-    practice: 'Policy & standards',
-    title: 'Policy suites for 300+ R&D labs',
-    mandate: 'Write the security and operational-compliance policies for a semiconductor R&D estate of 300+ labs across 6+ regions.',
-    owned: 'Policies, procedures and standards on ISO 27001 and NIST CSF baselines, a lab requirements library with coverage mapping, and KPIs for the labs.',
-    result: 'Controls the labs could put into practice without disrupting their operations.',
-    touches: ['ISO 27001', 'NIST CSF', 'Policy drafting', 'Semiconductors'],
-  },
-]
-
-/** The right-hand side of the engagement map. Every term is touched by at least one case file. */
-export const mapGroups = [
-  { label: 'Standards', terms: ['ISO 27001', 'ISO 22301', 'ISO 27701', 'NIST CSF', 'PCI DSS', 'OWASP Top 10', 'SOC 2'] },
-  { label: 'Regulation', terms: ['RBI', 'IRDAI', 'DPDPA', 'GDPR'] },
-  { label: 'Assurance work', terms: ['Internal audits', 'External audits', 'ITGC testing', 'Vendor audits', 'Control mapping', 'Policy drafting'] },
-  { label: 'Sectors', terms: ['Banking and insurance', 'E-commerce', 'Real estate', 'Semiconductors'] },
-]

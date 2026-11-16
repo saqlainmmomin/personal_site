@@ -1,0 +1,12 @@
+/* Yozora story page. The product UI lives in iframes; this only sizes the plain frames. */
+
+/* Wider than the 720px text column so the product shows its desktop layout; centred on the page. */
+.yz-wide {
+  position: relative;
+  left: 50%;
+  width: min(1200px, calc(100vw - 48px));
+  translate: -50% 0;
+}
+@media (max-width: 640px) {
+  .yz-wide { width: calc(100vw - 32px); }
+}
