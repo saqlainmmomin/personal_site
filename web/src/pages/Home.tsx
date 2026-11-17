@@ -56,7 +56,7 @@ export default function Home() {
 
       <Section id="projects" title="Projects">
         <p className="max-w-text text-grey">
-          Assessment software, a vendor screen, and apps built for the love of coding.{' '}
+          Software for the parts of audit work I found slow: assessing controls and screening vendors. Also apps I built because I wanted them.{' '}
           <a href="/projects">See the projects</a>.
         </p>
       </Section>

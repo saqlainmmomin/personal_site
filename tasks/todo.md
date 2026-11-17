@@ -1,3 +1,66 @@
+# PORTFOLIO REDESIGN v3: "PLAIN LETTER" (2026-11-16) — DECISIONS LOCKED, NOT STARTED
+
+Why: design roast of 68a1c9b found mixed metaphors (badge, NDA/DECLASSIFIED stamps, 3D seals,
+fake app window), 18 font sizes incl. 9–11px, four reds, no shared grid, inconsistent section
+anatomy, decorative thread, dead space, horizontal overflow (1468/1440, 435/390), engagement
+map broken on phones. Goal: professional, shows subject-matter depth, tasteful, no gimmicks.
+Reference: harshux.com (friend's site) — one 15px serif, ~560px column, ~230 words on home,
+no accent, hairlines only, projects = full-width image + bold title + one grey line, depth on
+inner pages, motion only inside the work (live mockups). Teardown screenshots in session
+scratchpad (harsh/).
+
+## Locked decisions (Saqlain, 2026-11-16)
+- Direction: plain, no metaphor. Drop badge, stamps, seals, fake window chrome, offset
+  shadows, dot grid, thread, reference-code costume. Copy plain and factual, first person,
+  no catchphrases (and no generic soft lines either).
+- Pages: short homepage + inner pages. Home: photo, short intro, contact links, compact
+  work list, compliance builds, love-of-coding tiles, credentials line, writing line.
+  Inner pages: KPMG engagements in depth; Yozora guided demo.
+- Hero: calm portrait (Harsh-style, small, top-left of column) + 2–4 short paragraphs +
+  Email (copy) · LinkedIn · CV.
+- Experience on home: KPMG (2022–now) and Mitkat (~5–6 mo, 2021) as plain rows. The
+  engagements table (5 rows: scope, frameworks, result, what I owned) is the one structured
+  element; full version on the KPMG inner page.
+- Compliance builds: Yozora + Recon. Yozora = guided clickable demo of the IDEAL product,
+  sample data, labelled "Concept · sample data"; tile on home is a live looping preview.
+- For the love of coding: Head-tracking app, Polymath app, RL Playground, Munshi (demo UI
+  exists). Real footage per project. Velocity dropped.
+- Credentials: one line/strip of text: 3 ISO lead-auditor certs + 2 degrees. No seals/graph.
+- Writing: one line + link to LinkedIn notes.
+
+## System rules
+- Type: one readable text serif (EB Garamond / Source Serif class) for all copy; Inter only
+  for small UI labels. Two sizes max on home (body + small label); hierarchy by weight and
+  grey. Name gets no special display font.
+- Color: off-white bg, near-black text, one grey; ONE red, links only.
+- Layout: one centred column (~720px), text capped ~560px (65–75 chars), images full column
+  width; generous fixed spacing scale; same section anatomy everywhere.
+- Motion: only inside the work (Yozora preview/demo, footage playing in view). No page-level
+  effects. Reduced motion respected.
+- Phones: zero horizontal overflow (fix html/body overflow root cause), 20px side padding.
+
+## Risk to watch
+- 2026-11-12 a stripped pass read as "empty". Harsh's site works because the images carry
+  it — our footage and the Yozora preview must be strong before launch.
+
+## Open inputs needed from Saqlain
+- [ ] Portrait photo for hero
+- [ ] Yozora ideal workflow: the 4–6 steps the tool should do (dedicated session)
+- [ ] Footage / repos: Head-tracking, Polymath (exact name), Munshi demo UI location, RL Playground
+- [ ] Engagement table content per row — check evidence map first
+- [ ] Intro paragraphs (draft from CV evidence map, Saqlain edits)
+
+## Build steps (proposed)
+1. Tokens, serif, column layout, routing for inner pages; strip removed devices; fix
+   overflow (smoke test: scrollWidth == innerWidth at 1440 and 390)
+2. Home: hero, work rows, credentials line, writing line, contact
+3. KPMG inner page with engagements table
+4. Project tiles (footage) for builds + love of coding
+5. Yozora guided demo page + looping home preview (largest piece; own plan)
+6. Before-exposure design pass (two-pass rule), phone + desktop screenshots reviewed
+
+---
+
 # PORTFOLIO REDESIGN: "THE AUDIT FILE" (2026-10-23) — APPROVED 2026-10-23, IN PROGRESS
 
 Decisions (Saqlain, 2026-10-23): Vite + React + TS + Tailwind; audit-file metaphor;
