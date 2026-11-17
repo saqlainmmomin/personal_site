@@ -34,8 +34,10 @@ function walk(dir) {
 // ---------------------------------------------------------------- static checks
 assert.ok(size(join(dist, 'index.html')) > 0, 'web/dist/index.html is missing: run `npm run build` first')
 assert.ok(size(join(dist, 'projects.html')) > 0, 'web/dist/projects.html is missing: projects should be a second Vite entry')
+assert.ok(size(join(dist, 'writing.html')) > 0, 'web/dist/writing.html is missing: writing should be a Vite entry')
 const html = readFileSync(join(dist, 'index.html'), 'utf8')
 const projectsHtml = readFileSync(join(dist, 'projects.html'), 'utf8')
+const writingHtml = readFileSync(join(dist, 'writing.html'), 'utf8')
 const contentFiles = walk(join(root, 'src', 'content')).filter((f) => f.endsWith('.ts'))
 const contentSource = contentFiles.map((f) => readFileSync(f, 'utf8')).join('\n')
 const bundle = walk(join(dist, 'assets'))
@@ -48,6 +50,7 @@ console.log('Static checks')
 assert.match(html, /<title>[^<]*Saqlain Momin[^<]*GRC/, 'Title should name Saqlain Momin and GRC')
 assert.ok(html.includes(`<link rel="canonical" href="${PRODUCTION_ORIGIN}/">`), 'Canonical URL should use the production origin')
 assert.ok(projectsHtml.includes(`<link rel="canonical" href="${PRODUCTION_ORIGIN}/projects">`), '/projects canonical should use the production origin')
+assert.ok(writingHtml.includes(`<link rel="canonical" href="${PRODUCTION_ORIGIN}/writing">`), '/writing canonical should use the production origin')
 assert.ok(html.includes(`content="${PRODUCTION_ORIGIN}/og/og-image.png"`), 'OG image should use the production origin')
 const jsonLd = JSON.parse(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/.exec(html)?.[1] ?? 'null')
 assert.equal(jsonLd?.url, `${PRODUCTION_ORIGIN}/`, 'JSON-LD URL should match the canonical URL')
@@ -55,6 +58,7 @@ assert.ok(size(join(dist, 'og', 'og-image.png')) > 0, 'Missing og/og-image.png')
 assert.match(readFileSync(join(dist, 'robots.txt'), 'utf8'), new RegExp(`Sitemap: ${PRODUCTION_ORIGIN}/sitemap\\.xml`))
 const sitemap = readFileSync(join(dist, 'sitemap.xml'), 'utf8')
 assert.ok(sitemap.includes(`<loc>${PRODUCTION_ORIGIN}/</loc>`) && sitemap.includes(`<loc>${PRODUCTION_ORIGIN}/projects</loc>`), 'Sitemap should list / and /projects')
+assert.ok(sitemap.includes(`<loc>${PRODUCTION_ORIGIN}/writing</loc>`), 'Sitemap should list /writing')
 assert.ok(size(join(dist, 'yozora.html')) > 0 && sitemap.includes(`<loc>${PRODUCTION_ORIGIN}/yozora</loc>`), '/yozora should be a Vite entry listed in the sitemap')
 ok('metadata, canonical, JSON-LD, robots, sitemap')
 
@@ -129,7 +133,7 @@ const viewports = [
 ]
 
 try {
-  for (const path of ['/', '/projects', '/yozora']) {
+  for (const path of ['/', '/projects', '/writing', '/yozora']) {
     for (const [vw, viewport] of viewports) {
       const label = `${path} @${vw}`
       const { page, context, problems } = await open(path, viewport)
@@ -264,6 +268,16 @@ try {
     assert.deepEqual(titles, ['Yozora', 'Recon', 'Unshrimp', 'Tell Me How', 'Munshi', 'RL Playground'], `[projects @${vw}] tiles`)
     assert.ok((await page.locator('a[href="/"]').count()) >= 2, 'projects page needs a way back home')
     ok(`projects @${vw}: six tiles; back link present`)
+    await context.close()
+  }
+  // Writing page
+  for (const [vw, viewport] of viewports) {
+    const { page, context } = await open('/writing', viewport)
+    assert.equal(await page.locator('li a[target=_blank]').count(), 5, `[writing @${vw}] five article links`)
+    assert.equal(await page.locator('li time').count(), 5, `[writing @${vw}] five dates`)
+    assert.ok((await page.getByRole('link', { name: 'LinkedIn' }).count()) === 1, `[writing @${vw}] LinkedIn link`)
+    assert.ok((await page.locator('a[href="/"]').count()) >= 2, 'writing page needs a way back home')
+    ok(`writing @${vw}: five notes, LinkedIn link, back link present`)
     await context.close()
   }
   // Yozora story page: six stages, each a product screen at its content height. Analyse, Run
