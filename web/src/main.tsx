@@ -8,3 +8,5 @@ createRoot(document.getElementById('root')!).render(
     <Home />
   </StrictMode>,
 )
+
+if (new URLSearchParams(location.search).has('fight')) void import('./fight/launch')

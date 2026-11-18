@@ -82,6 +82,12 @@ ok('no confidential names, em dashes or placeholders')
 assert.ok(bundle.includes('synthetic demo data'), 'Yozora media must disclose synthetic demo data')
 ok('demo-data disclosure present')
 
+// The fight prototype's physics lib ships in its own lazy chunk, never in the homepage entry.
+const mainChunk = readFileSync(join(dist, /<script type="module" crossorigin src="\/([^"]+)"/.exec(html)[1]), 'utf8')
+assert.ok(!mainChunk.includes('collisionStart'), 'Main chunk must not contain the physics lib')
+assert.ok(bundle.includes('collisionStart'), 'Physics lib should exist as a lazy chunk')
+ok('physics lib is a lazy chunk, not in the main entry')
+
 // ---------------------------------------------------------------- browser checks
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.woff2': 'font/woff2', '.mp4': 'video/mp4', '.pdf': 'application/pdf', '.xml': 'application/xml', '.txt': 'text/plain' }
 
@@ -234,6 +240,35 @@ try {
     assert.equal(await page.evaluate(() => navigator.clipboard.readText()), EMAIL)
     ok(`home @${vw}: email copy button copies the address and confirms`)
     await context.close()
+  }
+
+  // Fight prototype: only behind /?fight, desktop only; launching breaks lines loose, Esc restores the page.
+  {
+    const { page, context } = await open('/', viewports[0][1])
+    assert.equal(await page.locator('[data-fight-launch]').count(), 0, '/ must have no fight control')
+    await context.close()
+    const phone = await open('/?fight', viewports[1][1])
+    assert.equal(await phone.page.locator('[data-fight-launch]').count(), 0, '/?fight must hide the control on phones')
+    await phone.context.close()
+    const { page: p, context: c, problems } = await open('/?fight', viewports[0][1])
+    await p.waitForTimeout(1500) // let the scroll-reveal settle so it doesn't change main mid-test
+    const before = await p.evaluate(() => ({ main: document.querySelector('main').innerHTML, overflow: document.documentElement.style.overflow }))
+    await p.locator('[data-fight-launch] button').click()
+    await p.locator('canvas[data-fight]').waitFor()
+    await p.waitForFunction(() => window.__fight?.ready(), null, { timeout: 5000 })
+    await p.waitForTimeout(800)
+    const during = await p.evaluate(() => ({ hidden: document.querySelectorAll('[data-fight-hidden]').length, debris: document.querySelectorAll('[data-fight-debris]').length, fighters: window.__fight?.state().length }))
+    assert.ok(during.hidden > 0 && during.debris > 0, `launching should break lines loose: ${JSON.stringify(during)}`)
+    assert.ok(during.fighters >= 2, 'launching should drop in a player and an enemy')
+    await p.keyboard.press('Escape')
+    await p.waitForFunction(() => !window.__fight, null, { timeout: 5000 })
+    const after = await p.evaluate(() => ({ main: document.querySelector('main').innerHTML, overflow: document.documentElement.style.overflow, canvas: document.querySelectorAll('canvas[data-fight], [data-fight-debris], [data-fight-hud]').length }))
+    assert.equal(after.main, before.main, 'Esc must restore the page text exactly')
+    assert.equal(after.overflow, before.overflow, 'Esc must unlock scroll')
+    assert.equal(after.canvas, 0, 'Esc must remove the canvas, clones and HUD')
+    assert.deepEqual(problems, [], '/?fight console or network problems')
+    ok(`/?fight: control on desktop only; launch turned ${during.debris} pieces into the arena; Esc flew them home and restored the page`)
+    await c.close()
   }
 
   // Video: plays in view only
