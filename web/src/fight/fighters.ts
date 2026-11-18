@@ -34,11 +34,76 @@ type Pair = [number, number]
 type Pose = { lean: number; aF: Pair; aB: Pair; lF: Pair; lB: Pair }
 type Plat = { l: number; r: number; t: number }
 
-type AtkKind = 'punch' | 'kick'
-const ATK = {
-  punch: { su: 0.07, act: 0.08, rec: 0.17, dmg: 8, kb: 300, pop: 470, stun: 0.3, reach: 51, y0: 62, y1: 40, lunge: 150, shove: 7, lift: 3 },
-  kick: { su: 0.12, act: 0.1, rec: 0.24, dmg: 12, kb: 600, pop: 720, stun: 0.4, reach: 70, y0: 49, y1: 11, lunge: 200, shove: 13, lift: 7 },
-} as const
+type Btn = 'punch' | 'kick'
+type Name = 'jab' | 'cross' | 'uppercut' | 'kick' | 'roundhouse' | 'sweep' | 'lungekick'
+type Move = {
+  dur: number; hit: Pair; cancel: number // seconds from move start: active window; a buffered press may chain from `cancel`
+  box: { reach: number; y0: number; y1: number }
+  dmg: number; kb: number; pop: number; stun: number; lunge: number; shove: number; lift: number
+  react: 'flinch' | 'launch' | 'knockdown'; sfx: Btn
+  next?: Partial<Record<Btn, Name>>
+  keys: [number, Pose][] // pose keyframes (time, pose), smoothstepped between neighbours
+}
+
+const GUARD: Pose = { lean: 0.08, aF: [0.6, 2.2], aB: [0.2, 1.7], lF: [0.35, 0.15], lB: [-0.35, -0.15] }
+const LIE: Pose = { lean: -1.25, aF: [-1.4, -1.2], aB: [-1, -1.5], lF: [1.4, 1.5], lB: [1.3, 1.45] }
+const GETUP: [number, Pose][] = [[0, GUARD], [0.3, LIE]] // sampled by seconds left on the floor
+const DOWN = 0.8
+const K = (t: number, p: Partial<Pose> = {}): [number, Pose] => [t, { ...GUARD, ...p }]
+const PUNCH_LEGS: Partial<Pose> = { lF: [0.55, 0.25], lB: [-0.6, -0.3] }
+const KICK_ARMS: Partial<Pose> = { aF: [-1, -0.6], aB: [-2, -1.4], lB: [-0.12, -0.05] }
+const UP: Partial<Pose> = { lean: -0.1, aF: [2.7, 2.9], lF: [0.4, 0.1], lB: [-0.4, -0.1] }
+const LUNGE: Partial<Pose> = { ...KICK_ARMS, lean: -0.3, lF: [1.5, 1.55] }
+const JAB: Partial<Pose> = { ...PUNCH_LEGS, lean: 0.35, aF: [1.5, 1.5] }
+const CROSS: Partial<Pose> = { ...PUNCH_LEGS, lean: 0.4, aB: [1.5, 1.5] }
+const HIGH: Partial<Pose> = { ...KICK_ARMS, lean: -0.5, lF: [1.75, 1.7] }
+const SWEEP: Partial<Pose> = { ...KICK_ARMS, lean: -0.3, lF: [1.25, 1.35], lB: [-1.2, 1] }
+
+// Angles are radians from straight down, positive toward facing. Combos: J>J>J, J>K, K>K>K, down+K.
+const MOVES: Record<Name, Move> = {
+  jab: {
+    dur: 0.32, hit: [0.09, 0.16], cancel: 0.16, box: { reach: 51, y0: 62, y1: 40 },
+    dmg: 6, kb: 110, pop: 120, stun: 0.45, lunge: 150, shove: 7, lift: 3, react: 'flinch', sfx: 'punch',
+    next: { punch: 'cross', kick: 'lungekick' },
+    keys: [K(0), K(0.07, { ...PUNCH_LEGS, lean: 0.05, aF: [-0.8, 2.34] }), K(0.1, JAB), K(0.16, JAB), K(0.32)],
+  },
+  cross: {
+    dur: 0.4, hit: [0.11, 0.19], cancel: 0.22, box: { reach: 58, y0: 62, y1: 40 },
+    dmg: 9, kb: 130, pop: 140, stun: 0.5, lunge: 170, shove: 8, lift: 3, react: 'flinch', sfx: 'punch',
+    next: { punch: 'uppercut', kick: 'lungekick' },
+    keys: [K(0), K(0.09, { ...PUNCH_LEGS, lean: -0.1, aB: [-0.8, 2.34] }), K(0.12, CROSS), K(0.19, CROSS), K(0.4)],
+  },
+  uppercut: {
+    dur: 0.5, hit: [0.13, 0.28], cancel: 0.5, box: { reach: 56, y0: 82, y1: 30 },
+    dmg: 12, kb: 120, pop: 950, stun: 0.5, lunge: 260, shove: 5, lift: 10, react: 'launch', sfx: 'punch',
+    keys: [K(0), K(0.09, { lean: 0.3, aF: [-0.3, 0.5], lF: [0.9, 0.3], lB: [-0.8, 0.5] }), K(0.13, UP), K(0.28, UP), K(0.5)],
+  },
+  kick: {
+    dur: 0.46, hit: [0.14, 0.22], cancel: 0.26, box: { reach: 70, y0: 49, y1: 11 },
+    dmg: 12, kb: 140, pop: 160, stun: 0.5, lunge: 200, shove: 13, lift: 7, react: 'flinch', sfx: 'kick',
+    next: { kick: 'roundhouse' },
+    keys: [K(0), K(0.12, { ...KICK_ARMS, lean: -0.1, lF: [1.2, 0.1] }), K(0.15, LUNGE), K(0.22, LUNGE), K(0.46)],
+  },
+  roundhouse: {
+    dur: 0.55, hit: [0.17, 0.28], cancel: 0.3, box: { reach: 72, y0: 74, y1: 40 },
+    dmg: 14, kb: 180, pop: 220, stun: 0.55, lunge: 220, shove: 16, lift: 6, react: 'flinch', sfx: 'kick',
+    next: { kick: 'sweep' },
+    keys: [K(0), K(0.14, { ...KICK_ARMS, lean: 0.1, lF: [1.3, 0.2] }), K(0.19, HIGH), K(0.28, HIGH), K(0.55)],
+  },
+  sweep: {
+    dur: 0.55, hit: [0.17, 0.3], cancel: 0.55, box: { reach: 62, y0: 16, y1: 0 },
+    dmg: 10, kb: 450, pop: 250, stun: 0.3, lunge: 120, shove: 10, lift: 2, react: 'knockdown', sfx: 'kick',
+    keys: [K(0), K(0.14, { ...KICK_ARMS, lean: -0.1, lF: [1.2, 0.2], lB: [-1, 0.8] }), K(0.2, SWEEP), K(0.3, SWEEP), K(0.55)],
+  },
+  lungekick: {
+    dur: 0.6, hit: [0.14, 0.3], cancel: 0.6, box: { reach: 95, y0: 58, y1: 20 },
+    dmg: 16, kb: 750, pop: 560, stun: 0.5, lunge: 560, shove: 16, lift: 7, react: 'knockdown', sfx: 'kick',
+    keys: [K(0), K(0.12, { ...KICK_ARMS, lean: -0.1, lF: [1.2, 0.1] }), K(0.16, LUNGE), K(0.3, LUNGE), K(0.6)],
+  },
+}
+const ROOT: Record<Btn, Name> = { punch: 'jab', kick: 'kick' }
+/** What an enemy that commits to a string presses after its opening button; each is a valid chain from that opener. */
+const TAILS: Record<Btn, Btn[][]> = { punch: [['punch'], ['kick'], ['punch', 'punch']], kick: [['kick'], ['kick', 'kick']] }
 
 type Input = { dir: number; jump: boolean; jumpHeld: boolean; down: boolean; punch: boolean; kick: boolean; grab: boolean; up: boolean }
 
@@ -57,7 +122,8 @@ type Fighter = {
   stun: number; flash: number; inv: number
   gy: number; combo: number; comboT: number
   bp: number; bk: number
-  atk: { type: AtkKind; t: number; hit: boolean; shoved: boolean } | null
+  atk: { name: Name; t: number; hit: boolean; shoved: boolean; from: Pose } | null
+  down: number; fall: boolean; plan: Btn[] // seconds left on the floor; launched/knocked down and not yet landed; AI's queued presses
   phase: number; t: number
   rag: Ragdoll | null
   // enemy ai
@@ -71,11 +137,17 @@ const lerp2 = (a: Pair, b: Pair, u: number): Pair => [lerp(a[0], b[0], u), lerp(
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v))
 const approach = (v: number, target: number, step: number) => (v < target ? Math.min(v + step, target) : Math.max(v - step, target))
 
-function atkPhase(a: { type: AtkKind; t: number }) {
-  const d = ATK[a.type]
-  if (a.t < d.su) return { ph: 0, u: a.t / d.su }
-  if (a.t < d.su + d.act) return { ph: 1, u: (a.t - d.su) / d.act }
-  return { ph: 2, u: Math.min(1, (a.t - d.su - d.act) / d.rec) }
+const mix = (a: Pose, b: Pose, u: number): Pose => ({ lean: lerp(a.lean, b.lean, u), aF: lerp2(a.aF, b.aF, u), aB: lerp2(a.aB, b.aB, u), lF: lerp2(a.lF, b.lF, u), lB: lerp2(a.lB, b.lB, u) })
+
+/** `from` replaces the first keyframe, so a move blends out of whatever pose the fighter was in. */
+function sample(keys: [number, Pose][], t: number, from?: Pose): Pose {
+  let i = 1
+  while (i < keys.length - 1 && t > keys[i][0]) i++
+  const [t0, k] = keys[i - 1]
+  const a = i === 1 && from ? from : k
+  const [t1, b] = keys[i]
+  const u = clamp((t - t0) / (t1 - t0), 0, 1)
+  return mix(a, b, u * u * (3 - 2 * u))
 }
 
 function poseOf(f: Fighter): Pose {
@@ -90,28 +162,13 @@ function basePose(f: Fighter): Pose {
   const ph = f.phase
   const s = Math.sin(ph)
   const c = Math.cos(ph)
-  const guardA: Pair = [0.6, 2.2]
-  const standL: [Pair, Pair] = [[0.35, 0.15], [-0.35, -0.15]]
 
   if (f.stun > 0) {
     const tr = Math.sin(f.t * 70) * 0.06
     return { lean: -0.5 + tr, aF: [2.4, 2.9], aB: [-2.2, -2.7], lF: [0.5, 0.9], lB: [-0.7, -0.5] }
   }
-  if (f.atk) {
-    const { ph: p, u } = atkPhase(f.atk)
-    if (f.atk.type === 'punch') {
-      const cock: Pair = [-0.8, 2.34]
-      const ext: Pair = [1.5, 1.5]
-      const aF = p === 0 ? lerp2(guardA, cock, u) : p === 1 ? lerp2(cock, ext, Math.min(1, u * 3)) : lerp2(ext, guardA, u)
-      const lean = p === 0 ? 0.05 : p === 1 ? 0.35 : lerp(0.35, 0.08, u)
-      return { lean, aF, aB: [0.2, 1.7], lF: [0.55, 0.25], lB: [-0.6, -0.3] }
-    }
-    const chamber: Pair = [1.2, 0.1]
-    const ext: Pair = [1.5, 1.55]
-    const lF = p === 0 ? lerp2(standL[0], chamber, u) : p === 1 ? lerp2(chamber, ext, Math.min(1, u * 3)) : lerp2(ext, standL[0], u)
-    const lean = p === 0 ? lerp(0.05, -0.1, u) : p === 1 ? -0.3 : lerp(-0.3, 0.05, u)
-    return { lean, aF: [-1.0, -0.6], aB: [-2.0, -1.4], lF, lB: [-0.12, -0.05] }
-  }
+  if (f.down > 0) return sample(GETUP, f.down)
+  if (f.atk) return sample(MOVES[f.atk.name].keys, f.atk.t, f.atk.from)
   if (!f.grounded) {
     if (f.vy < 0) return { lean: 0.12, aF: [2.3, 2.7], aB: [-2.2, -2.6], lF: [0.8, -0.3], lB: [-0.3, -0.9] }
     return { lean: 0.04, aF: [2.6, 2.9], aB: [-2.5, -2.8], lF: [0.35, 0.2], lB: [-0.45, -0.2] }
@@ -127,11 +184,10 @@ function basePose(f: Fighter): Pose {
   }
   const br = Math.sin(f.t * 3.2)
   return {
-    lean: 0.08 + br * 0.03,
-    aF: [guardA[0] + br * 0.06, guardA[1] - br * 0.06],
-    aB: [0.2 + br * 0.05, 1.7],
-    lF: standL[0],
-    lB: standL[1],
+    ...GUARD,
+    lean: GUARD.lean + br * 0.03,
+    aF: [GUARD.aF[0] + br * 0.06, GUARD.aF[1] - br * 0.06],
+    aB: [GUARD.aB[0] + br * 0.05, GUARD.aB[1]],
   }
 }
 
@@ -249,7 +305,7 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
     const f: Fighter = {
       kind, x: 0, y: 0, vx: 0, vy: 0, face: Math.random() < 0.5 ? 1 : -1, hp: 100, ko: false, koT: 0,
       grounded: false, onLedge: false, coyote: 0, jumpBuf: 0, dropT: 0, stun: 0, flash: 0, inv: 0, gy: world.height, combo: 0, comboT: 0, bp: 0, bk: 0,
-      atk: null, phase: 0, t: Math.random() * 10, rag: null,
+      atk: null, down: 0, fall: false, plan: [], phase: 0, t: Math.random() * 10, rag: null,
       cd: rnd(0.8, 1.6), retreat: 0, jumpCd: 0, runMul: rnd(0.6, 0.82), wander: 0, wanderT: 0,
       side: Math.random() < 0.5 ? 1 : -1, standoff: rnd(50, 72), goal: null, goalT: 0, perch: 0, hop: rnd(1.5, 3.5),
       carry: null, carryT: 0, throwT: 0, grabCd: rnd(3, 7),
@@ -259,11 +315,12 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
     list.push(f)
   }
 
-  function startAtk(f: Fighter, type: AtkKind) {
-    f.atk = { type, t: 0, hit: false, shoved: false }
+  function startMove(f: Fighter, name: Name) {
+    const m = MOVES[name]
+    f.atk = { name, t: 0, hit: false, shoved: false, from: basePose(f) }
     f.bp = f.bk = 0
-    snd(f, 'whoosh', type === 'kick' ? 1 : 0.7)
-    if (f.grounded) f.vx = f.face * ATK[type].lunge
+    snd(f, 'whoosh', m.sfx === 'kick' ? 1 : 0.7)
+    if (f.grounded) f.vx = f.face * m.lunge
   }
 
   /** Let go of a carried word (hit, KO, exit): collisions come back and it drops. */
@@ -390,7 +447,7 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
     }
   }
 
-  function shoveDebris(f: Fighter, hb: { x0: number; x1: number; y0: number; y1: number }, d: (typeof ATK)[AtkKind]) {
+  function shoveDebris(f: Fighter, hb: { x0: number; x1: number; y0: number; y1: number }, d: Move) {
     for (const b of world.debris) {
       if (b.isStatic || b.isSensor) continue
       const m = 8
@@ -403,18 +460,18 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
 
   function processAttack(f: Fighter, dt: number) {
     const a = f.atk!
-    const d = ATK[a.type]
+    const m = MOVES[a.name]
     a.t += dt
-    if (a.t >= d.su + d.act + d.rec) { f.atk = null; return }
-    if (a.t < d.su || a.t >= d.su + d.act) return
-    const x0 = f.face > 0 ? f.x + 2 : f.x - 2 - d.reach
-    const hb = { x0, x1: x0 + d.reach, y0: f.y - d.y0, y1: f.y - d.y1 }
+    if (a.t >= m.dur) { f.atk = null; return }
+    if (a.t < m.hit[0] || a.t >= m.hit[1]) return
+    const x0 = f.face > 0 ? f.x + 2 : f.x - 2 - m.box.reach
+    const hb = { x0, x1: x0 + m.box.reach, y0: f.y - m.box.y0, y1: f.y - m.box.y1 }
+    const kk = m.sfx === 'kick'
     if (!a.shoved) {
       a.shoved = true
-      shoveDebris(f, hb, d)
+      shoveDebris(f, hb, m)
       // knock word bricks loose, at most once per attack
       const before = world.debris.length
-      const kk = a.type === 'kick'
       world.knock({ x: hb.x0, y: hb.y0, w: hb.x1 - hb.x0, h: hb.y1 - hb.y0 }, f.face * (kk ? 420 : 260), kk ? -380 : -150)
       if (world.debris.length > before) snd(f, 'knock', kk ? 1 : 0.7)
     }
@@ -423,30 +480,29 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
       if (o === f || o.kind === f.kind || o.ko || o.inv > 0) continue
       if (hb.x1 < o.x - HURT_W || hb.x0 > o.x + HURT_W || hb.y1 < o.y - HURT_H || hb.y0 > o.y) continue
       a.hit = true
-      const kick = a.type === 'kick'
       o.combo = o.comboT > 0 ? o.combo + 1 : 1
       o.comboT = 1.0
-      const breaker = o.combo >= 3 && o.hp > 0
-      const dmg = d.dmg * (f.kind === 'enemy' ? 0.75 : 1)
-      o.hp = Math.max(0, o.hp - dmg)
+      const react = o.combo >= 5 ? 'knockdown' : m.react // no endless juggles
+      o.hp = Math.max(0, o.hp - m.dmg * (f.kind === 'enemy' ? 0.75 : 1))
+      const ko = o.hp <= 0
+      const big = ko || react !== 'flinch'
       o.atk = null
       dropCarry(o)
-      o.stun = breaker ? 0.35 : d.stun
+      o.stun = m.stun
+      o.fall = o.fall || react !== 'flinch'
       o.flash = 0.12
       o.face = (f.face * -1) as 1 | -1
-      o.vx = f.face * d.kb * (breaker ? 2.2 : 1)
-      o.vy = -d.pop * (breaker ? 1.5 : 1)
+      o.vx = f.face * m.kb
+      o.vy = -m.pop
       o.grounded = false
       o.coyote = 0
       o.dropT = 0
-      if (breaker) { o.combo = 0; o.comboT = 0; o.inv = 0.9 }
-      freeze = o.hp <= 0 ? 0.16 : breaker ? 0.14 : kick ? 0.11 : 0.06
-      shake = Math.max(shake, o.hp <= 0 ? 11 : breaker ? 9 : kick ? 6 : 3)
-      sparks.push({ x: clamp(o.x, hb.x0, hb.x1), y: (hb.y0 + hb.y1) / 2, t: 0.18, k: breaker || o.hp <= 0 ? 1.8 : kick ? 1.4 : 1 })
-      const big = o.hp <= 0 || breaker
-      snd(f, kick ? 'kick' : 'punch', big ? 1 : kick ? 0.8 : 0.6)
+      freeze = ko ? 0.16 : big ? 0.12 : 0.03 + m.dmg / 300
+      shake = Math.max(shake, ko ? 11 : big ? 9 : m.dmg / 3)
+      sparks.push({ x: clamp(o.x, hb.x0, hb.x1), y: (hb.y0 + hb.y1) / 2, t: 0.18, k: big ? 1.8 : 1 + m.dmg / 30 })
+      snd(f, m.sfx, big ? 1 : kk ? 0.8 : 0.6)
       snd(o, 'hit', big ? 1 : 0.6)
-      if (o.hp <= 0) { o.vx = f.face * d.kb * 1.8; o.vy = -(d.pop * 1.3 + 100); koFighter(o) }
+      if (ko) { o.vx = f.face * m.kb * 1.8; o.vy = -(m.pop * 1.3 + 100); koFighter(o) }
       break
     }
   }
@@ -456,23 +512,26 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
     f.flash = Math.max(0, f.flash - dt)
     f.inv = Math.max(0, f.inv - dt)
     f.comboT = Math.max(0, f.comboT - dt)
-    f.stun = Math.max(0, f.stun - dt)
+    f.stun = Math.max(f.fall ? 0.1 : 0, f.stun - dt) // a launched fighter stays hurt until they land
+    f.down = Math.max(0, f.down - dt)
     f.coyote = Math.max(0, f.coyote - dt)
     f.jumpBuf = Math.max(0, f.jumpBuf - dt)
     f.dropT = Math.max(0, f.dropT - dt)
     f.bp = Math.max(0, f.bp - dt)
     f.bk = Math.max(0, f.bk - dt)
-    if (inp.punch) f.bp = 0.15
-    if (inp.kick) f.bk = 0.15
+    if (inp.punch) f.bp = 0.25
+    if (inp.kick) f.bk = 0.25
     if (inp.jump) f.jumpBuf = 0.12
     f.throwT = Math.max(0, f.throwT - dt)
     if (f.carry) { f.carryT += dt; f.bp = f.bk = 0 } // hands full: no punching or kicking
 
-    const stunned = f.stun > 0
-    const busy = f.atk !== null
-    if (!stunned && !busy) {
-      if (inp.dir !== 0) f.face = inp.dir > 0 ? 1 : -1
-      if (f.bp > 0 || f.bk > 0) startAtk(f, f.bk > f.bp ? 'kick' : 'punch')
+    const stunned = f.stun > 0 || f.down > 0
+    if (!stunned && !f.atk && inp.dir !== 0) f.face = inp.dir > 0 ? 1 : -1
+    if (!stunned && (f.bp > 0 || f.bk > 0)) {
+      const b: Btn = f.bk > f.bp ? 'kick' : 'punch'
+      const m = f.atk && MOVES[f.atk.name]
+      const nx = m ? (f.atk!.t >= m.cancel ? m.next?.[b] : undefined) : b === 'kick' && inp.down && f.grounded ? 'sweep' : ROOT[b]
+      if (nx) startMove(f, nx)
     }
 
     const maxv = RUN * (f.kind === 'enemy' ? f.runMul : 1) * (f.atk ? 0.15 : 1)
@@ -486,7 +545,7 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
       f.grounded = false
       f.coyote = 0
       f.jumpBuf = 0
-    } else if (!stunned && inp.down && f.grounded && f.onLedge) {
+    } else if (!stunned && !f.atk && inp.down && f.grounded && f.onLedge) {
       f.dropT = 0.18
       f.vy = 140
       f.grounded = false
@@ -498,7 +557,15 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
     f.vy = Math.min(MAX_FALL, f.vy + GRAV * gm * dt)
     f.x += f.vx * dt
     f.y += f.vy * dt
-    f.x = clamp(f.x, 8, world.width - 8)
+    const cx = clamp(f.x, 8, world.width - 8)
+    if (cx !== f.x && f.fall && Math.abs(f.vx) > 350) {
+      f.vx *= -0.5 // wall bounce
+      freeze = Math.max(freeze, 0.05)
+      shake = Math.max(shake, 6)
+      sparks.push({ x: cx, y: f.y - 40, t: 0.18, k: 1.2 })
+      snd(f, 'hit', 0.8)
+    }
+    f.x = cx
 
     let landed = false
     f.onLedge = false
@@ -514,6 +581,7 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
       if (landed) { if (f.vy > 700) snd(f, 'land', clamp((f.vy - 600) / 900, 0.3, 1)); f.vy = 0; f.coyote = 0.1; f.gy = f.y }
     }
     f.grounded = landed
+    if (landed && f.fall) { f.fall = false; f.stun = 0; f.down = f.inv = DOWN }
 
     if (f.atk) processAttack(f, dt)
     if (f.grounded && Math.abs(f.vx) > 60) f.phase += Math.abs(f.vx) * dt * 0.07
@@ -558,7 +626,9 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
     const dy = t.y - f.y
     const ad = Math.abs(dx)
     const sgn = dx >= 0 ? 1 : -1
-    const free = !f.atk && f.stun <= 0
+    const free = !f.atk && f.stun <= 0 && f.down <= 0
+    if (!f.atk) f.plan.length = 0
+    else if (f.plan.length && f.atk.t >= MOVES[f.atk.name].cancel) inp[f.plan.shift()!] = true
     const onFloor = f.y >= world.height - 1
     const lvl = t.gy
 
@@ -599,8 +669,9 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
 
     if (free && f.cd <= 0 && atkGate <= 0 && ad < 80 && Math.abs(dy) < 46) {
       f.face = sgn
-      if (ad > 60 || Math.random() < 0.35) inp.kick = true
-      else inp.punch = true
+      const b: Btn = ad > 60 || Math.random() < 0.35 ? 'kick' : 'punch'
+      inp[b] = true
+      if (Math.random() < 0.35) f.plan = [...TAILS[b][Math.floor(Math.random() * TAILS[b].length)]]
       f.cd = rnd(0.6, 1.3)
       atkGate = 0.3
       f.standoff = rnd(50, 72)
@@ -679,7 +750,7 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
         f.y = Math.max(...r.p.map((p) => p.y))
         f.grounded = r.p.every((p, i) => Math.hypot(p.x - r.q[i].x, p.y - r.q[i].y) < 0.4)
         if (f.kind === 'player' && f.koT > 2) {
-          f.ko = false; f.rag = null; f.hp = 100; f.stun = 0; f.atk = null; f.inv = 1.5
+          f.ko = false; f.rag = null; f.hp = 100; f.stun = 0; f.fall = false; f.atk = null; f.inv = 1.5
           spawn(f)
         }
         continue
@@ -698,8 +769,9 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
 
   function actionOf(f: Fighter) {
     if (f.ko) return 'ko'
+    if (f.down > 0) return 'down'
     if (f.stun > 0) return 'hit'
-    if (f.atk) return f.atk.type
+    if (f.atk) return f.atk.name
     if (f.throwT > 0) return 'throw'
     if (f.carry) return 'carry'
     if (!f.grounded) return f.vy < 0 ? 'jump' : 'fall'
@@ -716,7 +788,7 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
   }
 
   function drawFighter(ctx: CanvasRenderingContext2D, f: Fighter) {
-    if (f.inv > 0 && Math.floor(f.t * 20) % 2 === 0) return
+    if (f.inv > 0 && f.down <= 0 && Math.floor(f.t * 20) % 2 === 0) return
     const j = jointsOf(f)
     const base = f.kind === 'player' ? RED : INK
     const col = f.flash > 0 ? SPARK : base
