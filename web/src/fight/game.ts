@@ -85,6 +85,7 @@ export function start(onExit: () => void) {
     help.style.opacity = '0'
   }
   document.body.append(canvas, hud, help)
+  placeBesideLauncher(hud, help)
 
   const keys = new Set<string>()
   const down = (e: KeyboardEvent) => {
@@ -146,4 +147,15 @@ export function start(onExit: () => void) {
     delete w.__fight
     onExit()
   }
+}
+
+/** When the stickman sits in the right-hand margin, puts the HUD to its left and the controls card
+ *  under it. Launched from the nav, both keep their default spot at the window's top-right corner. */
+function placeBesideLauncher(hud: HTMLElement, help: HTMLElement) {
+  const btn = document.querySelector('[data-fight-launch]')?.getBoundingClientRect()
+  if (!btn) return
+  const columnRight = document.querySelector('main')?.getBoundingClientRect().right ?? 0
+  if (btn.left <= columnRight) return // still in the nav, inside the text column
+  Object.assign(hud.style, { top: `${btn.top + btn.height / 2}px`, right: `${innerWidth - btn.left + 16}px`, transform: 'translateY(-50%)' })
+  Object.assign(help.style, { top: `${hud.getBoundingClientRect().bottom + 12}px`, right: `${innerWidth - btn.right}px` })
 }

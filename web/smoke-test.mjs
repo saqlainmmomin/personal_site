@@ -248,7 +248,10 @@ try {
     assert.equal(await phone.page.locator('[data-fight-launch]').count(), 0, '/ must hide the fight control on phones')
     await phone.context.close()
     const { page: p, context: c, problems } = await open('/', viewports[0][1])
-    await p.waitForTimeout(1500) // let the scroll-reveal settle so it doesn't change main mid-test
+    // The nav (and the stickman in it) shows once the landing has moved into place: scroll to that point.
+    await p.mouse.wheel(0, 700)
+    await p.waitForFunction(() => document.documentElement.dataset.landing === 'open')
+    await p.waitForTimeout(1500) // let the scroll-reveal and nav fade settle so they don't change main mid-test
     const before = await p.evaluate(() => ({ main: document.querySelector('main').innerHTML, overflow: document.documentElement.style.overflow }))
     await p.locator('[data-fight-launch] button').click()
     await p.locator('canvas[data-fight]').waitFor()

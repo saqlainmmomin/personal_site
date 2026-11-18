@@ -1,4 +1,5 @@
 import { EmailCopy } from '@/components/EmailCopy'
+import { Landing } from '@/components/Landing'
 import { Layout, Section } from '@/components/Layout'
 import { WorkCycle } from '@/components/WorkCycle'
 import { contact } from '@/content/contact'
@@ -13,31 +14,38 @@ export default function Home() {
 
   return (
     <Layout>
-      <img src={profile.portrait} alt={profile.portraitAlt} width={96} height={96} className="size-24 rounded-sm border border-line object-cover object-top" />
-      <h1 className="sr-only">{profile.name}</h1>
-      <div className="mt-md max-w-text space-y-xs">
-        {profile.paragraphs.map((p) => (
-          <p key={p}>{p}</p>
-        ))}
-      </div>
+      <Landing
+        intro={
+          <>
+            <img src={profile.portrait} alt={profile.portraitAlt} width={96} height={96} className="size-24 rounded-sm border border-line object-cover object-top" />
+            <h1 className="sr-only">{profile.name}</h1>
+            <div className="mt-md max-w-text space-y-xs">
+              {profile.paragraphs.map((p) => (
+                <p key={p}>{p}</p>
+              ))}
+            </div>
+          </>
+        }
+        contact={
+          <Section id="contact" title="Get in touch" className="mt-lg">
+            <ul className="max-w-text space-y-xs">
+              <li>
+                Email: <EmailCopy email={contact.email} />
+              </li>
+              <li>
+                <a href={linkedin.href} {...external}>
+                  LinkedIn
+                </a>
+              </li>
+              <li>
+                <a href="/cv.pdf">CV (PDF)</a>
+              </li>
+            </ul>
+          </Section>
+        }
+      />
 
-      <Section id="contact" title="Get in touch" className="mt-lg">
-        <ul className="max-w-text space-y-xs">
-          <li>
-            Email: <EmailCopy email={contact.email} />
-          </li>
-          <li>
-            <a href={linkedin.href} {...external}>
-              LinkedIn
-            </a>
-          </li>
-          <li>
-            <a href="/cv.pdf">CV (PDF)</a>
-          </li>
-        </ul>
-      </Section>
-
-      <Section id="work" title="Work">
+      <Section id="work" title="Work" className="mt-lg">
         <p className="text-grey">KPMG · {kpmgTenure}</p>
         <div className="mt-md">
           <WorkCycle />

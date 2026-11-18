@@ -35,6 +35,28 @@ const navLinks: { id: string; label: string; href?: string }[] = [
   { id: 'contact', label: 'Contact' },
 ]
 
+/** Site name on the left, page links on the right. On the homepage, index.css pins it (see Landing.tsx). */
+function Header() {
+  return (
+    <header className="flex flex-wrap items-baseline justify-between gap-x-sm gap-y-xs bg-paper py-md">
+      <a href="/" data-site-name className="font-semibold text-ink no-underline">
+        Saqlain Momin
+      </a>
+      <nav aria-label="Primary">
+        <ul className="label flex gap-sm">
+          {navLinks.map((l) => (
+            <li key={l.id}>
+              <a href={l.href ?? `/#${l.id}`} className="text-grey no-underline hover:text-ink hover:underline">
+                {l.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </header>
+  )
+}
+
 export function Layout({ children }: { children: ReactNode }) {
   useScrollReveal()
   return (
@@ -43,22 +65,7 @@ export function Layout({ children }: { children: ReactNode }) {
         Skip to content
       </a>
       <div className="mx-auto max-w-column px-page">
-        <header className="flex flex-wrap items-baseline justify-between gap-x-sm gap-y-xs py-md">
-          <a href="/" className="font-semibold text-ink no-underline">
-            Saqlain Momin
-          </a>
-          <nav aria-label="Primary">
-            <ul className="label flex gap-sm">
-              {navLinks.map((l) => (
-                <li key={l.id}>
-                  <a href={l.href ?? `/#${l.id}`} className="text-grey no-underline hover:text-ink hover:underline">
-                    {l.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </header>
+        <Header />
         <main id="main">{children}</main>
         <footer className="label mt-2xl border-t border-line py-md text-grey">© 2026 Saqlain Momin · Bangalore</footer>
       </div>
