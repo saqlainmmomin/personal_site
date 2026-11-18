@@ -242,15 +242,12 @@ try {
     await context.close()
   }
 
-  // Fight prototype: only behind /?fight, desktop only; launching breaks lines loose, Esc restores the page.
+  // Fight: stickman in the nav on desktop only; launching breaks lines loose, Esc restores the page.
   {
-    const { page, context } = await open('/', viewports[0][1])
-    assert.equal(await page.locator('[data-fight-launch]').count(), 0, '/ must have no fight control')
-    await context.close()
-    const phone = await open('/?fight', viewports[1][1])
-    assert.equal(await phone.page.locator('[data-fight-launch]').count(), 0, '/?fight must hide the control on phones')
+    const phone = await open('/', viewports[1][1])
+    assert.equal(await phone.page.locator('[data-fight-launch]').count(), 0, '/ must hide the fight control on phones')
     await phone.context.close()
-    const { page: p, context: c, problems } = await open('/?fight', viewports[0][1])
+    const { page: p, context: c, problems } = await open('/', viewports[0][1])
     await p.waitForTimeout(1500) // let the scroll-reveal settle so it doesn't change main mid-test
     const before = await p.evaluate(() => ({ main: document.querySelector('main').innerHTML, overflow: document.documentElement.style.overflow }))
     await p.locator('[data-fight-launch] button').click()
@@ -266,8 +263,8 @@ try {
     assert.equal(after.main, before.main, 'Esc must restore the page text exactly')
     assert.equal(after.overflow, before.overflow, 'Esc must unlock scroll')
     assert.equal(after.canvas, 0, 'Esc must remove the canvas, clones and HUD')
-    assert.deepEqual(problems, [], '/?fight console or network problems')
-    ok(`/?fight: control on desktop only; launch turned ${during.debris} pieces into the arena; Esc flew them home and restored the page`)
+    assert.deepEqual(problems, [], 'fight console or network problems')
+    ok(`fight: control on desktop only; launch turned ${during.debris} pieces into the arena; Esc flew them home and restored the page`)
     await c.close()
   }
 
