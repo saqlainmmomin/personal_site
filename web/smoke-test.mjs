@@ -34,8 +34,10 @@ function walk(dir) {
 // ---------------------------------------------------------------- static checks
 assert.ok(size(join(dist, 'index.html')) > 0, 'web/dist/index.html is missing: run `npm run build` first')
 assert.ok(size(join(dist, 'projects.html')) > 0, 'web/dist/projects.html is missing: projects should be a second Vite entry')
+assert.ok(size(join(dist, 'writing.html')) > 0, 'web/dist/writing.html is missing: writing should be a Vite entry')
 const html = readFileSync(join(dist, 'index.html'), 'utf8')
 const projectsHtml = readFileSync(join(dist, 'projects.html'), 'utf8')
+const writingHtml = readFileSync(join(dist, 'writing.html'), 'utf8')
 const contentFiles = walk(join(root, 'src', 'content')).filter((f) => f.endsWith('.ts'))
 const contentSource = contentFiles.map((f) => readFileSync(f, 'utf8')).join('\n')
 const bundle = walk(join(dist, 'assets'))
@@ -48,6 +50,7 @@ console.log('Static checks')
 assert.match(html, /<title>[^<]*Saqlain Momin[^<]*GRC/, 'Title should name Saqlain Momin and GRC')
 assert.ok(html.includes(`<link rel="canonical" href="${PRODUCTION_ORIGIN}/">`), 'Canonical URL should use the production origin')
 assert.ok(projectsHtml.includes(`<link rel="canonical" href="${PRODUCTION_ORIGIN}/projects">`), '/projects canonical should use the production origin')
+assert.ok(writingHtml.includes(`<link rel="canonical" href="${PRODUCTION_ORIGIN}/writing">`), '/writing canonical should use the production origin')
 assert.ok(html.includes(`content="${PRODUCTION_ORIGIN}/og/og-image.png"`), 'OG image should use the production origin')
 const jsonLd = JSON.parse(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/.exec(html)?.[1] ?? 'null')
 assert.equal(jsonLd?.url, `${PRODUCTION_ORIGIN}/`, 'JSON-LD URL should match the canonical URL')
@@ -55,6 +58,7 @@ assert.ok(size(join(dist, 'og', 'og-image.png')) > 0, 'Missing og/og-image.png')
 assert.match(readFileSync(join(dist, 'robots.txt'), 'utf8'), new RegExp(`Sitemap: ${PRODUCTION_ORIGIN}/sitemap\\.xml`))
 const sitemap = readFileSync(join(dist, 'sitemap.xml'), 'utf8')
 assert.ok(sitemap.includes(`<loc>${PRODUCTION_ORIGIN}/</loc>`) && sitemap.includes(`<loc>${PRODUCTION_ORIGIN}/projects</loc>`), 'Sitemap should list / and /projects')
+assert.ok(sitemap.includes(`<loc>${PRODUCTION_ORIGIN}/writing</loc>`), 'Sitemap should list /writing')
 assert.ok(size(join(dist, 'yozora.html')) > 0 && sitemap.includes(`<loc>${PRODUCTION_ORIGIN}/yozora</loc>`), '/yozora should be a Vite entry listed in the sitemap')
 ok('metadata, canonical, JSON-LD, robots, sitemap')
 
@@ -77,6 +81,12 @@ ok('no confidential names, em dashes or placeholders')
 
 assert.ok(bundle.includes('synthetic demo data'), 'Yozora media must disclose synthetic demo data')
 ok('demo-data disclosure present')
+
+// The fight prototype's physics lib ships in its own lazy chunk, never in the homepage entry.
+const mainChunk = readFileSync(join(dist, /<script type="module" crossorigin src="\/([^"]+)"/.exec(html)[1]), 'utf8')
+assert.ok(!mainChunk.includes('collisionStart'), 'Main chunk must not contain the physics lib')
+assert.ok(bundle.includes('collisionStart'), 'Physics lib should exist as a lazy chunk')
+ok('physics lib is a lazy chunk, not in the main entry')
 
 // ---------------------------------------------------------------- browser checks
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.woff2': 'font/woff2', '.mp4': 'video/mp4', '.pdf': 'application/pdf', '.xml': 'application/xml', '.txt': 'text/plain' }
@@ -129,7 +139,7 @@ const viewports = [
 ]
 
 try {
-  for (const path of ['/', '/projects', '/yozora']) {
+  for (const path of ['/', '/projects', '/writing', '/yozora']) {
     for (const [vw, viewport] of viewports) {
       const label = `${path} @${vw}`
       const { page, context, problems } = await open(path, viewport)
@@ -232,6 +242,35 @@ try {
     await context.close()
   }
 
+  // Fight prototype: only behind /?fight, desktop only; launching breaks lines loose, Esc restores the page.
+  {
+    const { page, context } = await open('/', viewports[0][1])
+    assert.equal(await page.locator('[data-fight-launch]').count(), 0, '/ must have no fight control')
+    await context.close()
+    const phone = await open('/?fight', viewports[1][1])
+    assert.equal(await phone.page.locator('[data-fight-launch]').count(), 0, '/?fight must hide the control on phones')
+    await phone.context.close()
+    const { page: p, context: c, problems } = await open('/?fight', viewports[0][1])
+    await p.waitForTimeout(1500) // let the scroll-reveal settle so it doesn't change main mid-test
+    const before = await p.evaluate(() => ({ main: document.querySelector('main').innerHTML, overflow: document.documentElement.style.overflow }))
+    await p.locator('[data-fight-launch] button').click()
+    await p.locator('canvas[data-fight]').waitFor()
+    await p.waitForFunction(() => window.__fight?.ready(), null, { timeout: 5000 })
+    await p.waitForTimeout(800)
+    const during = await p.evaluate(() => ({ hidden: document.querySelectorAll('[data-fight-hidden]').length, debris: document.querySelectorAll('[data-fight-debris]').length, fighters: window.__fight?.state().length }))
+    assert.ok(during.hidden > 0 && during.debris > 0, `launching should break lines loose: ${JSON.stringify(during)}`)
+    assert.ok(during.fighters >= 2, 'launching should drop in a player and an enemy')
+    await p.keyboard.press('Escape')
+    await p.waitForFunction(() => !window.__fight, null, { timeout: 5000 })
+    const after = await p.evaluate(() => ({ main: document.querySelector('main').innerHTML, overflow: document.documentElement.style.overflow, canvas: document.querySelectorAll('canvas[data-fight], [data-fight-debris], [data-fight-hud]').length }))
+    assert.equal(after.main, before.main, 'Esc must restore the page text exactly')
+    assert.equal(after.overflow, before.overflow, 'Esc must unlock scroll')
+    assert.equal(after.canvas, 0, 'Esc must remove the canvas, clones and HUD')
+    assert.deepEqual(problems, [], '/?fight console or network problems')
+    ok(`/?fight: control on desktop only; launch turned ${during.debris} pieces into the arena; Esc flew them home and restored the page`)
+    await c.close()
+  }
+
   // Video: plays in view only
   {
     const { page, context } = await open('/projects', viewports[0][1])
@@ -264,6 +303,16 @@ try {
     assert.deepEqual(titles, ['Yozora', 'Recon', 'Unshrimp', 'Tell Me How', 'Munshi', 'RL Playground'], `[projects @${vw}] tiles`)
     assert.ok((await page.locator('a[href="/"]').count()) >= 2, 'projects page needs a way back home')
     ok(`projects @${vw}: six tiles; back link present`)
+    await context.close()
+  }
+  // Writing page
+  for (const [vw, viewport] of viewports) {
+    const { page, context } = await open('/writing', viewport)
+    assert.equal(await page.locator('li a[target=_blank]').count(), 5, `[writing @${vw}] five article links`)
+    assert.equal(await page.locator('li time').count(), 5, `[writing @${vw}] five dates`)
+    assert.ok((await page.getByRole('link', { name: 'LinkedIn' }).count()) === 1, `[writing @${vw}] LinkedIn link`)
+    assert.ok((await page.locator('a[href="/"]').count()) >= 2, 'writing page needs a way back home')
+    ok(`writing @${vw}: five notes, LinkedIn link, back link present`)
     await context.close()
   }
   // Yozora story page: six stages, each a product screen at its content height. Analyse, Run

@@ -4,7 +4,6 @@ import { WorkCycle } from '@/components/WorkCycle'
 import { contact } from '@/content/contact'
 import { certifications, degrees, school } from '@/content/credentials'
 import { internship, kpmgTenure } from '@/content/experience'
-import { allNotesHref } from '@/content/notes'
 import { profile } from '@/content/profile'
 
 const external = { target: '_blank', rel: 'noopener' } as const
@@ -76,11 +75,8 @@ export default function Home() {
 
       <Section id="writing" title="Writing">
         <p className="max-w-text text-grey">
-          Short notes on AI agents and what they mean for security controls, on{' '}
-          <a href={allNotesHref} {...external}>
-            LinkedIn
-          </a>
-          .
+          Short notes on AI agents and what they mean for security controls.{' '}
+          <a href="/writing">Read the writing</a>.
         </p>
       </Section>
     </Layout>

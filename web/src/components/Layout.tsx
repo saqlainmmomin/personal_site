@@ -31,7 +31,7 @@ function useScrollReveal() {
 const navLinks: { id: string; label: string; href?: string }[] = [
   { id: 'work', label: 'Work' },
   { id: 'projects', label: 'Projects', href: '/projects' },
-  { id: 'writing', label: 'Writing' },
+  { id: 'writing', label: 'Writing', href: '/writing' },
   { id: 'contact', label: 'Contact' },
 ]
 
