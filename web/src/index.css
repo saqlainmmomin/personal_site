@@ -88,3 +88,26 @@
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: none; }
 }
+
+/* Landing (see Landing.tsx). <html data-landing> steps through intro -> open -> past.
+   The homepage header is pinned throughout: hidden tabs while the intro sits centred, the full header
+   once it lands, and only the stickman once the landing has scrolled away (scrolling back brings it all back). */
+html[data-landing] header { position: sticky; top: 0; z-index: 30; }
+/* Landing.tsx resizes the landing while you scroll; the browser's scroll anchoring would undo that. */
+html[data-landing] { overflow-anchor: none; }
+.landing-pinned { position: sticky; } /* top and height are set in Landing.tsx, below the header */
+.landing-pinned [data-site-name] { will-change: transform; }
+html[data-landing='past'] header:not(:focus-within) { background: transparent; pointer-events: none; }
+html[data-landing='past'] header:not(:focus-within) :is([data-site-name], nav li:not([data-fight-launch])) { opacity: 0; }
+html[data-landing='past'] [data-fight-launch] { pointer-events: auto; }
+/* Past the landing, the stickman slides (same size) out of the text column into the right-hand margin,
+   48px in from the window's edge (the column's right edge is at 50vw + 340px). Too narrow for a margin: it stays put. */
+html[data-landing='past'] [data-fight-launch] { translate: max(0px, calc(50vw - 340px - 48px)) 16px; }
+@media (prefers-reduced-motion: no-preference) {
+  .landing-contact { opacity: 0; transform: translateY(8px); transition: opacity 0.5s ease-out, transform 0.5s ease-out; }
+  .landing-contact.is-shown { opacity: 1; transform: none; }
+  html[data-landing] header, html[data-landing] header :is([data-site-name], nav, nav li) { transition: opacity 0.4s ease-out, background-color 0.4s ease-out; }
+  html[data-landing='intro'] header nav:not(:focus-within) { opacity: 0; pointer-events: none; }
+  /* More specific than the header fade rule above, which would otherwise drop the slide. */
+  html[data-landing] header nav li[data-fight-launch] { transition: opacity 0.4s ease-out, translate 0.9s cubic-bezier(0.22, 0.61, 0.36, 1); }
+}
