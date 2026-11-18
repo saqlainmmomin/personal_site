@@ -15,7 +15,8 @@ export type World = {
   /** Resolves once the text has flown into its arena layout. The shell only steps physics and drops fighters after this. */
   ready: Promise<void>
   /** Knock platform bricks overlapping `r` loose (they become debris) with velocity vx, vy in px/s. */
-  knock(r: Rect, vx: number, vy: number): void
+  /** `blast` skips the throttle and allows more bricks per call (the ladder's shockwave). */
+  knock(r: Rect, vx: number, vy: number, blast?: boolean): void
   /** Copy body positions/angles onto the clones. Called every frame. */
   sync(): void
   /** Fly every piece back to its original spot, then remove clones and unhide the page exactly. The shell clears the engine after. */
@@ -404,9 +405,9 @@ export function buildWorld(engine: Matter.Engine): World {
 
   // 6. Fighting.
   let lastKnock = -1e9
-  function knock(r: Rect, vx: number, vy: number) {
+  function knock(r: Rect, vx: number, vy: number, blast = false) {
     const now = performance.now()
-    if (now - lastKnock < 140) return
+    if (!blast && now - lastKnock < 140) return
     const cx = r.x + r.w / 2, cy = r.y + r.h / 2
     const hits = pieces
       .filter((p) => {
@@ -418,7 +419,7 @@ export function buildWorld(engine: Matter.Engine): World {
     let n = 0
     for (const p of hits) {
       const plat = p.plat!
-      if (n >= 2 || plat.alive <= Math.ceil(plat.total * 0.3)) continue
+      if (n >= (blast ? 12 : 2) || plat.alive <= Math.ceil(plat.total * 0.3)) continue
       p.alive = false
       plat.alive--
       n++

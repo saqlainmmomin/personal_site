@@ -2,6 +2,7 @@
 // Launch: the text flies into an arena, then fighters drop. Esc: fighters fade, text flies home, page is restored.
 import Matter from 'matter-js'
 import { createFighters } from './fighters'
+import { bindHud, exit as exitLadder } from './ladder'
 import { muted, setMuted, unlock } from './sound'
 import { buildWorld } from './world'
 
@@ -9,13 +10,9 @@ const CONTROLS: [string, string][] = [
   ['Move', '← →  or  A D'],
   ['Jump', '↑  W  or  Space'],
   ['Drop down', '↓  or  S'],
-  ['Punch · combo', 'J  J  J'],
-  ['Every third combo: slam', 'J  J  J'],
-  ['Kick · combo', 'K  K  K'],
-  ['Sweep', '↓ + K'],
-  ['Lunge kick', 'J  K'],
-  ['Grab a loose word, throw it', 'L'],
-  ['Leave', 'Esc'],
+  ['Punch', 'J'],
+  ['Kick', 'K'],
+  ['Grab, throw', 'L'],
 ]
 
 const GAME_KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space', 'KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyJ', 'KeyK', 'KeyL'])
@@ -57,6 +54,7 @@ export function start(onExit: () => void) {
     `<button type="button" data-help class="cursor-pointer hover:text-ink">controls</button>` +
     `<button type="button" data-sound class="cursor-pointer hover:text-ink"></button>` +
     `<button type="button" data-close class="cursor-pointer hover:text-ink" aria-label="End the fight">Esc ×</button>`
+  bindHud(hud)
   const soundBtn = hud.querySelector<HTMLButtonElement>('[data-sound]')!
   const label = () => (soundBtn.textContent = muted() ? 'sound off' : 'sound on')
   label()
@@ -131,6 +129,7 @@ export function start(onExit: () => void) {
     removeEventListener('keyup', up)
     removeEventListener('blur', blur)
     keys.clear()
+    exitLadder()
     canvas.style.opacity = '0'
     hud.style.opacity = '0'
     clearTimeout(helpTimer)

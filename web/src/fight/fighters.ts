@@ -2,6 +2,7 @@
 import Matter from 'matter-js'
 import type { World } from './world'
 import { sfx } from './sound'
+import * as ladder from './ladder'
 
 export type FighterState = { kind: 'player' | 'enemy'; x: number; y: number; hp: number; ko: boolean; grounded: boolean; action: string }
 
@@ -16,9 +17,6 @@ export type Fighters = {
   destroy(): void
 }
 
-const INK = '#2B2B2B'
-const RED = '#B42318'
-const SPARK = RED
 const GRAV = 2300
 const RUN = 330
 const JUMP = 930
@@ -176,6 +174,8 @@ type Fighter = {
   cd: number; retreat: number; jumpCd: number; runMul: number; wander: number; wanderT: number
   side: 1 | -1; standoff: number; goal: Plat | null; goalT: number; perch: number; hop: number
   carry: Matter.Body | null; carryT: number; throwT: number; grabCd: number
+  grip: { o: Fighter; t: number } | null // a fighter held overhead
+  fly: { by: Fighter; hit: Set<Fighter>; pvx: number } | null // thrown: a body in flight that hurts its own side
 }
 
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v))
@@ -194,7 +194,7 @@ function poseOf(f: Fighter): Pose {
   const p = basePose(f)
   if (f.stun > 0) return p
   if (f.throwT > 0) return { ...p, lean: 0.3, aF: [1.7, 1.6], aB: [1.3, 1.45] }
-  if (f.carry && !f.atk) return { ...p, aF: [2.75, 3.05], aB: [2.55, 2.95] } // both hands up, holding the word overhead
+  if ((f.carry || f.grip) && !f.atk) return { ...p, aF: [2.75, 3.05], aB: [2.55, 2.95] } // both hands up, holding the word overhead
   return p
 }
 
@@ -346,7 +346,7 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
       atk: null, q: vec(GUARD), w: vec(GUARD).map(() => 0), hurt: 'high', n3: 0, down: 0, fall: false, plan: [], phase: 0, t: Math.random() * 10, rag: null,
       cd: rnd(0.8, 1.6), retreat: 0, jumpCd: 0, runMul: rnd(0.6, 0.82), wander: 0, wanderT: 0,
       side: Math.random() < 0.5 ? 1 : -1, standoff: rnd(50, 72), goal: null, goalT: 0, perch: 0, hop: rnd(1.5, 3.5),
-      carry: null, carryT: 0, throwT: 0, grabCd: rnd(3, 7),
+      carry: null, carryT: 0, throwT: 0, grabCd: rnd(3, 7), grip: null, fly: null,
     }
     const pl = list.find((o) => o.kind === 'player')
     spawn(f, kind === 'enemy' ? pl?.x : undefined)
@@ -364,6 +364,7 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
 
   /** Let go of a carried word (hit, KO, exit): collisions come back and it drops. */
   function dropCarry(f: Fighter) {
+    if (f.grip) { const o = f.grip.o; f.grip = null; o.vx = f.vx; o.vy = -200; o.stun = 0.4 } // a held fighter slips free
     const b = f.carry
     if (!b) return
     f.carry = null
@@ -380,6 +381,7 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
     f.atk = null
     f.rag = makeRagdoll(jointsOf(f), f.vx, f.vy)
     snd(f, 'ko')
+    if (f.kind === 'enemy') ladder.kill(f.x, f.y - 40, world)
     if (f.kind === 'enemy' && !list.some((o) => o !== f && o.kind === 'enemy' && !o.ko)) {
       // last enemy down: slow-mo, heavy hitstop, big shake, red burst
       slowAt = performance.now()
@@ -392,7 +394,22 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
   }
 
   function tryGrab(f: Fighter): boolean {
-    if (f.carry || f.ko || f.stun > 0 || f.atk) return false
+    if (f.carry || f.grip || f.ko || f.stun > 0 || f.atk) return false
+    // an opponent right in front beats any word
+    const v = list.find((o) => o.kind !== f.kind && !o.ko && o.inv <= 0 && !o.fly && !heldBy(o) && (o.x - f.x) * f.face > -4 && Math.abs(o.x - f.x) < 46 && Math.abs(o.y - f.y) < 40)
+    if (v) {
+      dropCarry(v)
+      v.atk = null
+      v.hurt = 'held'
+      v.stun = 2
+      v.fall = true
+      v.vx = v.vy = 0
+      v.face = (f.face * -1) as 1 | -1
+      f.grip = { o: v, t: 0 }
+      f.grabCd = rnd(8, 14)
+      snd(f, 'grab')
+      return true
+    }
     const pts = [{ x: f.x, y: f.y - 6 }, { x: f.x + f.face * 20, y: f.y - 40 }]
     let best: Matter.Body | null = null
     let bd = 60
@@ -436,6 +453,92 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
     projectiles.push({ b, owner: f, t: 0, hit: new Set(), pvx: v.x, pvy: v.y, pspd: Math.hypot(v.x, v.y) * 60 })
     f.throwT = 0.22
     snd(f, 'throw')
+  }
+
+  /** Hold the victim overhead; let go in a throw after 1.5s. */
+  function holdGrip(f: Fighter, dt: number) {
+    const g = f.grip!
+    if (g.o.ko) { f.grip = null; return }
+    g.t += dt
+    const j = jointsOf(f)
+    g.o.x = clamp((j.hdF.x + j.hdB.x) / 2, 8, world.width - 8)
+    g.o.y = Math.min(j.hdF.y, j.hdB.y) + 4
+  }
+
+  function throwGrip(f: Fighter, up: boolean) {
+    const o = f.grip!.o
+    f.grip = null
+    o.x = clamp(f.x + f.face * 18, 8, world.width - 8)
+    o.y = f.y - 50
+    o.vx = f.face * 820 + f.vx * 0.4
+    o.vy = up ? -820 : -320
+    o.hurt = 'high'
+    o.stun = 0.5
+    o.fall = true
+    o.grounded = false
+    o.fly = { by: f, hit: new Set(), pvx: o.vx }
+    f.throwT = 0.22
+    snd(f, 'throw')
+  }
+
+  /** A thrown fighter hurts the others on its own side in flight, and itself on a wall or the floor. */
+  function updateFlights() {
+    for (const o of list) {
+      const fl = o.fly
+      if (!fl) continue
+      const k = fl.by.kind === 'enemy' ? 0.75 : 1
+      const hurt = (t: Fighter, dmg: number) => {
+        t.hp = Math.max(0, t.hp - dmg * k)
+        t.flash = 0.12
+        freeze = t.hp <= 0 ? 0.16 : 0.08
+        sparks.push({ x: t.x, y: t.y - 40, t: 0.18, k: 1.6 })
+        snd(t, 'hit', 0.9)
+        if (t.hp <= 0) koFighter(t)
+      }
+      if (o.ko || heldBy(o)) { o.fly = null; continue }
+      if (!o.fall) { // landed
+        o.fly = null
+        hurt(o, 12)
+        shake = Math.max(shake, 8)
+        sfx('boom', 0.7)
+        continue
+      }
+      if (Math.abs(fl.pvx) > 350 && o.vx * fl.pvx < 0) { // bounced off a wall
+        const before = world.debris.length
+        world.knock({ x: o.x - 30, y: o.y - 70, w: 60, h: 70 }, fl.pvx * 0.8, -100)
+        if (world.debris.length > before) sfx('knock', 1)
+        hurt(o, 10)
+        shake = Math.max(shake, 8)
+        sfx('boom', 0.8)
+      }
+      fl.pvx = o.vx
+      if (Math.abs(o.vx) < 150) continue
+      for (const t of list) {
+        if (t === o || t.kind !== o.kind || t.ko || t.inv > 0 || fl.hit.has(t)) continue
+        if (Math.abs(t.x - o.x) > HURT_W * 2 || o.y < t.y - HURT_H || o.y - HURT_H > t.y) continue
+        fl.hit.add(t)
+        const dir = o.vx >= 0 ? 1 : -1
+        t.combo = t.comboT > 0 ? t.combo + 1 : 1
+        t.comboT = 1
+        t.atk = null
+        dropCarry(t)
+        t.hurt = 'high'
+        jolt(t, 14)
+        t.stun = 0.5
+        t.fall = true
+        t.face = (dir * -1) as 1 | -1
+        t.vx = dir * 450
+        t.vy = -480
+        t.grounded = false
+        t.coyote = 0
+        t.dropT = 0
+        o.vx *= 0.6
+        shake = Math.max(shake, 8)
+        sfx('knock', 0.9)
+        hurt(t, 14)
+        if (t.hp <= 0) { t.vx = dir * 600; t.vy = -800 }
+      }
+    }
   }
 
   function updateProjectiles(dt: number) {
@@ -617,7 +720,7 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
     if (inp.kick) f.bk = 0.25
     if (inp.jump) f.jumpBuf = 0.12
     f.throwT = Math.max(0, f.throwT - dt)
-    if (f.carry) { f.carryT += dt; f.bp = f.bk = 0 } // hands full: no punching or kicking
+    if (f.carry || f.grip) { f.carryT += dt; f.bp = f.bk = 0 } // hands full: no punching or kicking
 
     const stunned = f.stun > 0 || f.down > 0
     if (!stunned && !f.atk && inp.dir !== 0) f.face = inp.dir > 0 ? 1 : -1
@@ -776,6 +879,11 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
     if (f.grounded && f.jumpCd <= 0 && dy < -50 && ad < 220 && !f.goal) { inp.jump = true; f.jumpCd = rnd(0.5, 1.1) }
     if (f.grounded && f.onLedge && dy > 60 && ad < 110 && f.perch <= 0) inp.down = true
     // now and then pick up a loose word and lob it
+    if (f.grip) { f.face = sgn; if (f.grip.t > 0.6) inp.grab = true; return inp }
+    if (free && f.grabCd <= 0 && f.cd <= 0 && ad < 40 && Math.abs(dy) < 36 && t.inv <= 0 && Math.random() < 0.03) {
+      f.face = sgn; inp.grab = true; f.cd = rnd(1.5, 2.5); atkGate = 0.5
+      return inp
+    }
     if (f.carry) {
       if ((f.carryT > 0.7 && ad < 520 && Math.abs(dy) < 90) || f.carryT > 6) { f.face = sgn; inp.grab = true }
     } else {
@@ -853,17 +961,21 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
       const inp = f.kind === 'player' ? { ...pIn } : aiInput(f, dt)
       if (f.carry) {
         if (inp.grab || (f.kind === 'player' && inp.punch)) { throwWord(f, inp.up); inp.punch = false }
+      } else if (f.grip) {
+        if (inp.grab || f.grip.t > 1.5) throwGrip(f, inp.up)
       } else if (inp.grab) tryGrab(f)
       step(f, dt, inp)
       spring(f, dt)
       if (f.carry) holdCarry(f)
+      if (f.grip) holdGrip(f, dt)
     }
+    updateFlights()
     updateProjectiles(dt)
     separate(dt)
     for (let i = sparks.length - 1; i >= 0; i--) if ((sparks[i].t -= dt) <= 0) sparks.splice(i, 1)
   }
 
-  const heldBy = (f: Fighter) => list.find((o) => o.atk?.vic === f)
+  const heldBy = (f: Fighter) => list.find((o) => o.atk?.vic === f || o.grip?.o === f)
 
   function actionOf(f: Fighter) {
     if (f.ko) return 'ko'
@@ -889,8 +1001,9 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
   function drawFighter(ctx: CanvasRenderingContext2D, f: Fighter) {
     if (f.inv > 0 && f.down <= 0 && Math.floor(f.t * 20) % 2 === 0) return
     const j = jointsOf(f)
-    const base = f.kind === 'player' ? RED : INK
-    const col = f.flash > 0 ? SPARK : base
+    const pal = ladder.palette()
+    const base = f.kind === 'player' ? pal.player : pal.enemy
+    const col = f.flash > 0 ? pal.spark : base
     ctx.strokeStyle = col
     ctx.fillStyle = col
     ctx.lineWidth = f.flash > 0 ? 5.5 : 4
@@ -924,13 +1037,13 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
     for (const f of list) if (f.ko) drawFighter(ctx, f)
     for (const f of list) if (!f.ko && f.kind === 'enemy') drawFighter(ctx, f)
     for (const f of list) if (!f.ko && f.kind === 'player') drawFighter(ctx, f)
-    ctx.strokeStyle = SPARK
+    ctx.strokeStyle = ladder.palette().spark
     ctx.lineWidth = 2
     ctx.lineCap = 'round'
     for (const s of sparks) {
       const k = 1 - s.t / 0.18
       const m = s.k
-      ctx.strokeStyle = SPARK
+      ctx.strokeStyle = ladder.palette().spark
       ctx.lineWidth = 2.5
       ctx.beginPath()
       for (let i = 0; i < 8; i++) {
@@ -939,7 +1052,7 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
         ctx.lineTo(s.x + Math.cos(a) * (13 + k * 16) * m, s.y + Math.sin(a) * (13 + k * 16) * m)
       }
       ctx.stroke()
-      ctx.strokeStyle = INK
+      ctx.strokeStyle = ladder.palette().enemy
       ctx.lineWidth = 1.8
       ctx.beginPath()
       for (let i = 0; i < 5; i++) {
@@ -957,7 +1070,7 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
       const { x, y } = bursts[i]
       ctx.save()
       ctx.globalAlpha = 1 - u
-      ctx.strokeStyle = RED
+      ctx.strokeStyle = ladder.palette().spark
       ctx.lineCap = 'round'
       ctx.lineWidth = 5 * (1 - u) + 1
       ctx.beginPath()
@@ -993,6 +1106,18 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
     return 1
   }
 
+  if (import.meta.env.DEV) {
+    // test hook: KO the live enemy nearest the player, as if a hit landed
+    ;(window as unknown as { __fightKO?: () => void }).__fightKO = () => {
+      const pl = list.find((o) => o.kind === 'player')
+      const t = list.filter((o) => o.kind === 'enemy' && !o.ko).sort((a, b) => Math.abs(a.x - (pl?.x ?? 0)) - Math.abs(b.x - (pl?.x ?? 0)))[0]
+      if (!t) return
+      t.hp = 0
+      t.vx = (pl?.face ?? 1) * 600; t.vy = -700
+      koFighter(t)
+    }
+  }
+
   return {
     timeScale,
     add,
@@ -1001,6 +1126,8 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
     state: () => list.map((f) => ({ kind: f.kind, x: f.x, y: f.y, hp: f.hp, ko: f.ko, grounded: f.grounded, action: actionOf(f) })),
     destroy() {
       for (const f of list) dropCarry(f)
+      ladder.reset()
+      delete (window as unknown as { __fightKO?: unknown }).__fightKO
       list.length = 0; sparks.length = 0; projectiles.length = 0; bursts.length = 0; slowAt = 0; respawnAt = 0
     },
   }
