@@ -10,6 +10,7 @@ const CONTROLS: [string, string][] = [
   ['Jump', '↑  W  or  Space'],
   ['Drop down', '↓  or  S'],
   ['Punch · combo', 'J  J  J'],
+  ['Every third combo: slam', 'J  J  J'],
   ['Kick · combo', 'K  K  K'],
   ['Sweep', '↓ + K'],
   ['Lunge kick', 'J  K'],
