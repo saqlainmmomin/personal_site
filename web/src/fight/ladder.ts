@@ -56,6 +56,7 @@ function paintHud() {
 /** Hover colour comes from a tag (inline styles can't express :hover); removed in reset. */
 export function bindHud(el: HTMLElement) {
   hud = el
+  void document.fonts.load("900 1em 'Big Shoulders Display'") // fetch the numeral face at fight start so kill 1 doesn't swap mid-wipe
   if (!hudStyle) {
     hudStyle = document.createElement('style')
     hudStyle.dataset.fightLadder = ''
@@ -72,8 +73,8 @@ function makeLayer(p: Palette, n: number) {
   const num = document.createElement('div')
   const size = Math.min(40 + (n - 1) * 3, 70) // vh: grows a little per kill, capped
   num.textContent = String(n)
-  // light italic Garamond reads as a watermark rather than a slab; it drifts in after the wipe instead of being stamped
-  num.style.cssText = `font-family:'EB Garamond',Georgia,serif;font-style:italic;font-weight:400;font-size:${size}vh;line-height:1;letter-spacing:-0.02em;color:${p.num};opacity:${NUM_OPACITY};user-select:none`
+  // heavy condensed figures at low opacity read as a poster behind the arena; they drift in after the wipe instead of being stamped
+  num.style.cssText = `font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:${size}vh;line-height:0.8;letter-spacing:0.01em;color:${p.num};opacity:${NUM_OPACITY};user-select:none`
   el.appendChild(num)
   document.body.appendChild(el)
   if (!reduced())
