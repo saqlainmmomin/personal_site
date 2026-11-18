@@ -9,13 +9,9 @@ const CONTROLS: [string, string][] = [
   ['Move', '← →  or  A D'],
   ['Jump', '↑  W  or  Space'],
   ['Drop down', '↓  or  S'],
-  ['Punch · combo', 'J  J  J'],
-  ['Every third combo: slam', 'J  J  J'],
-  ['Kick · combo', 'K  K  K'],
-  ['Sweep', '↓ + K'],
-  ['Lunge kick', 'J  K'],
-  ['Grab a loose word, throw it', 'L'],
-  ['Leave', 'Esc'],
+  ['Punch', 'J'],
+  ['Kick', 'K'],
+  ['Grab, throw', 'L'],
 ]
 
 const GAME_KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space', 'KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyJ', 'KeyK', 'KeyL'])
