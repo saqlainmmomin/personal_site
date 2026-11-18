@@ -2,6 +2,7 @@
 import Matter from 'matter-js'
 import type { World } from './world'
 import { sfx } from './sound'
+import * as ladder from './ladder'
 
 export type FighterState = { kind: 'player' | 'enemy'; x: number; y: number; hp: number; ko: boolean; grounded: boolean; action: string }
 
@@ -16,9 +17,6 @@ export type Fighters = {
   destroy(): void
 }
 
-const INK = '#2B2B2B'
-const RED = '#B42318'
-const SPARK = RED
 const GRAV = 2300
 const RUN = 330
 const JUMP = 930
@@ -383,6 +381,7 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
     f.atk = null
     f.rag = makeRagdoll(jointsOf(f), f.vx, f.vy)
     snd(f, 'ko')
+    if (f.kind === 'enemy') ladder.kill(f.x, f.y - 40, world)
     if (f.kind === 'enemy' && !list.some((o) => o !== f && o.kind === 'enemy' && !o.ko)) {
       // last enemy down: slow-mo, heavy hitstop, big shake, red burst
       slowAt = performance.now()
@@ -1002,8 +1001,9 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
   function drawFighter(ctx: CanvasRenderingContext2D, f: Fighter) {
     if (f.inv > 0 && f.down <= 0 && Math.floor(f.t * 20) % 2 === 0) return
     const j = jointsOf(f)
-    const base = f.kind === 'player' ? RED : INK
-    const col = f.flash > 0 ? SPARK : base
+    const pal = ladder.palette()
+    const base = f.kind === 'player' ? pal.player : pal.enemy
+    const col = f.flash > 0 ? pal.spark : base
     ctx.strokeStyle = col
     ctx.fillStyle = col
     ctx.lineWidth = f.flash > 0 ? 5.5 : 4
@@ -1037,13 +1037,13 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
     for (const f of list) if (f.ko) drawFighter(ctx, f)
     for (const f of list) if (!f.ko && f.kind === 'enemy') drawFighter(ctx, f)
     for (const f of list) if (!f.ko && f.kind === 'player') drawFighter(ctx, f)
-    ctx.strokeStyle = SPARK
+    ctx.strokeStyle = ladder.palette().spark
     ctx.lineWidth = 2
     ctx.lineCap = 'round'
     for (const s of sparks) {
       const k = 1 - s.t / 0.18
       const m = s.k
-      ctx.strokeStyle = SPARK
+      ctx.strokeStyle = ladder.palette().spark
       ctx.lineWidth = 2.5
       ctx.beginPath()
       for (let i = 0; i < 8; i++) {
@@ -1052,7 +1052,7 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
         ctx.lineTo(s.x + Math.cos(a) * (13 + k * 16) * m, s.y + Math.sin(a) * (13 + k * 16) * m)
       }
       ctx.stroke()
-      ctx.strokeStyle = INK
+      ctx.strokeStyle = ladder.palette().enemy
       ctx.lineWidth = 1.8
       ctx.beginPath()
       for (let i = 0; i < 5; i++) {
@@ -1070,7 +1070,7 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
       const { x, y } = bursts[i]
       ctx.save()
       ctx.globalAlpha = 1 - u
-      ctx.strokeStyle = RED
+      ctx.strokeStyle = ladder.palette().spark
       ctx.lineCap = 'round'
       ctx.lineWidth = 5 * (1 - u) + 1
       ctx.beginPath()
@@ -1106,6 +1106,18 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
     return 1
   }
 
+  if (import.meta.env.DEV) {
+    // test hook: KO the live enemy nearest the player, as if a hit landed
+    ;(window as unknown as { __fightKO?: () => void }).__fightKO = () => {
+      const pl = list.find((o) => o.kind === 'player')
+      const t = list.filter((o) => o.kind === 'enemy' && !o.ko).sort((a, b) => Math.abs(a.x - (pl?.x ?? 0)) - Math.abs(b.x - (pl?.x ?? 0)))[0]
+      if (!t) return
+      t.hp = 0
+      t.vx = (pl?.face ?? 1) * 600; t.vy = -700
+      koFighter(t)
+    }
+  }
+
   return {
     timeScale,
     add,
@@ -1114,6 +1126,8 @@ export function createFighters(world: World, engine: Matter.Engine): Fighters {
     state: () => list.map((f) => ({ kind: f.kind, x: f.x, y: f.y, hp: f.hp, ko: f.ko, grounded: f.grounded, action: actionOf(f) })),
     destroy() {
       for (const f of list) dropCarry(f)
+      ladder.reset()
+      delete (window as unknown as { __fightKO?: unknown }).__fightKO
       list.length = 0; sparks.length = 0; projectiles.length = 0; bursts.length = 0; slowAt = 0; respawnAt = 0
     },
   }
