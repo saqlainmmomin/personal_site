@@ -8,3 +8,5 @@ createRoot(document.getElementById('root')!).render(
     <Home />
   </StrictMode>,
 )
+
+void import('./fight/launch') // tiny lazy chunk: adds the stickman to the nav on desktop; the game itself loads on click
