@@ -156,5 +156,8 @@ function placeBesideLauncher(hud: HTMLElement, help: HTMLElement) {
   const columnRight = document.querySelector('main')?.getBoundingClientRect().right ?? 0
   if (btn.left <= columnRight) return // still in the nav, inside the text column
   Object.assign(hud.style, { top: `${btn.top + btn.height / 2}px`, right: `${innerWidth - btn.left + 16}px`, transform: 'translateY(-50%)' })
-  Object.assign(help.style, { top: `${hud.getBoundingClientRect().bottom + 12}px`, right: `${innerWidth - btn.right}px` })
+  // Under the HUD, or above it when launched from low on the screen (the Projects footer).
+  const bar = hud.getBoundingClientRect()
+  const below = bar.bottom + 12 + help.offsetHeight <= innerHeight
+  Object.assign(help.style, { top: `${below ? bar.bottom + 12 : bar.top - 12 - help.offsetHeight}px`, right: `${innerWidth - btn.right}px` })
 }

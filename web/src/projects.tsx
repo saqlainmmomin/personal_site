@@ -8,3 +8,5 @@ createRoot(document.getElementById('root')!).render(
     <Projects />
   </StrictMode>,
 )
+
+void import('./fight/drop') // the stickman in the nav, which falls to the footer on the first scroll

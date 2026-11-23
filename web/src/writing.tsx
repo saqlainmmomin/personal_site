@@ -8,3 +8,5 @@ createRoot(document.getElementById('root')!).render(
     <Writing />
   </StrictMode>,
 )
+
+void import('./fight/launch') // the stickman in the nav, as on the homepage
