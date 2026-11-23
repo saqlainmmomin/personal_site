@@ -119,3 +119,8 @@ html[data-landing='past'] [data-fight-launch] { translate: max(0px, calc(50vw - 
   /* More specific than the header fade rule above, which would otherwise drop the slide. */
   html[data-landing] header nav li[data-fight-launch] { transition: opacity 0.4s ease-out, translate 0.9s cubic-bezier(0.22, 0.61, 0.36, 1); }
 }
+
+/* Projects: the stickman lands at the right end of the footer, in the same right-hand margin spot
+   as on the homepage (see drop.ts). */
+footer:has([data-fight-launch]) { position: relative; }
+footer [data-fight-launch] { position: absolute; right: 0; top: 50%; z-index: 40; translate: max(0px, calc(50vw - 340px - 48px)) -50%; }

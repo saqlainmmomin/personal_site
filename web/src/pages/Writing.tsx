@@ -1,9 +1,11 @@
 import { Layout } from '@/components/Layout'
+import { usePinnedHeader } from '@/components/usePinnedHeader'
 import { allNotesHref, notes } from '@/content/notes'
 
 const external = { target: '_blank', rel: 'noopener' } as const
 
 export default function Writing() {
+  usePinnedHeader()
   return (
     <Layout>
       <p className="label">
